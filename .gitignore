@@ -16,4 +16,8 @@ public/
 .gemini/
 
 # Logs
-*.logNEWS_POST.md
+*.log
+
+# Scripts and Temporary files
+NEWS_POST.md
+import_publications.sh
