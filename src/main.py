@@ -38,7 +38,7 @@ def deploy():
         logger.error(f"Deployment failed: {e}")
 
 def main():
-    parser = argparse.ArgumentParser(description="BiblioAssistant Pipeline")
+    parser = argparse.ArgumentParser(description="BiblioAssistant Pipeline (https://github.com/bitic/biblioassistant/)")
     parser.add_argument("--deploy", action="store_true", help="Deploy to remote server after generation")
     parser.add_argument("--force-all", action="store_true", help="Ignore 'seen' DB (use with caution)")
     parser.add_argument("--generate-only", action="store_true", help="Skip fetch/filter/synthesize and only generate the site")

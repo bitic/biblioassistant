@@ -1,6 +1,6 @@
-# BiblioAssistant (SCRC)
+# [BiblioAssistant](https://github.com/bitic/biblioassistant/)
 
-BiblioAssistant (Sistema de Curació i Resum Científic) is an automated pipeline designed for scientific and technological surveillance. It filters high volumes of daily publications and generates high-value summaries for researchers, with a focus on hydrology, climate, and meteorology. The selection is specifically tailored to the research interests of the [Hydrology and Climate Change](https://observatoriebre.gencat.cat) research group at the [Ebro Observatory](https://observatoriebre.gencat.cat).
+[BiblioAssistant](https://github.com/bitic/biblioassistant/) is an automated pipeline designed for scientific and technological surveillance. It filters high volumes of daily publications and generates high-value summaries for researchers, with a focus on hydrology, climate, and meteorology. The selection is specifically tailored to the research interests of the [Hydrology and Climate Change](https://observatoriebre.gencat.cat) research group at the [Ebro Observatory](https://observatoriebre.gencat.cat).
 
 ## Features
 

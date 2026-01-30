@@ -1,4 +1,4 @@
-# Relevance Context for BiblioAssistant
+# Relevance Context for [BiblioAssistant](https://github.com/bitic/biblioassistant/)
 
 ## Target Journals (RSS Candidates)
 1.  **Water Resources Research:** `https://agupubs.onlinelibrary.wiley.com/feed/19447973/most-recent`

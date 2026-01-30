@@ -1,6 +1,6 @@
-# Development Plan: BiblioAssistant (SCRC)
+# Development Plan: [BiblioAssistant](https://github.com/bitic/biblioassistant/)
 
-This document outlines the iterative development phases for the BiblioAssistant automated scientific curation system.
+This document outlines the iterative development phases for the [BiblioAssistant](https://github.com/bitic/biblioassistant/) automated scientific curation system.
 
 ## Phase 1: Foundation & Project Structure
 - [x] **Directory Layout:** Create `src/` directory for code and `data/` for persistence.

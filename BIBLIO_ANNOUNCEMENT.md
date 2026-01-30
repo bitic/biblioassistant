@@ -1,8 +1,8 @@
-# Naixement de BiblioAssistant i biblio.quintanasegui.com
+# Naixement de [BiblioAssistant](https://github.com/bitic/biblioassistant/) i biblio.quintanasegui.com
 
-Avui, 29 de gener de 2026, he posat en marxa **BiblioAssistant** (SCRC - Sistema de Curació i Resum Científic), un projecte personal per automatitzar la vigilància tecnològica i científica en els àmbits de la hidrologia, el clima i la meteorologia. Amb aquest sistema, també neix el portal **[biblio.quintanasegui.com](https://biblio.quintanasegui.com)**, on publicaré els resums generats automàticament.
+Avui, 29 de gener de 2026, he posat en marxa **[BiblioAssistant](https://github.com/bitic/biblioassistant/)**, un projecte personal per automatitzar la vigilància tecnològica i científica en els àmbits de la hidrologia, el clima i la meteorologia. Amb aquest sistema, també neix el portal **[biblio.quintanasegui.com](https://biblio.quintanasegui.com)**, on publicaré els resums generats automàticament.
 
-### Com funciona BiblioAssistant?
+### Com funciona [BiblioAssistant](https://github.com/bitic/biblioassistant/)?
 
 El sistema funciona com una "cascada de filtratge" per gestionar el gran volum de publicacions diàries sense morir en l'intent ni disparar els costos de computació:
 

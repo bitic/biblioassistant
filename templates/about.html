@@ -6,18 +6,23 @@
 <section>
     <h2>About this Project</h2>
     <p>
-        <strong>BiblioAssistant</strong> is an automated scientific curation system designed to filter and summarize 
+        <strong><a href="https://github.com/bitic/biblioassistant/" target="_blank" rel="noopener noreferrer">BiblioAssistant</a></strong> is an automated scientific curation system designed to filter and summarize 
         research articles in the fields of <strong>hydrology, climate, and meteorology</strong>. 
         The selection is specifically tailored to the research interests of the 
         <strong><a href="https://observatoriebre.gencat.cat" target="_blank" rel="noopener noreferrer">Hydrology and Climate Change</a></strong> 
         research group at the <strong><a href="https://observatoriebre.gencat.cat" target="_blank" rel="noopener noreferrer">Ebro Observatory</a></strong>.
     </p>
 
+    <p>
+        The project is <strong>open source</strong> and the code is <strong>publicly available</strong> on 
+        <strong><a href="https://github.com/bitic/biblioassistant/" target="_blank" rel="noopener noreferrer">GitHub</a></strong>.
+    </p>
+
     <h3>How it Works</h3>
     <p>The system operates through a specialized pipeline:</p>
     <ol>
         <li><strong>Ingestion:</strong> It monitors scientific literature using the <strong><a href="https://openalex.org" target="_blank" rel="noopener noreferrer">OpenAlex API</a></strong>. We are deeply grateful to OpenAlex for providing free, open access to their massive database of scholarly works.</li>
-        <li><strong>Discovery & Learning:</strong> The system proactively searches for new papers based on keywords, citations of existing research, and specific journals. Notably, BiblioAssistant <strong>self-learns</strong>: if a journal or an author appears in at least three relevant papers, the system automatically adds them to its permanent watchlist.</li>
+        <li><strong>Discovery & Learning:</strong> The system proactively searches for new papers based on keywords, citations of existing research, and specific journals. Notably, <strong><a href="https://github.com/bitic/biblioassistant/" target="_blank" rel="noopener noreferrer">BiblioAssistant</a></strong> <strong>self-learns</strong>: if a journal or an author appears in at least three relevant papers, the system automatically adds them to its permanent watchlist.</li>
         <li><strong>Relevance Filtering:</strong> A local Large Language Model (LLM) analyzes titles and abstracts to identify papers relevant to the specific research interests of the <strong>Hydrology and Climate Change team</strong> at the <strong><a href="https://observatoriebre.gencat.cat" target="_blank" rel="noopener noreferrer">Ebro Observatory</a></strong> (e.g., Land Surface Models, Droughts, Floods in the Mediterranean region).</li>
         <li><strong>Synthesis:</strong> Relevant papers are processed by an advanced LLM (e.g., DeepSeek-R1 locally or **Gemini 1.5 Flash** via API) to generate structured "Extended Cards". These summaries extract key information such as methodology, study configuration, main results, and funding sources.</li>
         <li><strong>Presentation:</strong> The summaries are compiled into this static website for easy access and reading.</li>
