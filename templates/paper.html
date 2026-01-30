@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - BiblioAssistant{% endblock %}
+
+{% block content %}
+<article>
+    <!-- Content is already HTML converted from Markdown -->
+    {{ content | safe }}
+    
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+        <p>
+            <strong>Original Source:</strong> 
+            <a href="{{ original_link }}" target="_blank" rel="noopener noreferrer">{{ original_link }}</a>
+        </p>
+    </div>
+</article>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Recent Summaries - BiblioAssistant{% endblock %}
+
+{% block content %}
+    <p style="font-size: 1.1em; color: var(--text-color); line-height: 1.5; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+        This website is a curated collection of automated summaries of research articles in <strong>hydrology, climate, and meteorology</strong>. 
+        The selection is specifically tailored to the research interests of the 
+        <strong><a href="https://observatoriebre.gencat.cat" target="_blank" rel="noopener noreferrer">Hydrology and Climate Change</a></strong> 
+        research group at the <strong><a href="https://observatoriebre.gencat.cat" target="_blank" rel="noopener noreferrer">Ebro Observatory</a></strong>.
+    </p>
+
+    <h2>Recent Summaries</h2>
+    
+    {% for paper in papers %}
+    <div class="paper-item">
+        <a href="{{ paper.rel_path }}" class="paper-title">{{ paper.title }}</a>
+        <div class="meta">
+            <span>Published on {{ paper.date }}</span>
+        </div>
+        <div class="paper-preview">
+            {{ paper.preview }}
+        </div>
+        <div style="margin-top: 10px;">
+            <a href="{{ paper.rel_path }}" style="font-size: 0.9em; font-family: var(--font-sans); text-transform: uppercase;">Read Summary &rarr;</a>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <p><a href="archive.html">View all archives &rarr;</a></p>
+{% endblock %}

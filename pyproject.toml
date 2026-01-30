@@ -1,0 +1,18 @@
+[project]
+name = "biblioassistant"
+version = "0.1.0"
+description = "Automated scientific curation system for hydrology, climate, and meteorology."
+readme = "README.md"
+license = { text = "GPL-3.0-only" }
+requires-python = ">=3.14"
+dependencies = [
+    "feedparser>=6.0.12",
+    "google-genai>=1.60.0",
+    "google-generativeai>=0.8.6",
+    "jinja2>=3.1.6",
+    "markdown2>=2.5.4",
+    "pymupdf>=1.26.7",
+    "python-dateutil>=2.9.0.post0",
+    "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
+]

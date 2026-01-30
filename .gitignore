@@ -1,0 +1,19 @@
+# Environments
+.venv/
+__pycache__/
+*.pyc
+
+# Data & Persistence
+data/db.sqlite3
+data/papers/
+data/summaries/
+
+# Generated Site
+public/
+
+# Secrets
+.env
+.gemini/
+
+# Logs
+*.log

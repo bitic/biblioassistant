@@ -1,0 +1,1 @@
+for doi in 10.1029/2020WR029249 10.1016/j.jhydrol.2025.133086 10.1016/j.jhydrol.2025.134292 10.1016/j.envsoft.2025.106824 10.1002/vzj2.70047 10.3390/rs16193699 10.1029/2022RG000801 10.1029/2023WR034506 10.1007/s00271-022-00789-9 10.3390/agronomy14091920; do uv run python -m src.main --add-doi $doi; done; uv run python -m src.main --generate-only --deploy

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Archive - BiblioAssistant{% endblock %}
+
+{% block content %}
+    <h2>Archive</h2>
+    
+    {% for year, months in archive.items() | sort(reverse=True) %}
+        <div style="margin-top: 30px;">
+            <h3 style="color: var(--accent-color); border-bottom: 2px solid var(--border-color);">{{ year }}</h3>
+            {% for month, papers in months.items() %}
+                <h4 style="font-family: var(--font-sans); color: #666; margin-top: 20px;">{{ month }}</h4>
+                <ul style="list-style: none; padding-left: 0;">
+                    {% for paper in papers %}
+                    <li style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color);">
+                        <div class="meta" style="margin-bottom: 2px;">{{ paper.date }}</div>
+                        <a href="{{ paper.rel_path }}" style="font-weight: 600; font-size: 1.1em; line-height: 1.3; display: block; margin-bottom: 5px;">{{ paper.title }}</a>
+                        <div style="font-size: 0.9em; color: #555; font-style: italic; line-height: 1.4;">
+                            {{ paper.preview }}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}
