@@ -207,7 +207,7 @@ class SiteGenerator:
         rss_feed = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-    <title>BiblioAssistant Feed (https://github.com/bitic/biblioassistant/)</title>
+    <title>BiblioAssistant Feed</title>
     <link>{base_url}</link>
     <description>Latest scientific summaries</description>
     <lastBuildDate>{datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0000")}</lastBuildDate>
@@ -243,7 +243,7 @@ class SiteGenerator:
         rss_feed = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-    <title>BiblioAssistant Events (https://github.com/bitic/biblioassistant/)</title>
+    <title>BiblioAssistant Events</title>
     <link>https://biblio.quintanasegui.com</link>
     <description>Internal system events and errors</description>
     <lastBuildDate>{datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0000")}</lastBuildDate>

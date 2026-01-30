@@ -1,6 +1,6 @@
 # Naixement de [BiblioAssistant](https://github.com/bitic/biblioassistant/) i biblio.quintanasegui.com
 
-Avui, 29 de gener de 2026, he posat en marxa **[BiblioAssistant](https://github.com/bitic/biblioassistant/)**, un projecte personal per automatitzar la vigilància tecnològica i científica en els àmbits de la hidrologia, el clima i la meteorologia. Amb aquest sistema, també neix el portal **[biblio.quintanasegui.com](https://biblio.quintanasegui.com)**, on publicaré els resums generats automàticament.
+Avui, 29 de gener de 2026, he posat en marxa **[BiblioAssistant](https://github.com/bitic/biblioassistant/)**, un projecte personal per automatitzar el seguiment de les novetats en la literatura científica en els àmbits de la hidrologia, el clima i la meteorologia. Amb aquest sistema, també neix el portal **[biblio.quintanasegui.com](https://biblio.quintanasegui.com)**, on publicaré els resums generats automàticament.
 
 ### Com funciona [BiblioAssistant](https://github.com/bitic/biblioassistant/)?
 

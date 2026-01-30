@@ -1,7 +1,7 @@
 # [BiblioAssistant](https://github.com/bitic/biblioassistant/)
 
 ## Project Overview
-[BiblioAssistant](https://github.com/bitic/biblioassistant/) is a Python-based automated pipeline designed for scientific and technological surveillance in the fields of **hydrology, climate, and meteorology**. Its primary goal is to filter high volumes of daily publications and generate high-value summaries for researchers.
+[BiblioAssistant](https://github.com/bitic/biblioassistant/) is a Python-based automated pipeline designed for keeping track of new scientific literature in the fields of **hydrology, climate, and meteorology**. Its primary goal is to filter high volumes of daily publications and generate high-value summaries for researchers.
 
 The system prioritizes local processing for filtering to maintain privacy and reduce costs, utilizing remote powerful LLMs only for deep synthesis of relevant content.
 
