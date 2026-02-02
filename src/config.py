@@ -26,14 +26,14 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "deepseek-r1:14b")
 
 # Relevance Engine ('gemini' or 'ollama')
 RELEVANCE_ENGINE = os.getenv("RELEVANCE_ENGINE", "gemini")
-RELEVANCE_MODEL = os.getenv("RELEVANCE_MODEL", "gemini-1.5-flash")
+RELEVANCE_MODEL = os.getenv("RELEVANCE_MODEL", "gemini-3-flash-preview")
 
 # Synthesis Engine ('gemini-api', 'gemini-cli', or 'ollama')
-SYNTHESIS_ENGINE = os.getenv("SYNTHESIS_ENGINE", "ollama")
+SYNTHESIS_ENGINE = os.getenv("SYNTHESIS_ENGINE", "gemini-api")
 
 # Remote LLM (Gemini)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
 
 # Deployment
 REMOTE_HOST = os.getenv("REMOTE_HOST", "your.server.com")
