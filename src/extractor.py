@@ -4,6 +4,7 @@ from pathlib import Path
 from src.config import PAPERS_DIR
 from src.models import Paper
 from src.logger import logger
+from playwright.sync_api import sync_playwright
 
 import re
 
@@ -53,6 +54,7 @@ class Extractor:
         """
         Fetches the article's HTML and strips tags to get raw text.
         Handles meta-refreshes and basic JS redirects.
+        Falls back to Playwright for dynamic pages.
         """
         target_url = url if url else paper.link
         try:
@@ -94,17 +96,17 @@ class Extractor:
 
                 # Basic cleaning
                 # 1. Remove scripts and styles
-                html = re.sub(r'<(script|style).*?</\1>', ' ', html, flags=re.DOTALL)
+                html_clean = re.sub(r'<(script|style).*?</\1>', ' ', html, flags=re.DOTALL)
                 # 2. Remove comments
-                html = re.sub(r'<!--.*?-->', '', html, flags=re.DOTALL)
+                html_clean = re.sub(r'<!--.*?-->', '', html_clean, flags=re.DOTALL)
                 # 3. Remove HTML tags
-                text = re.sub(r'<[^>]+>', ' ', html)
+                text = re.sub(r'<[^>]+>', ' ', html_clean)
                 # 4. Collapse whitespace
                 text = re.sub(r'\s+', ' ', text).strip()
                 
                 if len(text) < 500:
-                    logger.warning(f"HTML extraction too short ({len(text)} chars). Likely a block or redirect.")
-                    return ""
+                    logger.warning(f"HTML extraction too short ({len(text)} chars). Likely dynamic content. Trying Playwright fallback.")
+                    return self._extract_with_playwright(target_url)
 
                 logger.info(f"Extracted {len(text)} chars from HTML.")
                 return text
@@ -113,6 +115,66 @@ class Extractor:
                 return ""
         except Exception as e:
             logger.error(f"HTML extraction error: {e}")
+            return ""
+
+    def _extract_with_playwright(self, url: str) -> str:
+        """
+        Uses a headless browser to render the page and extract text.
+        Essential for ScienceDirect and other JS-heavy sites.
+        """
+        logger.info(f"Starting Playwright extraction for: {url}")
+        try:
+            with sync_playwright() as p:
+                # Launch browser
+                browser = p.chromium.launch(headless=True)
+                
+                # Create context with realistic user agent and stealth settings
+                context = browser.new_context(
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    viewport={"width": 1280, "height": 800},
+                    java_script_enabled=True
+                )
+                
+                # Basic stealth: hide automation signature
+                context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                
+                page = context.new_page()
+                
+                # Navigate and wait for content
+                # networkidle ensures that network requests (like loading article text) have finished
+                page.goto(url, timeout=60000, wait_until="domcontentloaded")
+                
+                try:
+                    page.wait_for_load_state("networkidle", timeout=15000)
+                except:
+                    logger.warning("Playwright networkidle timeout, proceeding with current content.")
+
+                # Specific handling for ScienceDirect cookie consent / access
+                # Try to dismiss cookie banners if they exist (generic approach)
+                try:
+                    page.get_by_role("button", name=re.compile("Accept|Agree|Consent", re.IGNORECASE)).click(timeout=2000)
+                except:
+                    pass
+
+                # Get the inner text of the body
+                text = page.inner_text("body")
+                
+                browser.close()
+                
+                # Basic cleanup
+                text = re.sub(r'\s+', ' ', text).strip()
+                
+                # Validate extracted text: if it's an error message, discard it
+                error_keywords = ["service interruption", "robot check", "access denied", "blocked", "captcha"]
+                if any(kw in text.lower() for kw in error_keywords) or len(text) < 1500:
+                    logger.warning("Extracted text looks like an error page or is too short. Rejecting.")
+                    return ""
+
+                logger.info(f"Playwright extracted {len(text)} chars.")
+                return text
+                
+        except Exception as e:
+            logger.error(f"Playwright extraction error: {e}")
             return ""
 
     def _download_pdf(self, paper: Paper, save_path: Path) -> bool:
@@ -131,6 +193,30 @@ class Extractor:
                 doi_part = target_url.split("/doi/")[-1].split("?")[0]
                 target_url = f"https://agupubs.onlinelibrary.wiley.com/doi/pdfdirect/{doi_part}"
         
+        # Heuristic for ScienceDirect / Elsevier
+        # Pattern: .../pii/S0000000000000000
+        if "sciencedirect.com" in target_url or "linkinghub.elsevier.com" in target_url:
+            # Try to resolve redirect first to get the PII if not present
+            try:
+                # We need to resolve the URL to find the PII if it's a DOI link or linkinghub
+                if "/pii/" not in target_url:
+                     # Lightweight HEAD/GET to resolve redirect
+                     r = requests.get(target_url, headers={"User-Agent": "Mozilla/5.0"}, verify=False, stream=True)
+                     target_url = r.url
+            except:
+                pass
+
+            if "/pii/" in target_url:
+                # Extract PII
+                import re
+                pii_match = re.search(r'/pii/([A-Z0-9]+)', target_url)
+                if pii_match:
+                    pii = pii_match.group(1)
+                    # Construct direct PDF link
+                    # Note: This might still require User-Agent or might be blocked, but worth a try
+                    target_url = f"https://www.sciencedirect.com/science/article/pii/{pii}/pdfft?isDTM=0&download=true"
+                    logger.info(f"Detected ScienceDirect PII {pii}. Trying direct PDF: {target_url}")
+
         try:
             logger.info(f"Attempting to download PDF from: {target_url}")
             headers = {
