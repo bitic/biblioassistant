@@ -4,10 +4,38 @@ from pathlib import Path
 from src.config import PAPERS_DIR, OPENALEX_EMAIL
 from src.models import Paper
 from src.logger import logger
+import random
 
 import re
 
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "Mozilla/5.0 (AppleWebKit/537.36; Chrome/121.0.0.0; Mobile) Safari/537.36",
+]
+
 class Extractor:
+    def _get_headers(self, referer: str = None) -> dict:
+        """Returns a realistic set of browser headers."""
+        headers = {
+            "User-Agent": random.choice(USER_AGENTS),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,application/pdf,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Accept-Encoding": "gzip, deflate, br",
+            "DNT": "1",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "cross-site",
+        }
+        if referer:
+            headers["Referer"] = referer
+        return headers
+
     def process(self, paper: Paper) -> tuple[str, bool]:
         """
         Downloads the PDF (if possible) and extracts text.
@@ -57,10 +85,9 @@ class Extractor:
         target_url = url if url else paper.link
         try:
             logger.info(f"Attempting HTML extraction from: {target_url}")
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            }
+            # Use improved headers
+            headers = self._get_headers(referer=paper.link)
+            
             # Disable SSL verification to handle institutional repositories with cert issues
             response = requests.get(target_url, headers=headers, timeout=30, verify=False)
             
@@ -166,7 +193,7 @@ class Extractor:
         if "sciencedirect.com" in target_url or "linkinghub.elsevier.com" in target_url:
              try:
                 if "/pii/" not in target_url:
-                     r = requests.get(target_url, headers={"User-Agent": "Mozilla/5.0"}, verify=False, stream=True)
+                     r = requests.get(target_url, headers=self._get_headers(), verify=False, stream=True)
                      target_url = r.url
              except:
                 pass
@@ -179,15 +206,7 @@ class Extractor:
 
         try:
             logger.info(f"Attempting to download PDF from: {target_url}")
-            headers = {
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept": "application/pdf,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.5",
-                "Referer": paper.link,
-                "DNT": "1",
-                "Connection": "keep-alive",
-                "Upgrade-Insecure-Requests": "1",
-            }
+            headers = self._get_headers(referer=paper.link)
             
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
