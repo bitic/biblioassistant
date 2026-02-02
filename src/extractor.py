@@ -59,7 +59,8 @@ class Extractor:
                 "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             }
-            response = requests.get(paper.link, headers=headers, timeout=30)
+            # Disable SSL verification to handle institutional repositories with cert issues
+            response = requests.get(paper.link, headers=headers, timeout=30, verify=False)
             
             if response.status_code == 200:
                 html = response.text
@@ -115,7 +116,11 @@ class Extractor:
                 "Upgrade-Insecure-Requests": "1",
             }
             
-            response = requests.get(target_url, headers=headers, stream=True, timeout=45)
+            # Disable SSL verification for PDF downloads
+            import urllib3
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            
+            response = requests.get(target_url, headers=headers, stream=True, timeout=45, verify=False)
             
             # Some publishers return 200 but it's a cookie wall page
             content_type = response.headers.get("Content-Type", "").lower()
