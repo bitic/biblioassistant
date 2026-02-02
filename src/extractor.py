@@ -1,7 +1,7 @@
 import requests
 import fitz  # PyMuPDF
 from pathlib import Path
-from src.config import PAPERS_DIR, OPENALEX_EMAIL
+from src.config import PAPERS_DIR, OPENALEX_EMAIL, CORE_API_KEY
 from src.models import Paper
 from src.logger import logger
 import random
@@ -160,6 +160,15 @@ class Extractor:
                 logger.info(f"Unpaywall found PDF URL: {oa_url}")
                 if self._try_download_url(oa_url, save_path, paper):
                     return True
+            
+            # Strategy 3: CORE API
+            if CORE_API_KEY:
+                logger.info(f"Unpaywall failed. Checking CORE API for OA PDF (DOI: {paper.doi})")
+                core_url = self._get_core_url(paper.doi)
+                if core_url:
+                    logger.info(f"CORE found PDF URL: {core_url}")
+                    if self._try_download_url(core_url, save_path, paper):
+                        return True
         
         return False
 
@@ -177,6 +186,33 @@ class Extractor:
             return ""
         except Exception as e:
             logger.warning(f"Unpaywall check failed: {e}")
+            return ""
+
+    def _get_core_url(self, doi: str) -> str:
+        """Queries CORE API v3 for a direct PDF link."""
+        try:
+            url = "https://api.core.ac.uk/v3/search/works"
+            headers = {"Authorization": f"Bearer {CORE_API_KEY}"}
+            payload = {"q": f"doi:{doi}", "limit": 1}
+            
+            response = requests.post(url, headers=headers, json=payload, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                results = data.get("results", [])
+                if results:
+                    work = results[0]
+                    # Check for downloadUrl
+                    if work.get("downloadUrl"):
+                        return work.get("downloadUrl")
+                    
+                    # Check for links in links list
+                    for link in work.get("links", []):
+                        if link.get("type") == "download":
+                            return link.get("url")
+            return ""
+        except Exception as e:
+            logger.warning(f"CORE API check failed: {e}")
             return ""
 
     def _try_download_url(self, target_url: str, save_path: Path, paper: Paper) -> bool:

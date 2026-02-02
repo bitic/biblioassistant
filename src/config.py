@@ -45,6 +45,10 @@ MAX_MONTHLY_COST = float(os.getenv("MAX_MONTHLY_COST", "10.0"))
 
 # OpenAlex Discovery
 OPENALEX_EMAIL = os.getenv("OPENALEX_EMAIL", "your-email@example.com")
+
+# CORE API (Optional)
+CORE_API_KEY = os.getenv("CORE_API_KEY")
+
 DISCOVERY_TASKS = [
     # 1. Author Tracking: Pere Quintana Seguí
     {"name": "Pere Quintana Seguí", "type": "author", "id": "A5053499463"}, 
