@@ -49,22 +49,49 @@ class Extractor:
              
         return text, is_full_text
 
-    def _extract_from_html(self, paper: Paper) -> str:
+    def _extract_from_html(self, paper: Paper, url: str = None) -> str:
         """
         Fetches the article's HTML and strips tags to get raw text.
+        Handles meta-refreshes and basic JS redirects.
         """
+        target_url = url if url else paper.link
         try:
-            logger.info(f"Attempting HTML extraction from: {paper.link}")
+            logger.info(f"Attempting HTML extraction from: {target_url}")
             headers = {
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
             }
             # Disable SSL verification to handle institutional repositories with cert issues
-            response = requests.get(paper.link, headers=headers, timeout=30, verify=False)
+            response = requests.get(target_url, headers=headers, timeout=30, verify=False)
             
             if response.status_code == 200:
                 html = response.text
                 
+                # Check for Meta Refresh Redirect
+                # <meta http-equiv="refresh" content="0; url=http://example.com/" />
+                meta_refresh = re.search(r'<meta[^>]*http-equiv=["\']?refresh["\']?[^>]*content=["\']?[^"\'>]*url=([^"\'>]+)["\']?', html, re.IGNORECASE)
+                if meta_refresh:
+                    redirect_url = meta_refresh.group(1).strip()
+                    # Handle relative URLs
+                    if not redirect_url.startswith(('http://', 'https://')):
+                        from urllib.parse import urljoin
+                        redirect_url = urljoin(target_url, redirect_url)
+                        
+                    logger.info(f"Following Meta Refresh to: {redirect_url}")
+                    return self._extract_from_html(paper, url=redirect_url)
+
+                # Check for basic JS Redirect (often used if meta refresh is absent)
+                # window.location = "..." or window.location.href = "..."
+                js_redirect = re.search(r'window\.location(?:\.href)?\s*=\s*["\']([^"\']+)["\']', html)
+                if js_redirect:
+                    redirect_url = js_redirect.group(1).strip()
+                    if not redirect_url.startswith(('http://', 'https://')):
+                        from urllib.parse import urljoin
+                        redirect_url = urljoin(target_url, redirect_url)
+                        
+                    logger.info(f"Following JS Redirect to: {redirect_url}")
+                    return self._extract_from_html(paper, url=redirect_url)
+
                 # Basic cleaning
                 # 1. Remove scripts and styles
                 html = re.sub(r'<(script|style).*?</\1>', ' ', html, flags=re.DOTALL)
