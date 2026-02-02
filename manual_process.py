@@ -3,7 +3,7 @@ from datetime import datetime
 from src.models import Paper
 from src.extractor import Extractor
 from src.synthesizer import Synthesizer
-from src.filter import LocalFilter
+from src.filter import RelevanceFilter
 from src.logger import logger
 
 # Setup logger to see output
@@ -27,10 +27,10 @@ def manual_run():
 
     print(f"\n--- Processing Paper: {paper.title} ---")
 
-    # 2. Test Filter (Ollama)
-    print("\n[Step 1] Testing Relevance Filter (Ollama)...")
-    local_filter = LocalFilter()
-    is_relevant = local_filter.check_relevance(paper)
+    # 2. Test Filter
+    print("\n[Step 1] Testing Relevance Filter...")
+    relevance_filter = RelevanceFilter()
+    is_relevant = relevance_filter.check_relevance(paper)
     print(f"Result: Relevant={is_relevant}")
 
     if not is_relevant:

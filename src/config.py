@@ -24,6 +24,10 @@ OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_FILTER_MODEL = os.getenv("OLLAMA_FILTER_MODEL", "llama3.1:8b")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "deepseek-r1:14b")
 
+# Relevance Engine ('gemini' or 'ollama')
+RELEVANCE_ENGINE = os.getenv("RELEVANCE_ENGINE", "gemini")
+RELEVANCE_MODEL = os.getenv("RELEVANCE_MODEL", "gemini-1.5-flash")
+
 # Synthesis Engine ('gemini-api', 'gemini-cli', or 'ollama')
 SYNTHESIS_ENGINE = os.getenv("SYNTHESIS_ENGINE", "ollama")
 

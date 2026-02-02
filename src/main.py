@@ -3,7 +3,7 @@ import subprocess
 from src.config import REMOTE_HOST, REMOTE_USER, REMOTE_PATH, PUBLIC_DIR
 from src.fetcher import Fetcher
 from src.discovery import Discovery
-from src.filter import LocalFilter
+from src.filter import RelevanceFilter
 from src.extractor import Extractor
 from src.synthesizer import Synthesizer
 from src.generator import SiteGenerator
@@ -66,7 +66,7 @@ def main():
         logger.info(f"Backfill requested: {args.backfill} days (Starting from {from_date_override})")
 
     discovery = Discovery(from_date=from_date_override)
-    local_filter = LocalFilter()
+    relevance_filter = RelevanceFilter()
     extractor = Extractor()
     synthesizer = Synthesizer()
 
@@ -120,7 +120,7 @@ def main():
             continue
 
         # Skip filter if manually added or if it passes relevance
-        if args.add_doi or local_filter.check_relevance(paper):
+        if args.add_doi or relevance_filter.check_relevance(paper):
             relevant_count += 1
             
             # Check budget during run (if using paid API)
