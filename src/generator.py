@@ -1,10 +1,11 @@
 import shutil
 import markdown2
+import html
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 from typing import List, Dict
-from src.config import TEMPLATES_DIR, PUBLIC_DIR, SUMMARIES_DIR, PAPERS_DIR
+from src.config import TEMPLATES_DIR, PUBLIC_DIR, SUMMARIES_DIR, PAPERS_DIR, SITE_URL
 from src.db import db
 from src.logger import logger
 
@@ -24,8 +25,8 @@ class SiteGenerator:
         # Collect all summaries
         papers = self._collect_papers()
         
-        # Sort by date (descending)
-        papers.sort(key=lambda x: x['date_obj'], reverse=True)
+        # Sort by added date (descending)
+        papers.sort(key=lambda x: x['added_date_obj'], reverse=True)
         
         # Generate individual pages
         for paper in papers:
@@ -50,6 +51,13 @@ class SiteGenerator:
 
     def _collect_papers(self) -> List[Dict]:
         papers = []
+        # Fetch added dates from DB
+        try:
+            added_dates_map = db.get_all_processed_dates()
+        except Exception as e:
+            logger.warning(f"Could not fetch processed dates from DB: {e}")
+            added_dates_map = {}
+
         # Walk through YYYY directories
         for year_dir in SUMMARIES_DIR.glob("*"):
             if not year_dir.is_dir(): continue
@@ -61,7 +69,7 @@ class SiteGenerator:
                 
                 # Default values
                 title = "Untitled"
-                date_obj = None
+                paper_date_obj = None
                 author = "Unknown"
                 
                 # Parse Title (Assume first line is # Title)
@@ -73,14 +81,14 @@ class SiteGenerator:
                 if len(md_file.name) > 8 and md_file.name[:8].isdigit():
                     try:
                         date_str = md_file.name[:8]
-                        date_obj = datetime.strptime(date_str, "%Y%m%d")
+                        paper_date_obj = datetime.strptime(date_str, "%Y%m%d")
                         author = md_file.name[9:-3]
                     except ValueError:
                         pass
                 
                 # Fallback: use file mtime if filename didn't yield a date
-                if not date_obj:
-                    date_obj = datetime.fromtimestamp(md_file.stat().st_mtime)
+                if not paper_date_obj:
+                    paper_date_obj = datetime.fromtimestamp(md_file.stat().st_mtime)
                     author = md_file.stem
 
                 # Parse Short Summary (between ## Short Summary and next ##)
@@ -113,8 +121,17 @@ class SiteGenerator:
                     except IndexError:
                         pass
 
+                # Determine Added Date (for Sorting/RSS)
+                added_date_obj = added_dates_map.get(original_link)
+                if not added_date_obj:
+                    # Fallback to file mtime if not in DB
+                    added_date_obj = datetime.fromtimestamp(md_file.stat().st_mtime)
+
                 # Convert to HTML (for summary page we keep everything except the warning comment tags)
-                html_content = markdown2.markdown(raw_content.replace("<!-- warning_start -->", "").replace("<!-- warning_end -->", ""))
+                html_content = markdown2.markdown(
+                    raw_content.replace("<!-- warning_start -->", "").replace("<!-- warning_end -->", ""),
+                    extras=["fenced-code-blocks"]
+                )
                 
                 # Relative paths for links
                 # Page will be at: public/summaries/YYYY/filename.html
@@ -124,25 +141,28 @@ class SiteGenerator:
                 papers.append({
                     'title': title,
                     'author': author,
-                    'date': date_obj.strftime("%Y-%m-%d"),
-                    'date_obj': date_obj,
+                    'date': paper_date_obj.strftime("%Y-%m-%d"), # Display date (Paper date)
+                    'date_obj': paper_date_obj, # Keep for archive logic?
+                    'added_date_obj': added_date_obj, # For Sorting/RSS
                     'preview': preview,
                     'content': html_content,
                     'raw_content': raw_content, # for RSS
                     'rel_path': rel_path,
                     'original_link': original_link,
                     'year': year_dir.name,
-                    'month': date_obj.strftime("%B"),
+                    'month': paper_date_obj.strftime("%B"),
                     'filename': md_file.stem
                 })
         return papers
 
     def _render_paper(self, paper):
         template = self.env.get_template("paper.html")
+        summary_link = f"{SITE_URL}/{paper['rel_path']}"
         output = template.render(
             title=paper['title'],
             content=paper['content'],
             original_link=paper['original_link'],
+            summary_link=summary_link,
             generated_at=self.generated_at
         )
         
@@ -191,14 +211,17 @@ class SiteGenerator:
     def _generate_rss(self, papers):
         # Basic RSS 2.0 generation
         rss_items = []
-        base_url = "https://biblio.quintanasegui.com"
+        base_url = SITE_URL
         for paper in papers:
+            # Clean title for XML: unescape HTML entities (like &ndash;) then escape for XML
+            clean_title = html.escape(html.unescape(paper['title']))
+            
             item = f"""
             <item>
-                <title>{paper['title']}</title>
+                <title>{clean_title}</title>
                 <link>{base_url}/summaries/{paper['year']}/{paper['filename']}.html</link>
                 <description><![CDATA[{paper['preview']}]]></description>
-                <pubDate>{paper['date_obj'].strftime("%a, %d %b %Y %H:%M:%S +0000")}</pubDate>
+                <pubDate>{paper['added_date_obj'].strftime("%a, %d %b %Y %H:%M:%S +0000")}</pubDate>
                 <guid>{paper['filename']}</guid>
             </item>
             """
@@ -230,9 +253,12 @@ class SiteGenerator:
             except:
                 pub_date = datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0000")
 
+            # Clean title for XML
+            clean_title = html.escape(html.unescape(f"[{event['event_type']}] {event['message'][:50]}..."))
+
             item = f"""
             <item>
-                <title>[{event['event_type']}] {event['message'][:50]}...</title>
+                <title>{clean_title}</title>
                 <description><![CDATA[{event['message']}]]></description>
                 <pubDate>{pub_date}</pubDate>
                 <guid>{event['timestamp']}-{event['event_type']}</guid>

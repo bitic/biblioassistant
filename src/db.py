@@ -158,6 +158,28 @@ class Database:
             return result[0].split(" ")[0]
         return None
 
+    def get_all_processed_dates(self) -> dict:
+        """Returns a dictionary mapping link -> processed_date (datetime object)."""
+        from datetime import datetime
+        conn = sqlite3.connect(self.db_path, timeout=30)
+        cursor = conn.cursor()
+        cursor.execute('SELECT link, processed_date FROM seen_papers')
+        rows = cursor.fetchall()
+        conn.close()
+        
+        results = {}
+        for link, date_str in rows:
+            if date_str:
+                try:
+                    # SQLite timestamp is usually YYYY-MM-DD HH:MM:SS
+                    # It might be in ISO format or others depending on insertion
+                    dt = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                    results[link] = dt
+                except ValueError:
+                    # Fallback or ignore
+                    pass
+        return results
+
     def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None):
         """Mark a paper as seen and record its authors."""
         import time
