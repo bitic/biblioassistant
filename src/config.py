@@ -40,6 +40,7 @@ REMOTE_HOST = os.getenv("REMOTE_HOST", "your.server.com")
 REMOTE_USER = os.getenv("REMOTE_USER", "username")
 REMOTE_PATH = os.getenv("REMOTE_PATH", "/var/www/biblio/")
 SITE_URL = os.getenv("SITE_URL", "https://biblio.quintanasegui.com")
+SITE_TITLE = "Hydrology and Climate Change Article Summaries"
 
 # Budget Control
 MAX_MONTHLY_COST = float(os.getenv("MAX_MONTHLY_COST", "10.0"))

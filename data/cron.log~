@@ -1,0 +1,762 @@
+--- Pipeline Run Started: Thu Jan 29 23:48:42 CET 2026 ---
+run_daily.sh: line 26: /usr/local/bin/uv: No such file or directory
+--- Pipeline Run Finished: Thu Jan 29 23:48:42 CET 2026 ---
+
+--- Pipeline Run Started: Thu Jan 29 23:51:07 CET 2026 ---
+2026-01-29 23:51:08 - biblioassistant - INFO - Discovery starting from last run date: 2026-01-29
+2026-01-29 23:51:08 - biblioassistant - INFO - Running discovery task: Pere Quintana Seguí (author)
+2026-01-29 23:51:08 - biblioassistant - INFO - Running discovery task: My Citation Watch (author_citations)
+2026-01-29 23:51:08 - biblioassistant - INFO - Automatically finding citations for author ID: A5053499463 (Range: 2026-01-29 to 2026-02-05)
+2026-01-29 23:51:09 - biblioassistant - INFO - Found 100 papers for author. Checking their recent citations in batches...
+2026-01-29 23:51:09 - biblioassistant - INFO - Checking citations for batch 1/2...
+2026-01-29 23:51:10 - biblioassistant - INFO - Checking citations for batch 2/2...
+2026-01-29 23:51:11 - biblioassistant - INFO - Running discovery task: Journal Watch (journal)
+2026-01-29 23:51:12 - biblioassistant - INFO - Running discovery task: Local: Pyrenees & Ebro (search)
+2026-01-29 23:51:13 - biblioassistant - INFO - Running discovery task: Global: Irrigation & LSM (search)
+2026-01-29 23:51:13 - biblioassistant - INFO - Running discovery task: Global: Model Development (search)
+2026-01-29 23:51:14 - biblioassistant - INFO - Running discovery task: Global: Hydrological Extremes (search)
+2026-01-29 23:51:14 - biblioassistant - INFO - Discovery complete. Found 0 potential new papers.
+2026-01-29 23:51:14 - biblioassistant - INFO - No new papers found.
+2026-01-29 23:51:14 - biblioassistant - INFO - Pipeline finished. Processed 0 new papers.
+2026-01-29 23:51:14 - biblioassistant - INFO - Starting static site generation...
+2026-01-29 23:51:14 - biblioassistant - INFO - Site generation complete.
+2026-01-29 23:51:14 - biblioassistant - INFO - Deploying to pqs@pdx1-shared-a1-18.dreamhost.com:biblio.quintanasegui.com/...
+sending incremental file list
+./
+about.html
+archive.html
+events.xml
+feed.xml
+index.html
+summaries/
+summaries/2021/
+summaries/2021/10.1029_2020wr029249.html
+summaries/2022/
+summaries/2022/10.1007_s00271-022-00789-9.html
+summaries/2023/
+summaries/2023/10.1029_2023wr034506.html
+summaries/2024/
+summaries/2024/10.1029_2022rg000801.html
+summaries/2024/10.3390_agronomy14091920.html
+summaries/2024/10.3390_rs16193699.html
+summaries/2025/
+summaries/2025/10.1002_vzj2.70047.html
+
+sent 2,750 bytes  received 1,367 bytes  914.89 bytes/sec
+total size is 123,703  speedup is 30.05
+2026-01-29 23:51:18 - biblioassistant - INFO - Deployment successful!
+--- Pipeline Run Finished: Thu Jan 29 23:51:18 CET 2026 ---
+
+--- Pipeline Run Started: Mon Feb  2 10:28:36 CET 2026 ---
+2026-02-02 10:28:37 - biblioassistant - INFO - Discovery starting from last run date: 2026-01-30
+2026-02-02 10:28:37 - biblioassistant - INFO - Running discovery task: Pere Quintana Seguí (author)
+2026-02-02 10:28:38 - biblioassistant - INFO - Running discovery task: My Citation Watch (author_citations)
+2026-02-02 10:28:38 - biblioassistant - INFO - Automatically finding citations for author ID: A5053499463 (Range: 2026-01-30 to 2026-02-09)
+2026-02-02 10:28:39 - biblioassistant - INFO - Found 100 papers for author. Checking their recent citations in batches...
+2026-02-02 10:28:39 - biblioassistant - INFO - Checking citations for batch 1/2...
+2026-02-02 10:28:41 - biblioassistant - INFO - Checking citations for batch 2/2...
+2026-02-02 10:28:43 - biblioassistant - INFO - Running discovery task: Journal Watch (journal)
+2026-02-02 10:28:45 - biblioassistant - INFO - Running discovery task: Local: Pyrenees & Ebro (search)
+2026-02-02 10:28:46 - biblioassistant - INFO - Running discovery task: Global: Irrigation & LSM (search)
+2026-02-02 10:28:47 - biblioassistant - INFO - Running discovery task: Global: Model Development (search)
+2026-02-02 10:28:47 - biblioassistant - INFO - Running discovery task: Global: Hydrological Extremes (search)
+2026-02-02 10:28:48 - biblioassistant - INFO - Running discovery task: Auto-Promoted Journals (journal)
+2026-02-02 10:28:49 - biblioassistant - INFO - Running discovery task: Auto-Promoted Authors (author)
+2026-02-02 10:28:50 - biblioassistant - INFO - Discovery complete. Found 134 potential new papers.
+2026-02-02 10:28:50 - biblioassistant - INFO - Checking relevance for: Soil moisture estimation at 1-km resolution over c...
+2026-02-02 10:31:32 - biblioassistant - INFO - ✅ Paper is relevant: Remote sensing of soil moisture (Sentinel-1/2 and SMOS-IC data), specific to Mediterranean region is not mentioned but it can be applied.
+2026-02-02 10:31:32 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.1080/22797254.2026.2622132
+2026-02-02 10:31:33 - biblioassistant - WARNING - Failed to download PDF (Status: 403, Type: text/html; charset=utf-8)
+2026-02-02 10:31:33 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Soil moisture estimation at 1-km resolution over croplands and grasslands using sentinel-1/2 and SMOS-IC data: algorithm and validation. Trying HTML fallback.
+2026-02-02 10:31:33 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.1080/22797254.2026.2622132
+2026-02-02 10:31:33 - biblioassistant - WARNING - HTML fetch failed: 403
+2026-02-02 10:31:33 - biblioassistant - WARNING - No text extracted for Soil moisture estimation at 1-km resolution over croplands and grasslands using sentinel-1/2 and SMOS-IC data: algorithm and validation. Using Abstract.
+2026-02-02 10:31:33 - biblioassistant - INFO - Synthesizing summary for: Soil moisture estimation at 1-km resolution over croplands and grasslands using sentinel-1/2 and SMOS-IC data: algorithm and validation using gemini-api
+2026-02-02 10:31:33 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 10:31:33 - biblioassistant - INFO - Checking relevance for: Impact of flash droughts on cereal crops under Med...
+2026-02-02 10:32:50 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Land Surface Interactions (cereal gross primary productivity), Phenomena: Drought propagation (flash droughts), Region: Mediterranean (Spain, Portugal, France, Italy)
+2026-02-02 10:32:50 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.5424/sjar/2025234-21655
+2026-02-02 10:32:51 - biblioassistant - ERROR - Error downloading PDF: HTTPSConnectionPool(host='sjar.revistas.csic.es', port=443): Max retries exceeded with url: /index.php/sjar/article/view/21655 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))
+2026-02-02 10:32:51 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Impact of flash droughts on cereal crops under Mediterranean conditions. Trying HTML fallback.
+2026-02-02 10:32:51 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.5424/sjar/2025234-21655
+2026-02-02 10:32:51 - biblioassistant - ERROR - HTML extraction error: HTTPSConnectionPool(host='sjar.revistas.csic.es', port=443): Max retries exceeded with url: /index.php/sjar/article/view/21655 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))
+2026-02-02 10:32:51 - biblioassistant - WARNING - No text extracted for Impact of flash droughts on cereal crops under Mediterranean conditions. Using Abstract.
+2026-02-02 10:32:51 - biblioassistant - INFO - Synthesizing summary for: Impact of flash droughts on cereal crops under Mediterranean conditions using gemini-api
+2026-02-02 10:32:51 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 10:32:51 - biblioassistant - INFO - Checking relevance for: From reach to catchment-scale impacts: High-resolu...
+2026-02-02 10:33:15 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:33:15 - biblioassistant - INFO - Checking relevance for: Impacto del riego estimado por satélite en la mode...
+2026-02-02 10:34:29 - biblioassistant - INFO - ✅ Paper is relevant: The paper deals with the impact of estimated irrigation by satellite on hydrological modeling in the Po river basin, using the TETIS model. This is relevant to Land Surface Interactions and Hydrometeorological Modeling.
+2026-02-02 10:34:29 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.4995/ia.24708
+2026-02-02 10:34:30 - biblioassistant - ERROR - Error downloading PDF: HTTPSConnectionPool(host='polipapers.upv.es', port=443): Max retries exceeded with url: /index.php/IA/article/view/24708 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))
+2026-02-02 10:34:30 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Impacto del riego estimado por satélite en la modelación hidrológica: análisis del balance hídrico y desempeño del modelo TETIS en la cuenca del río Po. Trying HTML fallback.
+2026-02-02 10:34:30 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.4995/ia.24708
+2026-02-02 10:34:30 - biblioassistant - ERROR - HTML extraction error: HTTPSConnectionPool(host='polipapers.upv.es', port=443): Max retries exceeded with url: /index.php/IA/article/view/24708 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))
+2026-02-02 10:34:30 - biblioassistant - WARNING - No text extracted for Impacto del riego estimado por satélite en la modelación hidrológica: análisis del balance hídrico y desempeño del modelo TETIS en la cuenca del río Po. Using Abstract.
+2026-02-02 10:34:30 - biblioassistant - INFO - Synthesizing summary for: Impacto del riego estimado por satélite en la modelación hidrológica: análisis del balance hídrico y desempeño del modelo TETIS en la cuenca del río Po using gemini-api
+2026-02-02 10:34:30 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 10:34:30 - biblioassistant - INFO - Checking relevance for: Limited resolution of DNA barcodes and environment...
+2026-02-02 10:34:45 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:34:45 - biblioassistant - INFO - Checking relevance for: Enhancing the properties and environmental perform...
+2026-02-02 10:35:02 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:35:02 - biblioassistant - INFO - Checking relevance for: Computational single-neuron mechanisms of visual o...
+2026-02-02 10:35:47 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:35:47 - biblioassistant - INFO - Checking relevance for: Integrating network toxicology, machine learning, ...
+2026-02-02 10:36:02 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:36:02 - biblioassistant - INFO - Checking relevance for: Effect of low-temperature intracanal sodium hypoch...
+2026-02-02 10:36:15 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:36:15 - biblioassistant - INFO - Checking relevance for: Probing the molecular structure at graphite–water ...
+2026-02-02 10:36:54 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:36:54 - biblioassistant - INFO - Checking relevance for: Oxidative stress-associated genes TPPP3 and VEGFA ...
+2026-02-02 10:37:39 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:37:39 - biblioassistant - INFO - Checking relevance for: Effects of date palm and green tea polyphenol extr...
+2026-02-02 10:37:48 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:37:48 - biblioassistant - INFO - Checking relevance for: Identification of RBX1 as a regulator of LIPT1 tra...
+2026-02-02 10:38:00 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:38:00 - biblioassistant - INFO - Checking relevance for: Upstream migration of the invasive blue crab in th...
+2026-02-02 10:38:10 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:38:10 - biblioassistant - INFO - Checking relevance for: Ultralow CNT-reinforced phase-change fibers for sc...
+2026-02-02 10:38:58 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:38:58 - biblioassistant - INFO - Checking relevance for: Changes in EGFR activity following CRISPR/Cas9-edi...
+2026-02-02 10:39:53 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:39:53 - biblioassistant - INFO - Checking relevance for: A bio inspired hybrid optimization framework for e...
+2026-02-02 10:40:42 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:40:42 - biblioassistant - INFO - Checking relevance for: A rabbit model of clinically relevant mucosal inju...
+2026-02-02 10:41:43 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:41:43 - biblioassistant - INFO - Checking relevance for: Experimental and numerical analysis of shear behav...
+2026-02-02 10:42:39 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:42:39 - biblioassistant - INFO - Checking relevance for: A spatiotemporal atlas of cerebrovascular developm...
+2026-02-02 10:43:28 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:43:28 - biblioassistant - INFO - Checking relevance for: Staphylococcus capitis strain producing dual bacte...
+2026-02-02 10:43:46 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:43:46 - biblioassistant - INFO - Checking relevance for: TRMT6 mitigates susceptibility and progression of ...
+2026-02-02 10:43:58 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:43:58 - biblioassistant - INFO - Checking relevance for: Prevalence of diabetes/prediabetes and their assoc...
+2026-02-02 10:45:35 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:45:35 - biblioassistant - INFO - Checking relevance for: The expression profiling of serum circPHLPP2 and L...
+2026-02-02 10:46:25 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:46:25 - biblioassistant - INFO - Checking relevance for: Benchmarking action recognition models for self-ha...
+2026-02-02 10:47:10 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:47:10 - biblioassistant - INFO - Checking relevance for: Design and implementation of a 6-DoF robot arm con...
+2026-02-02 10:47:26 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:47:26 - biblioassistant - INFO - Checking relevance for: Determinants of poor glycemic control in children ...
+2026-02-02 10:48:32 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:48:32 - biblioassistant - INFO - Checking relevance for: Assessment of the durability of polyurea resin coa...
+2026-02-02 10:48:42 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:48:42 - biblioassistant - INFO - Checking relevance for: Sequential platinum and PARP Inhibition enhances P...
+2026-02-02 10:49:33 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:49:33 - biblioassistant - INFO - Checking relevance for: Enhancing SOC accuracy in electric vehicle batteri...
+2026-02-02 10:50:12 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:50:12 - biblioassistant - INFO - Checking relevance for: Cybersickness-induced EEG responses in curved moni...
+2026-02-02 10:50:53 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:50:53 - biblioassistant - INFO - Checking relevance for: Microbiota-induced EI24 improves homeostasis but i...
+2026-02-02 10:51:34 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:51:34 - biblioassistant - INFO - Checking relevance for: Real-time object detection for unmanned aerial veh...
+2026-02-02 10:51:47 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:51:47 - biblioassistant - INFO - Checking relevance for: Fluorescence mapping of atropisomer populations en...
+2026-02-02 10:52:25 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:52:25 - biblioassistant - INFO - Checking relevance for: Development of a nomogram to predict in-hospital m...
+2026-02-02 10:53:07 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:53:07 - biblioassistant - INFO - Checking relevance for: Molecular signatures of resilience to Alzheimer’s ...
+2026-02-02 10:53:49 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:53:49 - biblioassistant - INFO - Checking relevance for: Occupational polycyclic aromatic hydrocarbons (PAH...
+2026-02-02 10:53:59 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:53:59 - biblioassistant - INFO - Checking relevance for: Mango peels-assisted synthesis of carbon quantum d...
+2026-02-02 10:54:10 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:54:10 - biblioassistant - INFO - Checking relevance for: Mechanical and durability performance of optimized...
+2026-02-02 10:54:21 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:54:21 - biblioassistant - INFO - Checking relevance for: Evaluating the prognostic significance of HIST1H4C...
+2026-02-02 10:54:58 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:54:58 - biblioassistant - INFO - Checking relevance for: Distance-amplified power-law distributions better ...
+2026-02-02 10:55:07 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:55:07 - biblioassistant - INFO - Checking relevance for: Tunable chiral and nematic states in the triple-Q ...
+2026-02-02 10:55:46 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:55:46 - biblioassistant - INFO - Checking relevance for: Printed origami thermoelectric generator achieves ...
+2026-02-02 10:56:26 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:56:26 - biblioassistant - INFO - Checking relevance for: Pyridinium- and bromine-substituted distyryl-BODIP...
+2026-02-02 10:57:11 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:57:11 - biblioassistant - INFO - Checking relevance for: Increasing trust in science through a “Do Your Own...
+2026-02-02 10:57:21 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:57:21 - biblioassistant - INFO - Checking relevance for: SSG–CAM: enhancing visual interpretability through...
+2026-02-02 10:58:08 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:58:08 - biblioassistant - INFO - Checking relevance for: Tomato antiviral ubiquitin-proteasome system recog...
+2026-02-02 10:59:05 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 10:59:05 - biblioassistant - INFO - Checking relevance for: A hybrid XGBoost–SVM ensemble framework for robust...
+2026-02-02 11:00:11 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:00:11 - biblioassistant - INFO - Checking relevance for: Experimental investigation of energy and exergy ch...
+2026-02-02 11:00:56 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:00:56 - biblioassistant - INFO - Checking relevance for: Energy, exergy, and environmental performance of a...
+2026-02-02 11:01:08 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:01:08 - biblioassistant - INFO - Checking relevance for: Comparative entropy analysis of 2D transition meta...
+2026-02-02 11:01:54 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:01:54 - biblioassistant - INFO - Checking relevance for: A novel optimized fuzzy neural network for enhance...
+2026-02-02 11:02:32 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:02:32 - biblioassistant - INFO - Checking relevance for: Experimental realization of dice-lattice flat band...
+2026-02-02 11:03:17 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:03:17 - biblioassistant - INFO - Checking relevance for: Vertical chiral emission from an intrinsically ach...
+2026-02-02 11:03:55 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:03:55 - biblioassistant - INFO - Checking relevance for: Data set supporting Estrela et al. (2009): hourly ...
+2026-02-02 11:05:00 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:05:00 - biblioassistant - INFO - Checking relevance for: Data set supporting Estrela et al. (2009): hourly ...
+2026-02-02 11:05:16 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:05:16 - biblioassistant - INFO - Checking relevance for: Impact of flash droughts on cereal crops under Med...
+2026-02-02 11:06:05 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Land Surface Interactions (cereal gross primary productivity), Phenomena: Drought propagation (flash droughts), Region: Mediterranean (Spain, Portugal, France, Italy)
+2026-02-02 11:06:05 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.5424/sjar/2025234-21655
+2026-02-02 11:06:06 - biblioassistant - ERROR - Error downloading PDF: HTTPSConnectionPool(host='sjar.revistas.csic.es', port=443): Max retries exceeded with url: /index.php/sjar/article/view/21655 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))
+2026-02-02 11:06:06 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Impact of flash droughts on cereal crops under Mediterranean conditions. Trying HTML fallback.
+2026-02-02 11:06:06 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.5424/sjar/2025234-21655
+2026-02-02 11:06:07 - biblioassistant - ERROR - HTML extraction error: HTTPSConnectionPool(host='sjar.revistas.csic.es', port=443): Max retries exceeded with url: /index.php/sjar/article/view/21655 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))
+2026-02-02 11:06:07 - biblioassistant - WARNING - No text extracted for Impact of flash droughts on cereal crops under Mediterranean conditions. Using Abstract.
+2026-02-02 11:06:07 - biblioassistant - INFO - Synthesizing summary for: Impact of flash droughts on cereal crops under Mediterranean conditions using gemini-api
+2026-02-02 11:06:07 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:06:07 - biblioassistant - INFO - Checking relevance for: Dataset supporting Estrela et al. (2008): 10-minut...
+2026-02-02 11:07:10 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:07:10 - biblioassistant - INFO - Checking relevance for: Dataset supporting Estrela et al. (2008): 10-minut...
+2026-02-02 11:07:22 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:07:22 - biblioassistant - INFO - Checking relevance for: Hybrid Ensemble Learning for TWSA Prediction in Wa...
+2026-02-02 11:08:19 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Land Surface Models (LSM) not explicitly mentioned, but Terrestrial Water Storage Anomalies (TWSA) is related to groundwater-related storage changes. Specific Models/Tools: GRACE and GRACE-FO are used for satellite-based observations. Phenomena: Groundwater stress, drought response planning.
+2026-02-02 11:08:19 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.3390/hydrology13020053
+2026-02-02 11:08:19 - biblioassistant - WARNING - Failed to download PDF (Status: 404, Type: text/html;charset=utf-8)
+2026-02-02 11:08:19 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Hybrid Ensemble Learning for TWSA Prediction in Water-Stressed Regions: A Case Study from Casablanca&ndash;Settat Region, Morocco. Trying HTML fallback.
+2026-02-02 11:08:19 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.3390/hydrology13020053
+2026-02-02 11:08:19 - biblioassistant - WARNING - HTML fetch failed: 404
+2026-02-02 11:08:19 - biblioassistant - WARNING - No text extracted for Hybrid Ensemble Learning for TWSA Prediction in Water-Stressed Regions: A Case Study from Casablanca&ndash;Settat Region, Morocco. Using Abstract.
+2026-02-02 11:08:19 - biblioassistant - INFO - Synthesizing summary for: Hybrid Ensemble Learning for TWSA Prediction in Water-Stressed Regions: A Case Study from Casablanca&ndash;Settat Region, Morocco using gemini-api
+2026-02-02 11:08:19 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:08:19 - biblioassistant - INFO - Checking relevance for: Groundwater, Energy, and Poverty...
+2026-02-02 11:08:36 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:08:36 - biblioassistant - INFO - Checking relevance for: Characterization and Mapping of Underground Water ...
+2026-02-02 11:09:21 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:09:21 - biblioassistant - INFO - Checking relevance for: Characterization and Mapping of Underground Water ...
+2026-02-02 11:09:32 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:09:32 - biblioassistant - INFO - Checking relevance for: An Interdisciplinary Study of the Conservation and...
+2026-02-02 11:10:11 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:10:11 - biblioassistant - INFO - Checking relevance for: Spatiotemporal assessment of maize evapotranspirat...
+2026-02-02 11:11:31 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:11:31 - biblioassistant - INFO - Checking relevance for: Sustainability-Oriented Analysis of Different Irri...
+2026-02-02 11:12:38 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:12:38 - biblioassistant - INFO - Checking relevance for: Field‐Scale Soil Moisture Predictions in Real Time...
+2026-02-02 11:13:34 - biblioassistant - INFO - ✅ Paper is relevant: Specifically mentions Land Surface Models (LSM), Soil Moisture, Evapotranspiration, Runoff generation is not explicitly mentioned but related to the overall hydrological cycle. Uses specific tools like DREAM and FAO-based soil water balance model.
+2026-02-02 11:13:34 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.1029/2025wr041324
+2026-02-02 11:13:34 - biblioassistant - WARNING - Failed to download PDF (Status: 403, Type: text/html; charset=utf-8)
+2026-02-02 11:13:34 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Field‐Scale Soil Moisture Predictions in Real Time Using In Situ Sensor Measurements in an Inverse Modeling Framework: SWIM <sup>2</sup>. Trying HTML fallback.
+2026-02-02 11:13:34 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.1029/2025wr041324
+2026-02-02 11:13:35 - biblioassistant - WARNING - HTML fetch failed: 403
+2026-02-02 11:13:35 - biblioassistant - WARNING - No text extracted for Field‐Scale Soil Moisture Predictions in Real Time Using In Situ Sensor Measurements in an Inverse Modeling Framework: SWIM <sup>2</sup>. Using Abstract.
+2026-02-02 11:13:35 - biblioassistant - INFO - Synthesizing summary for: Field‐Scale Soil Moisture Predictions in Real Time Using In Situ Sensor Measurements in an Inverse Modeling Framework: SWIM <sup>2</sup> using gemini-api
+2026-02-02 11:13:35 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:13:35 - biblioassistant - INFO - Checking relevance for: Evaluating the Performance of Colored Plastic Mulc...
+2026-02-02 11:14:22 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:14:22 - biblioassistant - INFO - Checking relevance for: Design : Automatic Irrigation Tools on Chili Plant...
+2026-02-02 11:14:55 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:14:55 - biblioassistant - INFO - Checking relevance for: Assessment and Mapping of Landscapes for Agricultu...
+2026-02-02 11:15:40 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:15:40 - biblioassistant - INFO - Checking relevance for: A Comprehensive Review of Surface and Groundwater ...
+2026-02-02 11:16:47 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:16:47 - biblioassistant - INFO - Checking relevance for: Evaluating the Impacts of Treated Wastewater and G...
+2026-02-02 11:17:05 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:17:05 - biblioassistant - INFO - Checking relevance for: Temporal changes in the water quality and ecology ...
+2026-02-02 11:18:04 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:18:04 - biblioassistant - INFO - Checking relevance for: BaqiAhady/SM-VCI-coupling: SM–VCI coupling...
+2026-02-02 11:18:22 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Soil Moisture, Phenomena: Drought indicators/indices, Techniques: Data Assimilation (coupling modeled and satellite data)
+2026-02-02 11:18:22 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.5281/zenodo.18451684
+2026-02-02 11:18:23 - biblioassistant - WARNING - Failed to download PDF (Status: 403, Type: application/octet-stream)
+2026-02-02 11:18:23 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for BaqiAhady/SM-VCI-coupling: SM–VCI coupling. Trying HTML fallback.
+2026-02-02 11:18:23 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.5281/zenodo.18451684
+2026-02-02 11:18:24 - biblioassistant - WARNING - HTML fetch failed: 403
+2026-02-02 11:18:24 - biblioassistant - WARNING - No text extracted for BaqiAhady/SM-VCI-coupling: SM–VCI coupling. Using Abstract.
+2026-02-02 11:18:24 - biblioassistant - INFO - Synthesizing summary for: BaqiAhady/SM-VCI-coupling: SM–VCI coupling using gemini-api
+2026-02-02 11:18:24 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:18:24 - biblioassistant - INFO - Checking relevance for: BaqiAhady/SM-VCI-coupling: SM–VCI coupling...
+2026-02-02 11:18:32 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Soil Moisture, Phenomena: Drought indicators/indices, Techniques: Data Assimilation (coupling modeled and satellite data)
+2026-02-02 11:18:32 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.5281/zenodo.18451685
+2026-02-02 11:18:33 - biblioassistant - WARNING - Failed to download PDF (Status: 403, Type: application/octet-stream)
+2026-02-02 11:18:33 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for BaqiAhady/SM-VCI-coupling: SM–VCI coupling. Trying HTML fallback.
+2026-02-02 11:18:33 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.5281/zenodo.18451685
+2026-02-02 11:18:34 - biblioassistant - WARNING - HTML fetch failed: 403
+2026-02-02 11:18:34 - biblioassistant - WARNING - No text extracted for BaqiAhady/SM-VCI-coupling: SM–VCI coupling. Using Abstract.
+2026-02-02 11:18:34 - biblioassistant - INFO - Synthesizing summary for: BaqiAhady/SM-VCI-coupling: SM–VCI coupling using gemini-api
+2026-02-02 11:18:34 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:18:34 - biblioassistant - INFO - Checking relevance for: Hybrid Ensemble Learning for TWSA Prediction in Wa...
+2026-02-02 11:19:34 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Land Surface Models (LSM) not explicitly mentioned, but Terrestrial Water Storage Anomalies (TWSA) is related to groundwater-related storage changes. Specific Models/Tools: GRACE and GRACE-FO are used for satellite-based observations. Phenomena: Groundwater stress, drought response planning.
+2026-02-02 11:19:34 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.3390/hydrology13020053
+2026-02-02 11:19:34 - biblioassistant - WARNING - Failed to download PDF (Status: 404, Type: text/html;charset=utf-8)
+2026-02-02 11:19:34 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Hybrid Ensemble Learning for TWSA Prediction in Water-Stressed Regions: A Case Study from Casablanca&ndash;Settat Region, Morocco. Trying HTML fallback.
+2026-02-02 11:19:34 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.3390/hydrology13020053
+2026-02-02 11:19:34 - biblioassistant - WARNING - HTML fetch failed: 404
+2026-02-02 11:19:34 - biblioassistant - WARNING - No text extracted for Hybrid Ensemble Learning for TWSA Prediction in Water-Stressed Regions: A Case Study from Casablanca&ndash;Settat Region, Morocco. Using Abstract.
+2026-02-02 11:19:34 - biblioassistant - INFO - Synthesizing summary for: Hybrid Ensemble Learning for TWSA Prediction in Water-Stressed Regions: A Case Study from Casablanca&ndash;Settat Region, Morocco using gemini-api
+2026-02-02 11:19:34 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:19:34 - biblioassistant - INFO - Checking relevance for: Comparing Temporal Dynamics of Soil Moisture from ...
+2026-02-02 11:20:31 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Soil Moisture; Specific Models/Tools: SMAP, ECMWF; Phenomena: Temporal dynamics of soil moisture; Techniques: Remote Sensing
+2026-02-02 11:20:31 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.3390/rs18030445
+2026-02-02 11:20:31 - biblioassistant - WARNING - Failed to download PDF (Status: 404, Type: text/html;charset=utf-8)
+2026-02-02 11:20:31 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Comparing Temporal Dynamics of Soil Moisture from Remote Sensing, Modeling, and Field Observations Across Europe. Trying HTML fallback.
+2026-02-02 11:20:31 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.3390/rs18030445
+2026-02-02 11:20:32 - biblioassistant - WARNING - HTML fetch failed: 404
+2026-02-02 11:20:32 - biblioassistant - WARNING - No text extracted for Comparing Temporal Dynamics of Soil Moisture from Remote Sensing, Modeling, and Field Observations Across Europe. Using Abstract.
+2026-02-02 11:20:32 - biblioassistant - INFO - Synthesizing summary for: Comparing Temporal Dynamics of Soil Moisture from Remote Sensing, Modeling, and Field Observations Across Europe using gemini-api
+2026-02-02 11:20:32 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:20:32 - biblioassistant - INFO - Checking relevance for: Decoding LSTM to Reveal Baseflow Contributions in ...
+2026-02-02 11:21:25 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:21:25 - biblioassistant - INFO - Checking relevance for: Correction: Groundwater level and drought predicti...
+2026-02-02 11:21:43 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:21:43 - biblioassistant - INFO - Checking relevance for: Climate-Induced Livelihood Vulnerabilities and Ada...
+2026-02-02 11:22:24 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:22:24 - biblioassistant - INFO - Checking relevance for: Climate-Induced Livelihood Vulnerabilities and Ada...
+2026-02-02 11:22:33 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:22:33 - biblioassistant - INFO - Checking relevance for: Impact of flash droughts on cereal crops under Med...
+2026-02-02 11:23:22 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Land Surface Interactions (cereal gross primary productivity), Phenomena: Drought propagation (flash droughts), Region: Mediterranean (Spain, Portugal, France, Italy)
+2026-02-02 11:23:22 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.5424/sjar/2025234-21655
+2026-02-02 11:23:23 - biblioassistant - ERROR - Error downloading PDF: HTTPSConnectionPool(host='sjar.revistas.csic.es', port=443): Max retries exceeded with url: /index.php/sjar/article/view/21655 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))
+2026-02-02 11:23:23 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for Impact of flash droughts on cereal crops under Mediterranean conditions. Trying HTML fallback.
+2026-02-02 11:23:23 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.5424/sjar/2025234-21655
+2026-02-02 11:23:23 - biblioassistant - ERROR - HTML extraction error: HTTPSConnectionPool(host='sjar.revistas.csic.es', port=443): Max retries exceeded with url: /index.php/sjar/article/view/21655 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))
+2026-02-02 11:23:23 - biblioassistant - WARNING - No text extracted for Impact of flash droughts on cereal crops under Mediterranean conditions. Using Abstract.
+2026-02-02 11:23:23 - biblioassistant - INFO - Synthesizing summary for: Impact of flash droughts on cereal crops under Mediterranean conditions using gemini-api
+2026-02-02 11:23:23 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:23:23 - biblioassistant - INFO - Checking relevance for: The prospects for stormwater harvesting in Cape To...
+2026-02-02 11:24:16 - biblioassistant - INFO - ✅ Paper is relevant: Core Subjects: Managed Aquifer Recharge, Stormwater Harvesting; Region: Mediterranean is not explicitly mentioned but the study is related to South Africa which can be considered as a region with similar climate and hydrological characteristics.
+2026-02-02 11:24:16 - biblioassistant - INFO - Attempting to download PDF from: https://doi.org/10.17159/wsa/2026.v52.i1.4165.2
+2026-02-02 11:24:31 - biblioassistant - ERROR - Error downloading PDF: HTTPSConnectionPool(host='watersa.net', port=443): Max retries exceeded with url: /article/view/25607 (Caused by NameResolutionError("HTTPSConnection(host='watersa.net', port=443): Failed to resolve 'watersa.net' ([Errno -2] Name or service not known)"))
+2026-02-02 11:24:31 - biblioassistant - WARNING - PDF text extraction failed or PDF missing for The prospects for stormwater harvesting in Cape Town: Part 2 – catchment-scale managed aquifer recharge with stormwater. Trying HTML fallback.
+2026-02-02 11:24:31 - biblioassistant - INFO - Attempting HTML extraction from: https://doi.org/10.17159/wsa/2026.v52.i1.4165.2
+2026-02-02 11:24:34 - biblioassistant - INFO - Extracted 3638 chars from HTML.
+2026-02-02 11:24:34 - biblioassistant - INFO - Synthesizing summary for: The prospects for stormwater harvesting in Cape Town: Part 2 – catchment-scale managed aquifer recharge with stormwater using gemini-api
+2026-02-02 11:24:34 - biblioassistant - ERROR - GEMINI_API_KEY not found in environment.
+2026-02-02 11:24:34 - biblioassistant - INFO - Checking relevance for: Root system architecture and drought adaptation: e...
+2026-02-02 11:25:16 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:25:16 - biblioassistant - INFO - Checking relevance for: Windows Fix: how to select Curved Arcs in the YAWL...
+2026-02-02 11:25:32 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:25:32 - biblioassistant - INFO - Checking relevance for: Quality Criteria for Futures Research: Beyond Trad...
+2026-02-02 11:26:07 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:26:07 - biblioassistant - INFO - Checking relevance for: Windows Fix: how to select Curved Arcs in the YAWL...
+2026-02-02 11:26:22 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:26:22 - biblioassistant - INFO - Checking relevance for: Dialogfunktion von Public Service Media: Impulse e...
+2026-02-02 11:26:33 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:26:33 - biblioassistant - INFO - Checking relevance for: Dialogfunktion von Public Service Media: Impulse e...
+2026-02-02 11:26:41 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:26:41 - biblioassistant - INFO - Checking relevance for: Quality Criteria for Futures Research: Beyond Trad...
+2026-02-02 11:27:18 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:27:18 - biblioassistant - INFO - Checking relevance for: Repositorien im Kontext von Open Research Data...
+2026-02-02 11:27:34 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:27:34 - biblioassistant - INFO - Checking relevance for: High-resolution figures from Linhart et al. 2026...
+2026-02-02 11:27:48 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:27:48 - biblioassistant - INFO - Checking relevance for: High-resolution figures from Linhart et al. 2026...
+2026-02-02 11:27:56 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:27:56 - biblioassistant - INFO - Checking relevance for: Digitalisation and Educational Transformation in U...
+2026-02-02 11:28:43 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:28:43 - biblioassistant - INFO - Checking relevance for: Digitalisation and Educational Transformation in U...
+2026-02-02 11:28:53 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:28:53 - biblioassistant - INFO - Checking relevance for: Parental Engagement And Support In Adolescent Repr...
+2026-02-02 11:29:02 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:29:02 - biblioassistant - INFO - Checking relevance for: Impact Of Industry-Institution Partnership On Tech...
+2026-02-02 11:29:18 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:29:18 - biblioassistant - INFO - Checking relevance for: Decolonizing Science Education: Integrating Tradit...
+2026-02-02 11:29:28 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:29:28 - biblioassistant - INFO - Checking relevance for: Recalibrating Intellectual Property Frameworks: Ad...
+2026-02-02 11:29:42 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:29:42 - biblioassistant - INFO - Checking relevance for: Recalibrating Intellectual Property Frameworks: Ad...
+2026-02-02 11:29:54 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:29:54 - biblioassistant - INFO - Checking relevance for: Decolonizing Science Education: Integrating Tradit...
+2026-02-02 11:30:05 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:30:05 - biblioassistant - INFO - Checking relevance for: Impact Of Industry-Institution Partnership On Tech...
+2026-02-02 11:30:26 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:30:26 - biblioassistant - INFO - Checking relevance for: Parental Engagement And Support In Adolescent Repr...
+2026-02-02 11:30:36 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:30:36 - biblioassistant - INFO - Checking relevance for: RNA sequencing and metabolic modeling_APC-WT vs m4...
+2026-02-02 11:31:13 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:31:13 - biblioassistant - INFO - Checking relevance for: Data from Fenstermacher et al. 2026: "Potentiation...
+2026-02-02 11:31:28 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:31:28 - biblioassistant - INFO - Checking relevance for: RNA sequencing and metabolic modeling_APC-WT vs m4...
+2026-02-02 11:32:00 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:32:00 - biblioassistant - INFO - Checking relevance for: Data from Fenstermacher et al. 2026: "Potentiation...
+2026-02-02 11:32:17 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:32:17 - biblioassistant - INFO - Checking relevance for: Benchmarking Automated Security Patch Backporting:...
+2026-02-02 11:32:31 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:32:31 - biblioassistant - INFO - Checking relevance for: Benchmarking Automated Security Patch Backporting:...
+2026-02-02 11:32:43 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:32:43 - biblioassistant - INFO - Checking relevance for: 即興演奏初心者の支援を目的とした演奏入力対応型メロディ生成システム...
+2026-02-02 11:34:20 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:34:20 - biblioassistant - INFO - Checking relevance for: 即興演奏初心者の支援を目的とした演奏入力対応型メロディ生成システム...
+2026-02-02 11:34:31 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:34:31 - biblioassistant - INFO - Checking relevance for: Data repository for Mitigating hidden climate chan...
+2026-02-02 11:35:24 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:35:24 - biblioassistant - INFO - Checking relevance for: 歌声分析における音源分離の影響の調査...
+2026-02-02 11:36:56 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:36:56 - biblioassistant - INFO - Checking relevance for: The Role of Social Media in Public Health Intellig...
+2026-02-02 11:37:04 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:37:04 - biblioassistant - INFO - Checking relevance for: Gnnを用いたジャズ楽曲に対する非和声音分析...
+2026-02-02 11:38:21 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:38:21 - biblioassistant - INFO - Checking relevance for: The Phonetic Rhythm in Wishful Discourse in Nahj a...
+2026-02-02 11:38:39 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:38:39 - biblioassistant - INFO - Checking relevance for: Primary data – physicochemical properties of polya...
+2026-02-02 11:39:04 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:39:04 - biblioassistant - INFO - Checking relevance for: マーチングバンドにおけるドリル作成支援に向けた効率的なデータ記述形式に関する研究...
+2026-02-02 11:40:24 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:40:24 - biblioassistant - INFO - Checking relevance for: マーチングバンドにおけるドリル作成支援に向けた効率的なデータ記述形式に関する研究...
+2026-02-02 11:40:48 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:40:48 - biblioassistant - INFO - Checking relevance for: Bgm付き漫画ビューアのための音楽推薦システムに関する研究...
+2026-02-02 11:42:07 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:42:07 - biblioassistant - INFO - Checking relevance for: カラーバーの段階的非表示による読譜誘導型ピアノ演奏支援システムの試作...
+2026-02-02 11:43:31 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:43:31 - biblioassistant - INFO - Checking relevance for: The Role of Social Media in Public Health Intellig...
+2026-02-02 11:43:39 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:43:39 - biblioassistant - INFO - Checking relevance for: Primary data – physicochemical properties of polya...
+2026-02-02 11:44:03 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:44:03 - biblioassistant - INFO - Checking relevance for: Bgm付き漫画ビューアのための音楽推薦システムに関する研究...
+2026-02-02 11:45:17 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:45:17 - biblioassistant - INFO - Checking relevance for: カラーバーの段階的非表示による読譜誘導型ピアノ演奏支援システムの試作...
+2026-02-02 11:46:37 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:46:37 - biblioassistant - INFO - Checking relevance for: The Phonetic Rhythm in Wishful Discourse in Nahj a...
+2026-02-02 11:46:53 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 11:46:53 - biblioassistant - INFO - Checking relevance for: The Impact of Social Media on Aesthetic Treatment ...
+2026-02-02 13:24:21 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 13:24:21 - biblioassistant - INFO - Checking relevance for: The Impact of Social Media on Aesthetic Treatment ...
+2026-02-02 13:24:28 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 13:24:28 - biblioassistant - INFO - Checking relevance for: Cvrnnを用いた演奏スタイルを制御可能な演奏表情付け...
+2026-02-02 13:26:08 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 13:26:08 - biblioassistant - INFO - Checking relevance for: 歌声分析における音源分離の影響の調査...
+2026-02-02 13:27:14 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 13:27:14 - biblioassistant - INFO - Checking relevance for: Cvrnnを用いた演奏スタイルを制御可能な演奏表情付け...
+2026-02-02 13:28:54 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 13:28:54 - biblioassistant - INFO - Checking relevance for: Gnnを用いたジャズ楽曲に対する非和声音分析...
+2026-02-02 13:29:54 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 13:29:54 - biblioassistant - INFO - Checking relevance for: Personalized Mathematics Instruction through Artif...
+2026-02-02 13:30:27 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 13:30:27 - biblioassistant - INFO - Checking relevance for: A Data-Driven Advanced Deep Learning Model For Fal...
+2026-02-02 13:30:36 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-02 13:30:36 - biblioassistant - INFO - Pipeline finished. Found 134 papers, 12 were relevant, 0 successfully synthesized. Run cost: 0.0000€. Monthly total: 0.00€.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5062041022 promoted to monitored list.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5062041022 reached relevance threshold and is now being automatically monitored.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5066171098 promoted to monitored list.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5066171098 reached relevance threshold and is now being automatically monitored.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5074057929 promoted to monitored list.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5074057929 reached relevance threshold and is now being automatically monitored.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5077053732 promoted to monitored list.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5077053732 reached relevance threshold and is now being automatically monitored.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5124351458 promoted to monitored list.
+2026-02-02 13:30:36 - biblioassistant - INFO - Author A5124351458 reached relevance threshold and is now being automatically monitored.
+2026-02-02 13:30:36 - biblioassistant - INFO - Starting static site generation...
+2026-02-02 13:30:37 - biblioassistant - INFO - Site generation complete.
+2026-02-02 13:30:37 - biblioassistant - INFO - Deploying to pqs@pdx1-shared-a1-18.dreamhost.com:biblio.quintanasegui.com/...
+ssh: Could not resolve hostname pdx1-shared-a1-18.dreamhost.com: Temporary failure in name resolution
+rsync: connection unexpectedly closed (0 bytes received so far) [sender]
+rsync error: unexplained error (code 255) at io.c(232) [sender=3.2.7]
+2026-02-02 13:30:47 - biblioassistant - ERROR - Deployment failed: Command '['rsync', '-avz', '--delete', '-e', 'ssh', '/home/pquintana/projectes/biblioassistant/public/', 'pqs@pdx1-shared-a1-18.dreamhost.com:biblio.quintanasegui.com/']' returned non-zero exit status 255.
+--- Pipeline Run Finished: Mon Feb  2 13:30:47 CET 2026 ---
+
+--- Pipeline Run Started: Mon Feb  2 14:00:20 CET 2026 ---
+2026-02-02 14:00:20 - biblioassistant - INFO - Discovery starting from last run date: 2026-02-02
+2026-02-02 14:00:20 - biblioassistant - INFO - Running discovery task: Pere Quintana Seguí (author)
+2026-02-02 14:00:22 - biblioassistant - INFO - Running discovery task: My Citation Watch (author_citations)
+2026-02-02 14:00:22 - biblioassistant - INFO - Automatically finding citations for author ID: A5053499463 (Range: 2026-02-02 to 2026-02-09)
+2026-02-02 14:00:24 - biblioassistant - INFO - Found 100 papers for author. Checking their recent citations in batches...
+2026-02-02 14:00:24 - biblioassistant - INFO - Checking citations for batch 1/2...
+2026-02-02 14:00:25 - biblioassistant - INFO - Checking citations for batch 2/2...
+2026-02-02 14:00:27 - biblioassistant - INFO - Running discovery task: Journal Watch (journal)
+2026-02-02 14:00:28 - biblioassistant - INFO - Running discovery task: Local: Pyrenees & Ebro (search)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/pquintana/projectes/biblioassistant/src/main.py", line 206, in <module>
+    main()
+    ~~~~^^
+  File "/home/pquintana/projectes/biblioassistant/src/main.py", line 96, in main
+    discovered_papers = discovery.run_all_tasks(ignore_seen=args.force_all)
+  File "/home/pquintana/projectes/biblioassistant/src/discovery.py", line 60, in run_all_tasks
+    papers = self.search_by_keywords(task['query'])
+  File "/home/pquintana/projectes/biblioassistant/src/discovery.py", line 127, in search_by_keywords
+    return self._fetch_openalex(params)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/home/pquintana/projectes/biblioassistant/src/discovery.py", line 193, in _fetch_openalex
+    response = requests.get(self.base_url, params=params, timeout=30)
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/urllib3/connection.py", line 796, in connect
+    sock_and_verified = _ssl_wrap_socket_and_match_hostname(
+        sock=sock,
+    ...<14 lines>...
+        assert_fingerprint=self.assert_fingerprint,
+    )
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/urllib3/connection.py", line 975, in _ssl_wrap_socket_and_match_hostname
+    ssl_sock = ssl_wrap_socket(
+        sock=sock,
+    ...<8 lines>...
+        tls_in_tls=tls_in_tls,
+    )
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/urllib3/util/ssl_.py", line 483, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls, server_hostname)
+  File "/home/pquintana/projectes/biblioassistant/.venv/lib/python3.14/site-packages/urllib3/util/ssl_.py", line 527, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pquintana/.local/share/uv/python/cpython-3.14.2-linux-x86_64-gnu/lib/python3.14/ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sock=sock,
+        ^^^^^^^^^^
+    ...<5 lines>...
+        session=session
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/pquintana/.local/share/uv/python/cpython-3.14.2-linux-x86_64-gnu/lib/python3.14/ssl.py", line 1076, in _create
+    self.do_handshake()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/pquintana/.local/share/uv/python/cpython-3.14.2-linux-x86_64-gnu/lib/python3.14/ssl.py", line 1372, in do_handshake
+    self._sslobj.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+KeyboardInterrupt
+--- Pipeline Run Finished: Mon Feb  2 14:00:29 CET 2026 ---
+
+--- Pipeline Run Started: Tue Feb  3 12:45:31 CET 2026 ---
+2026-02-03 12:45:32 - biblioassistant - INFO - Discovery starting from last run date: 2026-02-02
+2026-02-03 12:45:32 - biblioassistant - INFO - Running discovery task: Pere Quintana Seguí (author)
+2026-02-03 12:45:34 - biblioassistant - INFO - Running discovery task: My Citation Watch (author_citations)
+2026-02-03 12:45:34 - biblioassistant - INFO - Automatically finding citations for author ID: A5053499463 (Range: 2026-02-02 to 2026-02-10)
+2026-02-03 12:45:35 - biblioassistant - INFO - Found 100 papers for author. Checking their recent citations in batches...
+2026-02-03 12:45:35 - biblioassistant - INFO - Checking citations for batch 1/2...
+2026-02-03 12:45:37 - biblioassistant - INFO - Checking citations for batch 2/2...
+2026-02-03 12:45:39 - biblioassistant - INFO - Running discovery task: Journal Watch (journal)
+2026-02-03 12:45:40 - biblioassistant - INFO - Running discovery task: Local: Pyrenees & Ebro (search)
+2026-02-03 12:45:42 - biblioassistant - INFO - Running discovery task: Global: Irrigation & LSM (search)
+2026-02-03 12:45:43 - biblioassistant - INFO - Running discovery task: Global: Model Development (search)
+2026-02-03 12:45:45 - biblioassistant - INFO - Running discovery task: Global: Hydrological Extremes (search)
+2026-02-03 12:45:47 - biblioassistant - INFO - Running discovery task: Auto-Promoted Journals (journal)
+2026-02-03 12:45:49 - biblioassistant - INFO - Running discovery task: Auto-Promoted Authors (author)
+2026-02-03 12:45:50 - biblioassistant - INFO - Discovery complete. Found 50 potential new papers.
+2026-02-03 12:45:50 - biblioassistant - INFO - Checking relevance for: Identity Across Cultures: Communication, Multiling... using gemini
+2026-02-03 12:46:06 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:46:06 - biblioassistant - INFO - Checking relevance for: The Depiction of Mental Health in Contemporary Eng... using gemini
+2026-02-03 12:46:10 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:46:10 - biblioassistant - INFO - Checking relevance for: सचर–मडय और ससकत क परसपर सबध और परवरतन... using gemini
+2026-02-03 12:46:14 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:46:14 - biblioassistant - INFO - Checking relevance for: Linguistic Transformations Driven by Social Media ... using gemini
+2026-02-03 12:46:30 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:46:30 - biblioassistant - INFO - Checking relevance for: ಡಜಟಲ ಯಗ: ಸಸಕತಕ ಪರವರತನಗಳ... using gemini
+2026-02-03 12:46:44 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:46:45 - biblioassistant - INFO - Checking relevance for: Dataset of "Operando and post-mortem study of irid... using gemini
+2026-02-03 12:46:49 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:46:49 - biblioassistant - INFO - Checking relevance for: ವಸಧದರರ ಆಯದ ಸಣಣಕಥಗಳ: ಜಗತಕರಣ ಮತತ ಸಸಕತಕ ಬಕಕಟಟಗಳ ಒದ ವಶ... using gemini
+2026-02-03 12:47:07 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:47:07 - biblioassistant - INFO - Checking relevance for: ಕನನಡ ಸಹತಯದ ಜಞನ ಪರಸರಣ ಮತತ ಸರಕಷಣಯಲಲ ಡಜಟಲ ಮನವಕಶಸತರದ ಅ... using gemini
+2026-02-03 12:47:11 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:47:11 - biblioassistant - INFO - Checking relevance for: हनद भष क मनकत क सदध करनवल करक... using gemini
+2026-02-03 12:47:24 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:47:24 - biblioassistant - INFO - Checking relevance for: ಮಸತ ವಕಟಶ ಅಯಯಗರ ಹಗ ಕ.ಪ. ಪರಣಚದರ ತಜಸವ ಅವರ ಸಣಣಕತಗಳ ತಲನ... using gemini
+2026-02-03 12:47:29 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:47:29 - biblioassistant - INFO - Checking relevance for: ಅಕಕ ಮಹದವ ಮತತ ಮರಬಯ ಅವರ ಕವತಗಳಲಲನ ಭಕತ ರಸ... using gemini
+2026-02-03 12:47:32 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:47:32 - biblioassistant - INFO - Checking relevance for: A Data Descriptor on the Impact of COVID-19 Infect... using gemini
+2026-02-03 12:47:34 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:47:34 - biblioassistant - INFO - Checking relevance for: Digital Documentation of Heritage Spaces: Preservi... using gemini
+2026-02-03 12:47:38 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:47:38 - biblioassistant - INFO - Checking relevance for: कतरम बदधमतत क मनव जवन पर परभव... using gemini
+2026-02-03 12:47:43 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:47:43 - biblioassistant - INFO - Checking relevance for: Identity Across Cultures: Communication, Multiling... using gemini
+2026-02-03 12:47:56 - biblioassistant - ERROR - Error calling Gemini: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The model is overloaded. Please try again later.', 'status': 'UNAVAILABLE'}}
+2026-02-03 12:47:56 - biblioassistant - INFO - Checking relevance for: Design as Language: Digital Tools and New Dimensio... using gemini
+2026-02-03 12:48:00 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:48:00 - biblioassistant - INFO - Checking relevance for: ಭಷ ತತರಜಞನ ಮತತ ಕತಕ ಬದಧಮತತ: ಒದ ಸಮಗರ ಅವಲಕನ... using gemini
+2026-02-03 12:48:03 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:48:03 - biblioassistant - INFO - Checking relevance for: ಭಷ ತತರಜಞನ ಮತತ ಕತಕ ಬದಧಮತತ: ಒದ ಸಮಗರ ಅವಲಕನ... using gemini
+2026-02-03 12:48:07 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:48:07 - biblioassistant - INFO - Checking relevance for: Dataset of "Operando and post-mortem study of irid... using gemini
+2026-02-03 12:48:23 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:48:23 - biblioassistant - INFO - Checking relevance for: कतरम बदधमतत क मनव जवन पर परभव... using gemini
+2026-02-03 12:48:33 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:48:33 - biblioassistant - INFO - Checking relevance for: Negotiating Patriarchy in Transit: Gendered Subjec... using gemini
+2026-02-03 12:48:48 - biblioassistant - ERROR - Error calling Gemini: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The model is overloaded. Please try again later.', 'status': 'UNAVAILABLE'}}
+2026-02-03 12:48:48 - biblioassistant - INFO - Checking relevance for: ವಸಧದರರ ಆಯದ ಸಣಣಕಥಗಳ: ಜಗತಕರಣ ಮತತ ಸಸಕತಕ ಬಕಕಟಟಗಳ ಒದ ವಶ... using gemini
+2026-02-03 12:48:53 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:48:53 - biblioassistant - INFO - Checking relevance for: ಮಸತ ವಕಟಶ ಅಯಯಗರ ಹಗ ಕ.ಪ. ಪರಣಚದರ ತಜಸವ ಅವರ ಸಣಣಕತಗಳ ತಲನ... using gemini
+2026-02-03 12:49:12 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:49:12 - biblioassistant - INFO - Checking relevance for: Themes of Good vs. Evil in Amish Tripathi's Shiva ... using gemini
+2026-02-03 12:49:29 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:49:29 - biblioassistant - INFO - Checking relevance for: भष, सहतय और ससकत म उभरत परवततय: सनम, नटक और जनससकत... using gemini
+2026-02-03 12:49:33 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:49:33 - biblioassistant - INFO - Checking relevance for: भष, सहतय और ससकत क अतरसबध... using gemini
+2026-02-03 12:49:48 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:49:48 - biblioassistant - INFO - Checking relevance for: From Historical Roots to the Digital Age: Cultural... using gemini
+2026-02-03 12:50:05 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:50:05 - biblioassistant - INFO - Checking relevance for: Laughter, Language and Popular Culture: Vadivelu a... using gemini
+2026-02-03 12:50:20 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:50:20 - biblioassistant - INFO - Checking relevance for: ದಲತ – ಬಡಯ ಸಹತಯದ ಸವರಪ - ಧರಣ ಮತತ ಲಕಷಣಗಳ... using gemini
+2026-02-03 12:50:22 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:50:22 - biblioassistant - INFO - Checking relevance for: The Depiction of Mental Health in Contemporary Eng... using gemini
+2026-02-03 12:50:27 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:50:27 - biblioassistant - INFO - Checking relevance for: A Data Descriptor on the Impact of COVID-19 Infect... using gemini
+2026-02-03 12:50:29 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-03 12:50:29 - biblioassistant - INFO - Checking relevance for: ಅಕಕ ಮಹದವ ಮತತ ಮರಬಯ ಅವರ ಕವತಗಳಲಲನ ಭಕತ ರಸ... using gemini
+--- Pipeline Run Started: Tue Feb  3 12:52:33 CET 2026 ---
+2026-02-03 12:52:34 - biblioassistant - INFO - Discovery starting from last run date: 2026-02-03
+2026-02-03 12:52:34 - biblioassistant - INFO - Running discovery task: Pere Quintana Seguí (author)
+2026-02-03 12:52:35 - biblioassistant - INFO - Running discovery task: My Citation Watch (author_citations)
+2026-02-03 12:52:35 - biblioassistant - INFO - Automatically finding citations for author ID: A5053499463 (Range: 2026-02-03 to 2026-02-10)
+2026-02-03 12:52:37 - biblioassistant - INFO - Found 100 papers for author. Checking their recent citations in batches...
+2026-02-03 12:52:37 - biblioassistant - INFO - Checking citations for batch 1/2...
+--- Pipeline Run Started: Wed Feb  4 11:36:06 CET 2026 ---
+2026-02-04 11:36:08 - biblioassistant - INFO - Discovery starting from last run date: 2026-02-03
+2026-02-04 11:36:08 - biblioassistant - INFO - Running discovery task: Pere Quintana Seguí (author)
+2026-02-04 11:36:10 - biblioassistant - INFO - Running discovery task: My Citation Watch (author_citations)
+2026-02-04 11:36:10 - biblioassistant - INFO - Automatically finding citations for author ID: A5053499463 (Range: 2026-02-03 to 2026-02-11)
+2026-02-04 11:36:12 - biblioassistant - INFO - Found 100 papers for author. Checking their recent citations in batches...
+2026-02-04 11:36:12 - biblioassistant - INFO - Checking citations for batch 1/2...
+2026-02-04 11:36:14 - biblioassistant - INFO - Checking citations for batch 2/2...
+2026-02-04 11:36:17 - biblioassistant - INFO - Running discovery task: Journal Watch (journal)
+2026-02-04 11:36:19 - biblioassistant - INFO - Running discovery task: Local: Pyrenees & Ebro (search)
+2026-02-04 11:36:21 - biblioassistant - INFO - Running discovery task: Global: Irrigation & LSM (search)
+2026-02-04 11:36:23 - biblioassistant - INFO - Running discovery task: Global: Model Development (search)
+2026-02-04 11:36:25 - biblioassistant - INFO - Running discovery task: Global: Hydrological Extremes (search)
+2026-02-04 11:36:27 - biblioassistant - INFO - Running discovery task: Auto-Promoted Journals (journal)
+2026-02-04 11:36:29 - biblioassistant - INFO - Running discovery task: Auto-Promoted Authors (author)
+2026-02-04 11:36:31 - biblioassistant - INFO - Discovery complete. Found 4 potential new papers.
+2026-02-04 11:36:31 - biblioassistant - INFO - Checking relevance for: AI Code Optimization for Sustainability: Dataset... using gemini
+2026-02-04 11:36:36 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-04 11:36:36 - biblioassistant - INFO - Checking relevance for: Dataset for "Tissue specific epigenetic and geneti... using gemini
+2026-02-04 11:36:41 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-04 11:36:41 - biblioassistant - INFO - Checking relevance for: Dataset for "Tissue specific epigenetic and geneti... using gemini
+2026-02-04 11:36:44 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-04 11:36:44 - biblioassistant - INFO - Checking relevance for: AI Code Optimization for Sustainability: Dataset... using gemini
+2026-02-04 11:36:46 - biblioassistant - INFO - ❌ Paper not relevant.
+2026-02-04 11:36:46 - biblioassistant - INFO - Pipeline finished. Found 4 papers, 0 were relevant, 0 successfully synthesized. Run cost: 0.0004€. Monthly total: 0.05€.
+2026-02-04 11:36:46 - biblioassistant - INFO - Starting static site generation...
+2026-02-04 11:36:47 - biblioassistant - INFO - Site generation complete.
+2026-02-04 11:36:47 - biblioassistant - INFO - Deploying to pqs@pdx1-shared-a1-18.dreamhost.com:biblio.quintanasegui.com/...
+sending incremental file list
+./
+about.html
+archive.html
+events.xml
+feed.xml
+index.html
+summaries/
+summaries/2007/
+summaries/2007/10.1051_lhb_2007088.html
+summaries/2008/
+summaries/2008/10.1029_2007jd008548.html
+summaries/2008/10.1175_2007jamc1636.1.html
+summaries/2009/
+summaries/2009/10.5194_hess-13-163-2009.html
+summaries/2011/
+summaries/2011/10.1029_2011jd016166.html
+summaries/2011/10.5194_nhess-11-1411-2011.html
+summaries/2011/10.5194_nhess-11-2803-2011.html
+summaries/2012/
+summaries/2012/10.1007_s10113-012-0363-9.html
+summaries/2012/10.3369_tethys.2012.9.06.html
+summaries/2013/
+summaries/2013/10.5194_nhess-13-809-2013.html
+summaries/2014/
+summaries/2014/10.5194_nhess-14-427-2014.html
+summaries/2016/
+summaries/2016/10.1007_s00382-016-3083-x.html
+summaries/2016/10.1016_j.rse.2016.02.046.html
+summaries/2016/10.3808_jei.201600335.html
+summaries/2017/
+summaries/2017/10.5194_hess-21-2187-2017.html
+summaries/2018/
+summaries/2018/10.3390_rs10091495.html
+summaries/2018/10.5194_hess-22-1371-2018.html
+summaries/2018/10.5194_hess-22-673-2018.html
+summaries/2019/
+summaries/2019/10.1002_joc.6181.html
+summaries/2019/10.1007_s11269-018-2160-9.html
+summaries/2019/10.3390_rs11060718.html
+summaries/2019/10.5194_hess-23-5111-2019.html
+summaries/2020/
+summaries/2020/10.1080_02626667.2020.1849708.html
+summaries/2020/10.3390_rs12162593.html
+summaries/2021/
+summaries/2021/10.1002_joc.7011.html
+summaries/2021/10.1029_2020wr029249.html
+summaries/2021/10.3390_rs13061112.html
+summaries/2021/10.3390_rs13204112.html
+summaries/2022/
+summaries/2022/10.1007_s00271-022-00789-9.html
+summaries/2022/10.1038_s41586-022-04917-5.html
+summaries/2022/10.3390_w14050804.html
+summaries/2022/10.37053_lameteorologie-2022-0005.html
+summaries/2022/10.5194_nhess-22-1325-2022.html
+summaries/2022/10.5194_nhess-22-3461-2022.html
+summaries/2023/
+summaries/2023/10.1007_s00382-022-06656-9.html
+summaries/2023/10.1016_j.ejrh.2023.101322.html
+summaries/2023/10.1029_2023wr034506.html
+summaries/2023/10.1029_2023wr034509.html
+summaries/2023/10.5194_essd-15-1555-2023.html
+summaries/2023/10.5194_essd-15-2009-2023.html
+summaries/2023/10.5194_hess-27-169-2023.html
+summaries/2024/
+summaries/2024/10.1007_s00271-024-00971-1.html
+summaries/2024/10.1016_j.agwat.2024.108773.html
+summaries/2024/10.1029_2022rg000801.html
+summaries/2024/10.1029_2023wr036510.html
+summaries/2024/10.3390_agronomy14091920.html
+summaries/2024/10.3390_rs16193699.html
+summaries/2024/10.3390_w16050644.html
+summaries/2024/10.5194_hess-28-3695-2024.html
+summaries/2025/
+summaries/2025/10.1002_vzj2.70047.html
+summaries/2025/10.1016_j.jag.2025.105011.html
+summaries/2025/10.1029_2024wr038220.html
+summaries/2025/10.1109_tgrs.2025.3561253.html
+summaries/2025/10.1371_journal.pwat.0000297.html
+summaries/2026/
+summaries/2026/10.1007_s41748-025-00994-4.html
+summaries/2026/10.1007_s44288-026-00389-6.html
+summaries/2026/10.1016_j.agwat.2026.110131.html
+summaries/2026/10.1029_2024wr039571.html
+summaries/2026/10.1029_2025ms005092.html
+summaries/2026/10.1029_2025wr041324.html
+summaries/2026/10.1038_s41598-025-31887-1.html
+summaries/2026/10.1038_s41598-025-33916-5.html
+summaries/2026/10.1080_22797254.2026.2622132.html
+summaries/2026/10.1111_1752-1688.70084.html
+summaries/2026/10.20944_preprints202601.2237.v1.html
+summaries/2026/10.21203_rs.3.rs-8271367_v1.html
+summaries/2026/10.2139_ssrn.6118139.html
+summaries/2026/10.3390_agriculture16030316.html
+summaries/2026/10.3390_hydrology13020053.html
+summaries/2026/10.3390_rs18030445.html
+summaries/2026/10.3390_w18030331.html
+summaries/2026/10.4995_ia.24708.html
+summaries/2026/10.5194_essd-2025-728.html
+summaries/2026/10.5194_wcd-7-223-2026.html
+summaries/2026/10.5281_zenodo.18434017.html
+summaries/2026/10.5281_zenodo.18444225.html
+summaries/2026/10.5281_zenodo.18444226.html
+summaries/2026/10.5281_zenodo.18451684.html
+summaries/2026/10.5281_zenodo.18451685.html
+summaries/2026/10.5424_sjar_2025234-21655.html
+
+sent 11,179 bytes  received 11,318 bytes  2,368.11 bytes/sec
+total size is 1,092,179  speedup is 48.55
+2026-02-04 11:36:56 - biblioassistant - INFO - Deployment successful!
+--- Pipeline Run Finished: Wed Feb  4 11:36:56 CET 2026 ---
+

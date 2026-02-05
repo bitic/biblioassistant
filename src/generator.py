@@ -5,7 +5,7 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 from typing import List, Dict
-from src.config import TEMPLATES_DIR, PUBLIC_DIR, SUMMARIES_DIR, PAPERS_DIR, SITE_URL
+from src.config import TEMPLATES_DIR, PUBLIC_DIR, SUMMARIES_DIR, PAPERS_DIR, SITE_URL, SITE_TITLE
 from src.db import db
 from src.logger import logger
 
@@ -22,6 +22,11 @@ class SiteGenerator:
             shutil.rmtree(PUBLIC_DIR)
         PUBLIC_DIR.mkdir()
         
+        # Copy assets
+        assets_src = Path("assets")
+        if assets_src.exists():
+            shutil.copytree(assets_src, PUBLIC_DIR / "assets")
+
         # Collect all summaries
         papers = self._collect_papers()
         
@@ -230,7 +235,7 @@ class SiteGenerator:
         rss_feed = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-    <title>BiblioAssistant Feed</title>
+    <title>{SITE_TITLE}</title>
     <link>{base_url}</link>
     <description>Latest scientific summaries</description>
     <lastBuildDate>{datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0000")}</lastBuildDate>
