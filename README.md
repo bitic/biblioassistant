@@ -120,7 +120,7 @@ The system uses the `run_daily.sh` script provided in the repository to manage t
 
 Developed by **[Pere Quintana Seguí](http://pere.quintanasegui.com)**.
 
-This project was partially funded by **[Fundació Observatori de l'Ebre](https://www.obsebre.es/)**.
+This project was partially funded by **[Fundació Observatori de l'Ebre](https://observatoriebre.gencat.cat)**.
 
 This project was developed with the assistance of AI tools, specifically **[Gemini CLI](https://geminicli.com)**.
 
