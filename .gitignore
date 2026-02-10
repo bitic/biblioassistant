@@ -4,9 +4,7 @@ __pycache__/
 *.pyc
 
 # Data & Persistence
-data/db.sqlite3
-data/papers/
-data/summaries/
+data/
 
 # Generated Site
 public/
