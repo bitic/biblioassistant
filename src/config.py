@@ -51,6 +51,10 @@ OPENALEX_EMAIL = os.getenv("OPENALEX_EMAIL", "your-email@example.com")
 # CORE API (Optional)
 CORE_API_KEY = os.getenv("CORE_API_KEY")
 
+# Elsevier API (Optional)
+ELSEVIER_API_KEY = os.getenv("ELSEVIER_API_KEY")
+ELSEVIER_INST_TOKEN = os.getenv("ELSEVIER_INST_TOKEN")
+
 DISCOVERY_TASKS = [
     # 1. Author Tracking: Pere Quintana Seguí
     {"name": "Pere Quintana Seguí", "type": "author", "id": "A5053499463"}, 

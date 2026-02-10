@@ -1,7 +1,7 @@
 import requests
 import fitz  # PyMuPDF
 from pathlib import Path
-from src.config import PAPERS_DIR, OPENALEX_EMAIL, CORE_API_KEY
+from src.config import PAPERS_DIR, OPENALEX_EMAIL, CORE_API_KEY, ELSEVIER_API_KEY, ELSEVIER_INST_TOKEN
 from src.models import Paper
 from src.logger import logger
 import random
@@ -146,13 +146,19 @@ class Extractor:
         """
         Attempts to download the PDF.
         1. Try direct link (with heuristics).
-        2. If failed, try Unpaywall API to find OA PDF.
+        2. If Elsevier, try Elsevier API (ScienceDirect).
+        3. If failed, try Unpaywall API to find OA PDF.
         """
         # Strategy 1: Direct Link (Existing Heuristics)
         if self._try_download_url(paper.link, save_path, paper):
             return True
             
-        # Strategy 2: Unpaywall API
+        # Strategy 2: Elsevier API (ScienceDirect)
+        if paper.doi and ("10.1016" in paper.doi or "sciencedirect" in paper.link or "elsevier" in paper.link):
+            if self._download_from_elsevier(paper.doi, save_path):
+                return True
+
+        # Strategy 3: Unpaywall API
         if paper.doi:
             logger.info(f"Direct download failed. Checking Unpaywall for OA PDF (DOI: {paper.doi})")
             oa_url = self._get_unpaywall_url(paper.doi)
@@ -161,7 +167,7 @@ class Extractor:
                 if self._try_download_url(oa_url, save_path, paper):
                     return True
             
-            # Strategy 3: CORE API
+            # Strategy 4: CORE API
             if CORE_API_KEY:
                 logger.info(f"Unpaywall failed. Checking CORE API for OA PDF (DOI: {paper.doi})")
                 core_url = self._get_core_url(paper.doi)
@@ -171,6 +177,39 @@ class Extractor:
                         return True
         
         return False
+
+    def _download_from_elsevier(self, doi: str, save_path: Path) -> bool:
+        """Downloads PDF using Elsevier Article Retrieval API."""
+        if not ELSEVIER_API_KEY:
+            logger.warning("ELSEVIER_API_KEY not set. Skipping Elsevier API.")
+            return False
+            
+        try:
+            # Note: Elsevier API requires institutional access (usually via IP) 
+            # and an API Key.
+            url = f"https://api.elsevier.com/content/article/doi/{doi}"
+            headers = {
+                "X-ELS-APIKey": ELSEVIER_API_KEY,
+                "Accept": "application/pdf"
+            }
+            if ELSEVIER_INST_TOKEN:
+                headers["X-ELS-Insttoken"] = ELSEVIER_INST_TOKEN
+            
+            logger.info(f"Requesting Elsevier API: {url}")
+            response = requests.get(url, headers=headers, stream=True, timeout=30)
+            
+            if response.status_code == 200:
+                with open(save_path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                logger.info(f"Successfully downloaded Elsevier PDF: {save_path}")
+                return True
+            else:
+                logger.warning(f"Elsevier API failed (Status: {response.status_code}): {response.text[:200]}")
+                return False
+        except Exception as e:
+            logger.error(f"Elsevier API error: {e}")
+            return False
 
     def _get_unpaywall_url(self, doi: str) -> str:
         """Queries Unpaywall API for a direct PDF link."""
