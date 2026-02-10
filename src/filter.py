@@ -26,6 +26,8 @@ The user works on Land Surface Interactions, Hydrometeorological Modeling, and C
 - Purely atmospheric dynamics without surface coupling.
 - Social sciences/policy without quantitative physical basis.
 - Studies on specific crops/agriculture without hydrological perspective.
+- **Microbiology, pathogens, and purely biological studies** (e.g., Salmonella, E. coli, bacteria in soil/water) unless the focus is on their hydrological transport modeling or large-scale water resources impacts.
+- Purely chemistry/pollution without a hydrological transport or water balance component.
 
 **INSTRUCTIONS:**
 Analyze the provided Title and Abstract.

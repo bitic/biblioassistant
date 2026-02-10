@@ -6,6 +6,7 @@ from src.config import DB_PATH, PAPERS_DIR, SUMMARIES_DIR
 from src.extractor import Extractor
 from src.synthesizer import Synthesizer
 from src.generator import SiteGenerator
+from src.discovery import Discovery
 from src.models import Paper
 from src.logger import logger
 
@@ -13,6 +14,7 @@ def recover_missing_elsevier_pdfs():
     extractor = Extractor()
     synthesizer = Synthesizer()
     generator = SiteGenerator()
+    discovery = Discovery()
     
     # 1. Connect to DB to find Elsevier papers
     conn = sqlite3.connect(DB_PATH)
@@ -41,52 +43,46 @@ def recover_missing_elsevier_pdfs():
         except:
             p_date = datetime.now()
             
-        # Create a temporary Paper object for path generation
-        paper = Paper(
-            title=title,
-            link=link,
-            published=p_date,
-            source="Recovery",
-            abstract="",
-            authors=[],
-            doi=doi
-        )
-        
+        # Check if PDF exists
         year = p_date.strftime("%Y")
-        filename_pdf = paper.to_filename().replace(".md", ".pdf")
+        # Temporary paper object for filename generation
+        temp_paper = Paper(title=title, link=link, published=p_date, source="Recovery", doi=doi)
+        filename_pdf = temp_paper.to_filename().replace(".md", ".pdf")
         pdf_path = PAPERS_DIR / year / filename_pdf
+        
+        filename_md = temp_paper.to_filename()
+        summary_path = SUMMARIES_DIR / year / filename_md
         
         newly_downloaded = False
         if not pdf_path.exists():
             logger.info(f"PDF missing for: {title} ({doi}). Attempting recovery...")
-            
-            # Ensure directory exists
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
-            
             if extractor._download_from_elsevier(doi, pdf_path):
                 logger.info(f"Successfully recovered: {filename_pdf}")
                 recovered_count += 1
                 newly_downloaded = True
-            else:
-                logger.warning(f"Failed to recover PDF for {doi}")
-        
-        # If we just downloaded it, or if it already existed but summary might be partial
-        # We check if the summary exists and if it contains the "abstract only" warning
-        filename_md = paper.to_filename()
-        summary_path = SUMMARIES_DIR / year / filename_md
         
         needs_synthesis = newly_downloaded
-        
         if not needs_synthesis and summary_path.exists():
-            # Check if it was an abstract-only summary
             with open(summary_path, "r") as f:
                 content = f.read()
                 if "Warning:** This summary was generated from the **abstract only**" in content:
-                    logger.info(f"Existing summary for {title} is abstract-only. Upgrading with full text.")
+                    logger.info(f"Existing summary for {title} is abstract-only. Upgrading.")
                     needs_synthesis = True
 
         if needs_synthesis and pdf_path.exists():
-            logger.info(f"Synthesizing full-text summary for: {title}")
+            # FETCH FULL METADATA to avoid "Unknown" authors
+            logger.info(f"Fetching full metadata for {doi} to ensure author names are correct...")
+            meta_papers = discovery.fetch_by_doi(doi)
+            if meta_papers:
+                paper = meta_papers[0]
+                # Ensure date matches what's in DB for directory consistency
+                paper.published = p_date 
+            else:
+                logger.warning(f"Could not fetch metadata for {doi}. Using database fields.")
+                paper = temp_paper
+
+            logger.info(f"Synthesizing full-text summary for: {paper.title}")
             full_text = extractor._extract_text(pdf_path)
             if full_text:
                 if synthesizer.synthesize(paper, full_text, is_full_text=True):
