@@ -94,26 +94,53 @@ class SiteGenerator:
                     except ValueError:
                         pass
                 
-                # NEW: Look for date in the content if filename parsing failed
+                # Extract original link from metadata comment
+                original_link = "#"
+                if "<!-- metadata:original_link:" in raw_content:
+                    try:
+                        part = raw_content.split("<!-- metadata:original_link:")[1]
+                        original_link = part.split(" -->")[0].strip()
+                    except IndexError:
+                        pass
+
+                # Determine Added Date (for Sorting/RSS)
+                # This comes from the database (processed_date)
+                added_date_obj = added_dates_map.get(original_link)
+                if not added_date_obj:
+                    # Fallback to file mtime if not in DB
+                    added_date_obj = datetime.fromtimestamp(md_file.stat().st_mtime)
+
+                # NEW: Robust date extraction for the paper (publication date)
+                # 1. Try to extract full Date from Identification section
+                import re
+                match = re.search(r"-\s+\*\*Date:\*\*\s+(\d{4}-\d{2}-\d{2})", raw_content)
+                if match:
+                    try:
+                        paper_date_obj = datetime.strptime(match.group(1), "%Y-%m-%d")
+                    except ValueError:
+                        pass
+                
+                # 2. Try filename: YYYYMMDD-Author.md
+                if not paper_date_obj and len(md_file.name) > 8 and md_file.name[:8].isdigit():
+                    try:
+                        date_str = md_file.name[:8]
+                        paper_date_obj = datetime.strptime(date_str, "%Y%m%d")
+                        author = md_file.name[9:-3]
+                    except ValueError:
+                        pass
+
+                # 3. Fallback to Year from Identification (using Year-01-01)
                 if not paper_date_obj:
-                    import re
-                    # Look for Year in Identification section
-                    # - **Year:** 2024
                     match = re.search(r"-\s+\*\*Year:\*\*\s+(\d{4})", raw_content)
                     if match:
-                        year_str = match.group(1)
-                        # We don't have the full date, so we use Year-01-01 as approximation
-                        # or try to extract more from Identification if available.
-                        # For now, Year-01-01 is better than current month.
                         try:
-                            paper_date_obj = datetime.strptime(f"{year_str}0101", "%Y%m%d")
+                            paper_date_obj = datetime.strptime(f"{match.group(1)}0101", "%Y%m%d")
                         except ValueError:
                             pass
 
-                # Fallback: use file mtime if content parsing also failed
+                # 4. FINAL FALLBACK: Use DB added_date (which for backfill IS publication date)
                 if not paper_date_obj:
-                    paper_date_obj = datetime.fromtimestamp(md_file.stat().st_mtime)
-                    author = md_file.stem
+                    paper_date_obj = added_date_obj
 
                 # Parse Short Summary (between ## Short Summary and next ##)
                 preview = ""
@@ -135,21 +162,6 @@ class SiteGenerator:
                 if not preview:
                     # Fallback to lines skipping the first few
                     preview = ' '.join(lines[2:5]) + '...'
-
-                # Extract original link from metadata comment
-                original_link = "#"
-                if "<!-- metadata:original_link:" in raw_content:
-                    try:
-                        part = raw_content.split("<!-- metadata:original_link:")[1]
-                        original_link = part.split(" -->")[0].strip()
-                    except IndexError:
-                        pass
-
-                # Determine Added Date (for Sorting/RSS)
-                added_date_obj = added_dates_map.get(original_link)
-                if not added_date_obj:
-                    # Fallback to file mtime if not in DB
-                    added_date_obj = datetime.fromtimestamp(md_file.stat().st_mtime)
 
                 # Convert to HTML (for summary page we keep everything except the warning comment tags)
                 html_content = markdown2.markdown(
