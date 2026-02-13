@@ -29,7 +29,10 @@ The user works on Land Surface Interactions, Hydrometeorological Modeling, and C
 - Purely marine/oceanography (unless coastal aquifers).
 - Purely atmospheric dynamics without surface coupling.
 - Social sciences/policy without quantitative physical basis.
-- Studies on specific crops/agriculture without hydrological perspective.
+- **Engineering & IoT:** Technical studies on sensor hardware, IoT protocols, cloud platforms, or general AI frameworks for "Smart Agriculture" if they lack a rigorous physical evaluation of the water cycle or land surface processes. Also REJECT purely hydraulic engineering of irrigation systems (e.g., emitter discharge rates, pump efficiency, pipe design) without a larger hydrological or water resource context.
+- **Purely Agricultural:** Studies on specific crops, yield optimization, pests, or fertilizer management that do not have a primary hydrological or water resource focus. This includes purely agronomic studies of water requirements for a single crop (e.g., "crop water requirement of ginger") without a catchment-scale or regional resource management context.
+- **Geophysics & Geomechanics:** Seismology, tectonics, or structural geology studies (e.g., "mountain bangs", fault dynamics, seismic monitoring) even if they occur within an aquifer, unless the primary focus is the water balance or resource management.
+- **Purely Hydrogeological or Geochemical:** Studies on groundwater potential mapping (e.g., using AHP, GIS overlay for zonation), aquifer characterization without physical modeling of the water cycle, or water quality/chemistry/isotopic analysis without a primary focus on water quantity or surface-subsurface coupling.
 
 **INSTRUCTIONS:**
 Analyze the provided Title and Abstract.

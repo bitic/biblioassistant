@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Library Statistics</h1>
+        <p class="lead text-muted">A quantitative overview of our curated collection in Hydrology and Climate.</p>
+    </div>
+
+    <!-- Articles per Year Table -->
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+            <h3 class="h4 fw-bold text-accent">Articles per Year</h3>
+        </div>
+        <div class="card-body px-4 pb-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Year</th>
+                            <th class="text-center" style="width: 60%;">Distribution</th>
+                            <th class="text-end pe-4">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set max_year_count = articles_per_year[0][1] if articles_per_year else 1 %}
+                        {% for year, count in articles_per_year %}
+                        <tr>
+                            <td class="ps-4 fw-bold text-dark">{{ year }}</td>
+                            <td>
+                                <div class="progress" style="height: 8px; background-color: #f0f0f0;">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: {{ (count / max_year_count * 100)|round }}%; background-color: var(--accent-color);" 
+                                         aria-valuenow="{{ count }}" aria-valuemin="0" aria-valuemax="{{ max_year_count }}"></div>
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <span class="badge bg-light text-accent border">{{ count }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Journals and Authors Grid -->
+    <div class="row g-4 mb-5">
+        <!-- Top 10 Journals -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h3 class="h4 fw-bold text-accent">Top 10 Journals</h3>
+                </div>
+                <div class="card-body px-4">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle mb-0">
+                            <tbody>
+                                {% for journal, count in top_journals %}
+                                <tr>
+                                    <td class="py-3 text-dark">{{ journal }}</td>
+                                    <td class="text-end py-3">
+                                        <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3">{{ count }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Authors -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h3 class="h4 fw-bold text-accent">Top 10 Authors</h3>
+                </div>
+                <div class="card-body px-4">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle mb-0">
+                            <tbody>
+                                {% for author, count in top_authors %}
+                                <tr>
+                                    <td class="py-3 text-dark">{{ author }}</td>
+                                    <td class="text-end py-3">
+                                        <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3">{{ count }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-accent { color: var(--accent-color); }
+    .bg-light { background-color: #f8f9fa !important; }
+    .extra-small { font-size: 0.7rem; }
+    .table thead th { 
+        font-size: 0.85rem; 
+        text-transform: uppercase; 
+        letter-spacing: 0.05em; 
+        font-weight: 700;
+        color: #777;
+        border-top: none;
+    }
+    .table td { border-bottom: 1px solid #f0f0f0; }
+    .progress-bar { transition: width 0.6s ease; }
+    .card { border-radius: 12px; }
+    .badge { font-weight: 600; }
+</style>
+{% endblock %}

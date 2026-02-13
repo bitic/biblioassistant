@@ -15,8 +15,20 @@ echo "--- Pipeline Run Started: $(date) ---" >> "$LOG_FILE"
 # 1. Navigate to project directory
 cd "$PROJECT_DIR" || exit
 
+# Find uv absolute path
+UV_PATH=$(which uv)
+if [ -z "$UV_PATH" ]; then
+    # Fallback to common location if not in PATH
+    if [ -f "/home/pquintana/.local/bin/uv" ]; then
+        UV_PATH="/home/pquintana/.local/bin/uv"
+    else
+        echo "[$(date)] ERROR: 'uv' command not found." >> "$LOG_FILE"
+        exit 1
+    fi
+fi
+
 # 2. Check if Ollama is needed
-NEEDS_OLLAMA=$(uv run -q python -c "
+NEEDS_OLLAMA=$($UV_PATH run -q python -c "
 import sys
 try:
     from src.config import RELEVANCE_ENGINE, SYNTHESIS_ENGINE, GEMINI_API_KEY, MAX_MONTHLY_COST
@@ -48,8 +60,16 @@ if [ "$NEEDS_OLLAMA" = "yes" ]; then
 fi
 
 # 3. Run the pipeline
-# The --deploy flag ensures the site is live after processing
-uv run python -m src.main --deploy >> "$LOG_FILE" 2>&1
+# Default to --deploy if no arguments are provided, otherwise use provided arguments
+if [ $# -eq 0 ]; then
+    $UV_PATH run python -m src.main --deploy >> "$LOG_FILE" 2>&1
+    
+    # 4. Run the backfill (historical papers)
+    echo "[$(date)] INFO: Starting backfill step..." >> "$LOG_FILE"
+    $UV_PATH run python backfill.py --deploy >> "$LOG_FILE" 2>&1
+else
+    $UV_PATH run python -m src.main "$@" >> "$LOG_FILE" 2>&1
+fi
 
 echo "--- Pipeline Run Finished: $(date) ---" >> "$LOG_FILE"
 echo "" >> "$LOG_FILE"

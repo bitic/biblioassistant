@@ -40,15 +40,29 @@ This document outlines the iterative development phases for the [BiblioAssistant
 - [x] **Formatting:** Ensure output is clean Markdown.
 
 ## Phase 6: Static Site Generation
+
 - [x] **Generator:** Implement `src/generator.py` to build the static site.
+
 - [x] **Templates:** Create Jinja2 templates for:
+
     - `index.html` (Recent summaries).
+
     - `archive.html` (List by Year/Month).
+
     - `paper.html` (Individual "Fitxa Estesa").
-- [ ] **RSS Feed:** Generate a site-specific RSS feed (`feed.xml`) containing the new summaries.
+
+- [x] **RSS Feed:** Generate a site-specific RSS feed (`feed.xml`) containing the new summaries.
+
 - [x] **Deployment:** Implement `src/deploy.py` or a shell script to `rsync` the `public/` directory to the remote server.
 
+
+
 ## Phase 7: Orchestration & Automation
+
 - [x] **Main Entrypoint:** Create `src/main.py` to tie all modules together.
-- [ ] **Error Handling:** Robust retries for network-dependent tasks.
+
+- [x] **Error Handling:** Robust retries for network-dependent tasks.
+
 - [x] **CLI Interface:** Basic commands to trigger manual runs or status checks.
+
+- [x] **Backfill Engine:** Automated historical data processing with daily regression.

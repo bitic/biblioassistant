@@ -7,21 +7,14 @@
     
     {% for year, months in archive.items() | sort(reverse=True) %}
         <div style="margin-top: 30px;">
-            <h3 style="color: var(--accent-color); border-bottom: 2px solid var(--border-color);">{{ year }}</h3>
-            {% for month, papers in months.items() %}
-                <h4 style="font-family: var(--font-sans); color: #666; margin-top: 20px;">{{ month }}</h4>
-                <ul style="list-style: none; padding-left: 0;">
-                    {% for paper in papers %}
-                    <li style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color);">
-                        <div class="meta" style="margin-bottom: 2px;">{{ paper.date }}</div>
-                        <a href="{{ paper.rel_path }}" style="font-weight: 600; font-size: 1.1em; line-height: 1.3; display: block; margin-bottom: 5px;">{{ paper.title }}</a>
-                        <div style="font-size: 0.9em; color: #555; font-style: italic; line-height: 1.4;">
-                            {{ paper.preview }}
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-            {% endfor %}
+            <h3 style="color: var(--accent-color); border-bottom: 2px solid var(--border-color); padding-bottom: 5px;">{{ year }}</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                {% for month_name, data in months.items() | sort(attribute='1.month_num', reverse=True) %}
+                    <a href="archive/{{ year }}/{{ data.month_num }}.html" class="btn" style="text-align: center; text-transform: none; font-weight: 500;">
+                        {{ month_name }} <span style="font-size: 0.8em; opacity: 0.8;">({{ data.papers|length }})</span>
+                    </a>
+                {% endfor %}
+            </div>
         </div>
     {% endfor %}
 {% endblock %}

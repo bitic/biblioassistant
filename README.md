@@ -80,7 +80,25 @@ uv run python -m src.main --deploy
 - `--generate-only`: Skip fetching and processing; only rebuild the static site.
 - `--rss`: Enable legacy RSS feeds (default: disabled).
 - `--add-doi <DOI>`: Manually add a specific paper by DOI.
-- `--backfill <days>`: Re-process the last N days.
+- `--backfill <days>`: Set the start date for discovery to N days ago.
+- `--to-date <YYYY-MM-DD>`: Set the end date for discovery (useful for backfilling).
+- `--backfill-mode`: Set the "added date" to the paper's publication date. This prevents historical papers from appearing in the RSS feed or the "Recent" section.
+
+## Historical Backfilling
+
+BiblioAssistant includes a mechanism to progressively populate its database with historical papers without overwhelming the RSS feed or the main page.
+
+The `backfill.py` script:
+1. Retrieves a "cursor" from the database (starting 7 days ago if first run).
+2. Processes a 7-day window of historical papers.
+3. Sets their entry date to their publication date (`--backfill-mode`).
+4. Moves the cursor back by 7 days for the next run.
+5. Stops automatically when it reaches January 1, 2000.
+
+This script is automatically called by `run_daily.sh` after the main pipeline run. To run it manually:
+```bash
+uv run python backfill.py --deploy
+```
 
 ## Scheduling
 

@@ -46,6 +46,9 @@ class SiteGenerator:
         # Generate About Page
         self._render_about()
         
+        # Generate Stats Page
+        self._render_stats(papers)
+        
         # Generate RSS
         self._generate_rss(papers[:20]) # Feed for last 20 items
         
@@ -91,7 +94,23 @@ class SiteGenerator:
                     except ValueError:
                         pass
                 
-                # Fallback: use file mtime if filename didn't yield a date
+                # NEW: Look for date in the content if filename parsing failed
+                if not paper_date_obj:
+                    import re
+                    # Look for Year in Identification section
+                    # - **Year:** 2024
+                    match = re.search(r"-\s+\*\*Year:\*\*\s+(\d{4})", raw_content)
+                    if match:
+                        year_str = match.group(1)
+                        # We don't have the full date, so we use Year-01-01 as approximation
+                        # or try to extract more from Identification if available.
+                        # For now, Year-01-01 is better than current month.
+                        try:
+                            paper_date_obj = datetime.strptime(f"{year_str}0101", "%Y%m%d")
+                        except ValueError:
+                            pass
+
+                # Fallback: use file mtime if content parsing also failed
                 if not paper_date_obj:
                     paper_date_obj = datetime.fromtimestamp(md_file.stat().st_mtime)
                     author = md_file.stem
@@ -193,10 +212,17 @@ class SiteGenerator:
         for paper in papers:
             y = paper['year']
             m = paper['month']
-            if y not in archive: archive[y] = {}
-            if m not in archive[y]: archive[y][m] = []
-            archive[y][m].append(paper)
+            month_num = paper['date_obj'].strftime("%m")
             
+            if y not in archive: archive[y] = {}
+            if m not in archive[y]: 
+                archive[y][m] = {
+                    'month_num': month_num,
+                    'papers': []
+                }
+            archive[y][m]['papers'].append(paper)
+            
+        # Render main archive page
         template = self.env.get_template("archive.html")
         output = template.render(
             archive=archive,
@@ -204,6 +230,26 @@ class SiteGenerator:
         )
         with open(PUBLIC_DIR / "archive.html", "w") as f:
             f.write(output)
+            
+        # Render individual monthly pages
+        month_template = self.env.get_template("month.html")
+        for year, months in archive.items():
+            year_dir = PUBLIC_DIR / "archive" / year
+            year_dir.mkdir(parents=True, exist_ok=True)
+            
+            for month_name, data in months.items():
+                # Sort papers in the month by date descending
+                data['papers'].sort(key=lambda x: x['date_obj'], reverse=True)
+                
+                output = month_template.render(
+                    year=year,
+                    month=month_name,
+                    papers=data['papers'],
+                    generated_at=self.generated_at
+                )
+                month_path = year_dir / f"{data['month_num']}.html"
+                with open(month_path, "w") as f:
+                    f.write(output)
 
     def _render_about(self):
         template = self.env.get_template("about.html")
@@ -211,6 +257,60 @@ class SiteGenerator:
             generated_at=self.generated_at
         )
         with open(PUBLIC_DIR / "about.html", "w") as f:
+            f.write(output)
+
+    def _render_stats(self, papers: List[Dict]):
+        from collections import Counter
+        
+        # 1. Top 10 Journals
+        journals = []
+        for paper in papers:
+            # Try to extract Journal from raw_content
+            # Format: - **Journal:** Name
+            import re
+            match = re.search(r"-\s+\*\*Journal:\*\*\s+(.*)", paper['raw_content'])
+            if match:
+                journals.append(match.group(1).strip())
+            else:
+                # Fallback to 'author' field if it looks like a journal? 
+                # Better to use a dedicated field if available.
+                # For now, if we can't find it, skip or use 'Unknown'
+                pass
+        
+        top_journals = Counter(journals).most_common(10)
+        
+        # 2. Top 10 Authors
+        # paper['author'] usually contains the primary author from filename.
+        # But for stats we might want ALL authors if available.
+        all_authors = []
+        for paper in papers:
+            # Extract Authors from Identification or Bibliographic info
+            # Format: - **Authors:** Name1, Name2...
+            import re
+            match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", paper['raw_content'])
+            if match:
+                authors_str = match.group(1).strip()
+                # Split by comma or 'and'
+                authors_list = [a.strip() for a in re.split(r",| and ", authors_str) if a.strip()]
+                all_authors.extend(authors_list)
+            else:
+                # Fallback to the primary author from metadata
+                all_authors.append(paper['author'])
+        
+        top_authors = Counter(all_authors).most_common(10)
+        
+        # 3. Articles per Year
+        years = [paper['date_obj'].year for paper in papers]
+        articles_per_year = sorted(Counter(years).items(), reverse=True)
+        
+        template = self.env.get_template("stats.html")
+        output = template.render(
+            top_journals=top_journals,
+            top_authors=top_authors,
+            articles_per_year=articles_per_year,
+            generated_at=self.generated_at
+        )
+        with open(PUBLIC_DIR / "stats.html", "w") as f:
             f.write(output)
 
     def _generate_rss(self, papers):

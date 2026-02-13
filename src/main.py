@@ -45,6 +45,8 @@ def main():
     parser.add_argument("--rss", action="store_true", help="Enable legacy RSS feeds (default: False)")
     parser.add_argument("--add-doi", type=str, help="Manually add a single paper by DOI")
     parser.add_argument("--backfill", type=int, help="Number of days to go back for discovery (overrides last run date)")
+    parser.add_argument("--to-date", type=str, help="End date for discovery (YYYY-MM-DD)")
+    parser.add_argument("--backfill-mode", action="store_true", help="Set processed_date to publication_date (prevents RSS contamination)")
     args = parser.parse_args()
 
     if args.generate_only:
@@ -65,7 +67,7 @@ def main():
         from_date_override = (datetime.now() - timedelta(days=args.backfill)).strftime("%Y-%m-%d")
         logger.info(f"Backfill requested: {args.backfill} days (Starting from {from_date_override})")
 
-    discovery = Discovery(from_date=from_date_override)
+    discovery = Discovery(from_date=from_date_override, to_date=args.to_date)
     relevance_filter = RelevanceFilter()
     extractor = Extractor()
     synthesizer = Synthesizer()
@@ -142,7 +144,8 @@ def main():
                 if synthesizer.synthesize(paper, full_text, is_full_text):
                     processed_count += 1
                     # Mark as seen in DB only after successful processing
-                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids)
+                    p_date = paper.published.strftime("%Y-%m-%d %H:%M:%S") if args.backfill_mode else None
+                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date)
                 
                 synthesizer.engine = original_engine
             else:
@@ -151,7 +154,8 @@ def main():
                 db.add_event("WARNING", msg)
         else:
             # Mark irrelevant papers as seen too, so we don't re-check them
-            db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids)
+            p_date = paper.published.strftime("%Y-%m-%d %H:%M:%S") if args.backfill_mode else None
+            db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date)
 
     end_cost = db.get_monthly_cost()
     run_cost = end_cost - start_cost

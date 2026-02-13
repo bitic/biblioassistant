@@ -180,7 +180,7 @@ class Database:
                     pass
         return results
 
-    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None):
+    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None):
         """Mark a paper as seen and record its authors."""
         import time
         retries = 3
@@ -188,10 +188,16 @@ class Database:
             try:
                 with sqlite3.connect(self.db_path, timeout=30) as conn:
                     cursor = conn.cursor()
-                    cursor.execute(
-                        'INSERT INTO seen_papers (link, doi, title, source_id) VALUES (?, ?, ?, ?)', 
-                        (link, doi, title, source_id)
-                    )
+                    if processed_date:
+                        cursor.execute(
+                            'INSERT INTO seen_papers (link, doi, title, source_id, processed_date) VALUES (?, ?, ?, ?, ?)', 
+                            (link, doi, title, source_id, processed_date)
+                        )
+                    else:
+                        cursor.execute(
+                            'INSERT INTO seen_papers (link, doi, title, source_id) VALUES (?, ?, ?, ?)', 
+                            (link, doi, title, source_id)
+                        )
                     paper_id = cursor.lastrowid
                     
                     # Record authors for frequency tracking
@@ -215,6 +221,30 @@ class Database:
             except sqlite3.IntegrityError:
                 # Normal if already exists
                 break
+
+    def set_metadata(self, key: str, value: str):
+        """Sets a system-level metadata value."""
+        try:
+            with sqlite3.connect(self.db_path, timeout=30) as conn:
+                cursor = conn.cursor()
+                cursor.execute('CREATE TABLE IF NOT EXISTS system_metadata (key TEXT PRIMARY KEY, value TEXT)')
+                cursor.execute('INSERT OR REPLACE INTO system_metadata (key, value) VALUES (?, ?)', (key, value))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"Error setting metadata {key}: {e}")
+
+    def get_metadata(self, key: str) -> str:
+        """Retrieves a system-level metadata value."""
+        try:
+            with sqlite3.connect(self.db_path, timeout=30) as conn:
+                cursor = conn.cursor()
+                cursor.execute('CREATE TABLE IF NOT EXISTS system_metadata (key TEXT PRIMARY KEY, value TEXT)')
+                cursor.execute('SELECT value FROM system_metadata WHERE key = ?', (key,))
+                result = cursor.fetchone()
+                return result[0] if result else None
+        except Exception as e:
+            logger.error(f"Error getting metadata {key}: {e}")
+            return None
 
     def get_promotable_journals(self, threshold: int = 3) -> list[str]:
         """Finds source_ids that have at least 'threshold' papers but aren't monitored yet."""

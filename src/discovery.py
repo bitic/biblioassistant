@@ -7,7 +7,7 @@ from src.logger import logger
 from src.db import db
 
 class Discovery:
-    def __init__(self, email: str = OPENALEX_EMAIL, from_date: str = None):
+    def __init__(self, email: str = OPENALEX_EMAIL, from_date: str = None, to_date: str = None):
         self.base_url = "https://api.openalex.org/works"
         self.params = {"mailto": email} if email else {}
         
@@ -25,8 +25,12 @@ class Discovery:
                 self.from_date = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
                 logger.info(f"First run detected. Discovery starting from fallback date: {self.from_date}")
             
-        # Determine End Date: Today + 7 days (safety margin)
-        self.to_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
+        # Determine End Date: Override -> Today + 7 days (safety margin)
+        if to_date:
+            self.to_date = to_date
+            logger.info(f"Discovery ending at override date: {self.to_date}")
+        else:
+            self.to_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
 
     def run_all_tasks(self, ignore_seen: bool = False) -> List[Paper]:
         """Executes all discovery tasks defined in config and DB."""
@@ -203,6 +207,10 @@ class Discovery:
                 raw_doi = work.get("doi")
                 doi = raw_doi.replace("https://doi.org/", "") if raw_doi else None
                 link = raw_doi or work.get("id")
+
+                # QUICK CHECK: Skip if already in DB
+                if db.is_seen(link, doi):
+                    continue
                 
                 # Published date
                 pub_date_str = work.get("publication_date")
