@@ -5,7 +5,53 @@ from datetime import datetime, timedelta
 from src.db import db
 from src.logger import logger
 
+def run_delayed_check():
+    """Once a month, re-scan the period from 3 months ago to catch late-indexed articles."""
+    last_check = db.get_metadata("last_delayed_check_month")
+    now = datetime.now()
+    current_month = now.strftime("%Y-%m")
+    
+    if last_check == current_month:
+        return # Already performed the check for this month
+
+    logger.info(">>> MONTHLY DELAYED CHECK: Re-scanning articles from 3 months ago...")
+    
+    # Calculate range: 1st day to last day of (Month - 3)
+    # Example: If today is Feb 13, target is Nov 1 to Nov 30.
+    first_of_this_month = now.replace(day=1)
+    last_of_3_months_ago = (first_of_this_month - timedelta(days=60)).replace(day=1) - timedelta(days=1)
+    first_of_3_months_ago = last_of_3_months_ago.replace(day=1)
+    
+    start_str = first_of_3_months_ago.strftime("%Y-%m-%d")
+    end_str = last_of_3_months_ago.strftime("%Y-%m-%d")
+    
+    msg = f"DELAYED CHECK: Re-scanning period {start_str} to {end_str}"
+    logger.info(msg)
+    db.add_event("BACKFILL_DELAYED_START", msg)
+    
+    days_back = (now - first_of_3_months_ago).days
+    
+    cmd = [
+        sys.executable, "-m", "src.main",
+        "--backfill", str(days_back),
+        "--to-date", end_str,
+        "--backfill-mode"
+    ]
+    
+    if "--deploy" in sys.argv:
+        cmd.append("--deploy")
+        
+    try:
+        subprocess.run(cmd, check=True)
+        db.set_metadata("last_delayed_check_month", current_month)
+        db.add_event("BACKFILL_DELAYED_END", f"Delayed check for {start_str} to {end_str} completed.")
+    except subprocess.CalledProcessError as e:
+        db.add_event("ERROR", f"Delayed check failed: {e}")
+
 def run_backfill():
+    # Run the monthly delayed check first (if needed)
+    run_delayed_check()
+    
     # 1. Get current backfill cursor
     cursor_str = db.get_metadata("backfill_cursor")
     
