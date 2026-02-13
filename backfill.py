@@ -34,7 +34,9 @@ def run_backfill():
     start_str = start_date.strftime("%Y-%m-%d")
     end_str = end_date.strftime("%Y-%m-%d")
     
-    logger.info(f">>> BACKFILL STEP: Processing from {start_str} to {end_str}")
+    msg = f"BACKFILL STEP: Processing from {start_str} to {end_str}"
+    logger.info(f">>> {msg}")
+    db.add_event("BACKFILL_START", msg)
 
     # 4. Calculate 'days back' for --backfill argument
     # main.py uses (datetime.now() - timedelta(days=args.backfill)) as from_date
@@ -60,10 +62,14 @@ def run_backfill():
         
         # 6. Update cursor for tomorrow
         db.set_metadata("backfill_cursor", start_str)
-        logger.info(f"Backfill step successful. New cursor: {start_str}")
+        success_msg = f"Backfill step successful. New cursor: {start_str}"
+        logger.info(success_msg)
+        db.add_event("BACKFILL_END", success_msg)
         
     except subprocess.CalledProcessError as e:
-        logger.error(f"Backfill step failed: {e}")
+        error_msg = f"Backfill step failed for period {start_str} to {end_str}: {e}"
+        logger.error(error_msg)
+        db.add_event("ERROR", error_msg)
         sys.exit(1)
 
 if __name__ == "__main__":
