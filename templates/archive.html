@@ -9,7 +9,8 @@
         <div style="margin-top: 30px;">
             <h3 style="color: var(--accent-color); border-bottom: 2px solid var(--border-color); padding-bottom: 5px;">{{ year }}</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
-                {% for month_name, data in months.items() | sort(attribute='1.month_num', reverse=True) %}
+                {% set sorted_months = months.items() | list | sort(attribute='1.month_num', reverse=True) %}
+                {% for month_name, data in sorted_months %}
                     <a href="archive/{{ year }}/{{ data.month_num }}.html" class="btn" style="text-align: center; text-transform: none; font-weight: 500;">
                         {{ month_name }} <span style="font-size: 0.8em; opacity: 0.8;">({{ data.papers|length }})</span>
                     </a>
