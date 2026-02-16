@@ -210,12 +210,14 @@ class Synthesizer:
     def _generate_deterministic_id_section(self, paper: Paper) -> str:
         """Constructs the Identification section deterministically."""
         year = paper.published.strftime("%Y")
+        full_date = paper.published.strftime("%Y-%m-%d")
         authors_list = ", ".join(paper.authors) if paper.authors else "Unknown"
         doi_link = f"https://doi.org/{paper.doi}" if paper.doi else paper.link
         
         section = f"## Identification\n"
         section += f"- **Journal:** {paper.source}\n"
         section += f"- **Year:** {year}\n"
+        section += f"- **Date:** {full_date}\n"
         section += f"- **Authors:** {authors_list}\n"
         section += f"- **DOI:** [{paper.doi}]({doi_link})\n"
         

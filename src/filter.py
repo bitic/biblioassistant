@@ -23,7 +23,7 @@ The user is a Senior Hydrologist and Climate Scientist focusing on the physical 
 **Criteria for NOT RELEVANT:**
 - **Purely Climate/Atmospheric:** Studies on atmospheric dynamics, teleconnections (ENSO, NAO), or general climate change trends WITHOUT a direct, primary focus on hydrological variables or water resources.
 - **Microbiology & Health:** Studies on pathogens (Salmonella, E. coli), epidemiology, or biological aerosols (pollen), even if they use meteorological data.
-- **Purely Ecological:** Species distribution, phenology, or biodiversity studies that do not model the physical water balance.
+- **Purely Ecological or Physiological:** Species distribution, phenology, or biodiversity studies. Also REJECT purely plant-physiological or eco-physiological studies (e.g., sap flow, xylem dynamics, stomatal conductance, leaf-level gas exchange) unless they are directly and primarily used to calibrate or validate a catchment-scale or regional hydrological model.
 - **Marine/Oceanography:** Unless focusing on coastal aquifers or saltwater intrusion.
 - **Social Sciences:** Policy or management studies without a quantitative physical/hydrological basis.
 - **Engineering & IoT:** Technical studies on sensor hardware, IoT protocols, cloud platforms, or general AI frameworks for "Smart Agriculture" if they lack a rigorous physical evaluation of the water cycle or land surface processes. Also REJECT purely hydraulic engineering of irrigation systems (e.g., emitter discharge rates, pump efficiency, pipe design) without a larger hydrological or water resource context.
