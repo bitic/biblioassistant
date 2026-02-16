@@ -61,4 +61,5 @@ The system implements a four-stage "Waterfall Filter" architecture:
 ## Project Memories
 - **Environment:** The project uses `uv` for environment and dependency management.
 - **Commit Messages:** The user prefers verbose, well-written, and descriptive commit messages that clearly explain the motivation and nature of the changes.
+- **Engine vs Content:** NEVER commit files located in the `data/` directory or any other "content" files (summaries, PDFs, news items, databases). The repository must only contain the "engine" (code, templates, config).
 

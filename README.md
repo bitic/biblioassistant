@@ -134,6 +134,13 @@ The system uses the `run_daily.sh` script provided in the repository to manage t
 - `data/`: Local storage for the database, PDFs, and Markdown summaries (ignored by git).
 - `public/`: The generated static website (ignored by git).
 
+## Development Philosophy
+
+**Separation of Engine and Content:** 
+This repository is designed to contain only the "engine" of the project: the source code, configuration structures, and templates. All "content" (processed data, PDFs, markdown summaries, databases, and news items) must reside in the `data/` directory, which is excluded from version control. 
+
+This ensures that the repository remains lightweight and focuses on the software logic, while the data is managed as a separate, local-first artifact. Files such as `data/news.json` or `data/db.sqlite3` should never be force-added to the repository.
+
 ## Author
 
 Developed by **[Pere Quintana Seguí](http://pere.quintanasegui.com)**.
