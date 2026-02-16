@@ -1,0 +1,17 @@
+[
+    {
+        "date": "2026.02.16",
+        "emoji": "🎯",
+        "text": "Avui estem treballant intensament en afinar el prompt de filtratge. L'objectiu és reduir els falsos positius d'articles purament ecofisiològics (com el flux de saba) que no tenen un enfocament clar en els recursos hídrics o la hidrologia de conca."
+    },
+    {
+        "date": "2026.02.15",
+        "emoji": "🔄",
+        "text": "S'ha creat i posat en marxa un script de backfilling. Aquesta eina ens permetrà recuperar i processar automàticament articles rellevants de mesos i anys anteriors per completar la base de dades històrica del projecte."
+    },
+    {
+        "date": "2026.02.09",
+        "emoji": "🚀",
+        "text": "Publiquem oficialment el web de BiblioAssistant. Aquest portal neix amb la missió d'automatitzar el seguiment de la literatura científica en hidrologia i canvi climàtic, facilitant la feina de síntesi als investigadors."
+    }
+]

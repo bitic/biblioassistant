@@ -1,6 +1,7 @@
 import shutil
 import markdown2
 import html
+import json
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
@@ -42,6 +43,9 @@ class SiteGenerator:
         
         # Generate Archive
         self._render_archive(papers)
+        
+        # Generate News Page
+        self._render_news()
         
         # Generate About Page
         self._render_about()
@@ -269,6 +273,24 @@ class SiteGenerator:
             generated_at=self.generated_at
         )
         with open(PUBLIC_DIR / "about.html", "w") as f:
+            f.write(output)
+
+    def _render_news(self):
+        news_file = Path("data/news.json")
+        news_data = []
+        if news_file.exists():
+            try:
+                with open(news_file, "r") as f:
+                    news_data = json.load(f)
+            except Exception as e:
+                logger.error(f"Error loading news data: {e}")
+        
+        template = self.env.get_template("news.html")
+        output = template.render(
+            news=news_data,
+            generated_at=self.generated_at
+        )
+        with open(PUBLIC_DIR / "news.html", "w") as f:
             f.write(output)
 
     def _render_stats(self, papers: List[Dict]):
