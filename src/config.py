@@ -26,14 +26,14 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "deepseek-r1:14b")
 
 # Relevance Engine ('gemini' or 'ollama')
 RELEVANCE_ENGINE = os.getenv("RELEVANCE_ENGINE", "gemini")
-RELEVANCE_MODEL = os.getenv("RELEVANCE_MODEL", "gemini-3-flash-preview")
+RELEVANCE_MODEL = os.getenv("RELEVANCE_MODEL", "gemini-2.5-flash")
 
 # Synthesis Engine ('gemini-api', 'gemini-cli', or 'ollama')
 SYNTHESIS_ENGINE = os.getenv("SYNTHESIS_ENGINE", "gemini-api")
 
 # Remote LLM (Gemini)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 # Deployment
 REMOTE_HOST = os.getenv("REMOTE_HOST", "your.server.com")
@@ -79,5 +79,8 @@ DISCOVERY_TASKS = [
     {"name": "Global: Model Development", "type": "search", "query": "\"SURFEX\" OR \"SAFRAN\" OR \"mHM model\" OR \"ORCHIDEE model\" OR \"JULES model\" OR \"VIC model\" OR \"LPRM\" OR \"global hydrolocial model\""},
 
     # 7. Global Process: Drought & Flood Extremes
-    {"name": "Global: Hydrological Extremes", "type": "search", "query": "(\"drought\" OR \"flash flood\") AND (\"groundwater\" OR \"soil moisture\" OR \"data assimilation\")"}
+    {"name": "Global: Hydrological Extremes", "type": "search", "query": "(\"drought\" OR \"flash flood\") AND (\"groundwater\" OR \"soil moisture\" OR \"data assimilation\")"},
+
+    # 8. New Journal Watch: Earth Observation (EO)
+    {"name": "Earth Observation (EO)", "type": "issn", "issn": "3054-1786"}
 ]

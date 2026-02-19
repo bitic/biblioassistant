@@ -70,6 +70,8 @@ class Discovery:
                 papers = self.search_citations_for_author(task['id'])
             elif task['type'] == "journal":
                 papers = self.search_by_journal(task['id'])
+            elif task['type'] == "issn":
+                papers = self.search_by_issn(task['issn'])
             
             # Filter duplicates and seen papers
             for paper in papers:
@@ -143,6 +145,15 @@ class Discovery:
         params = self.params.copy()
         params.update({
             "filter": f"primary_location.source.id:{source_id},from_publication_date:{self.from_date},to_publication_date:{self.to_date}",
+            "sort": "publication_date:desc",
+            "per_page": 50
+        })
+        return self._fetch_openalex(params)
+
+    def search_by_issn(self, issn: str) -> List[Paper]:
+        params = self.params.copy()
+        params.update({
+            "filter": f"primary_location.source.issn:{issn},from_publication_date:{self.from_date},to_publication_date:{self.to_date}",
             "sort": "publication_date:desc",
             "per_page": 50
         })

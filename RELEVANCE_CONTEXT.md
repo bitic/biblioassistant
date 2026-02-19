@@ -7,6 +7,7 @@
 4.  **Journal of Hydrology:** `https://rss.sciencedirect.com/publication/science/00221694`
 5.  **International Journal of Climatology:** `https://rmets.onlinelibrary.wiley.com/feed/10970088/most-recent`
 6.  **Natural Hazards and Earth System Sciences (NHESS):** `https://nhess.copernicus.org/xml/rss2_0.xml`
+7.  **Earth Observation (EO):** `https://earth-observation.net/` (New journal, check for RSS later)
 
 ## Local Filter Prompt (Ollama)
 
