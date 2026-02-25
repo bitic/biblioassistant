@@ -57,11 +57,17 @@
                     <div class="table-responsive">
                         <table class="table table-sm table-hover align-middle mb-0">
                             <tbody>
-                                {% for journal, count in top_journals %}
+                                {% for journal in top_journals %}
                                 <tr>
-                                    <td class="py-3 text-dark">{{ journal }}</td>
+                                    <td class="py-3 text-dark">
+                                        {% if journal.url %}
+                                        <a href="{{ journal.url }}" target="_blank" rel="noopener noreferrer">{{ journal.name }}</a>
+                                        {% else %}
+                                        {{ journal.name }}
+                                        {% endif %}
+                                    </td>
                                     <td class="text-end py-3">
-                                        <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3">{{ count }}</span>
+                                        <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3">{{ journal.count }}</span>
                                     </td>
                                 </tr>
                                 {% endfor %}

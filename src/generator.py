@@ -15,6 +15,7 @@ class SiteGenerator:
         self.env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
         self.env.filters['slugify'] = self._slugify
         self.generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.journal_url_map = {} # Name -> URL
 
     def build(self):
         logger.info("Starting static site generation...")
@@ -29,8 +30,17 @@ class SiteGenerator:
         if assets_src.exists():
             shutil.copytree(assets_src, PUBLIC_DIR / "assets")
 
+        # Fetch added dates and journal URLs from DB
+        try:
+            added_dates_map = db.get_all_processed_dates()
+            self.paper_journal_links = db.get_journal_urls() # link -> (id, url)
+        except Exception as e:
+            logger.warning(f"Could not fetch metadata from DB: {e}")
+            added_dates_map = {}
+            self.paper_journal_links = {}
+
         # Collect all summaries
-        papers = self._collect_papers()
+        papers = self._collect_papers(added_dates_map)
         
         # Sort by added date (descending)
         papers.sort(key=lambda x: x['added_date_obj'], reverse=True)
@@ -175,14 +185,21 @@ class SiteGenerator:
         with open(PUBLIC_DIR / "news.xml", "w") as f:
             f.write(rss_feed)
 
-    def _collect_papers(self) -> List[Dict]:
+    def _collect_papers(self, added_dates_map: dict) -> List[Dict]:
         papers = []
-        # Fetch added dates from DB
+        # Fetch added dates and journal URLs from DB
         try:
             added_dates_map = db.get_all_processed_dates()
+            # New helper to get journal URLs
+            conn = sqlite3.connect(db.db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT DISTINCT source_id, source_url FROM seen_papers WHERE source_url IS NOT NULL")
+            journal_db_urls = {row[0]: row[1] for row in cursor.fetchall() if row[0]}
+            conn.close()
         except Exception as e:
-            logger.warning(f"Could not fetch processed dates from DB: {e}")
+            logger.warning(f"Could not fetch metadata from DB: {e}")
             added_dates_map = {}
+            journal_db_urls = {}
 
         # Walk through YYYY directories
         for year_dir in SUMMARIES_DIR.glob("*"):
@@ -203,32 +220,54 @@ class SiteGenerator:
                 if lines and lines[0].startswith('# '):
                     title = lines[0][2:].strip()
 
-                # Parse filename: YYYYMMDD-Author.md or DOI.md
-                if len(md_file.name) > 8 and md_file.name[:8].isdigit():
+                # DETERMINISTIC EXTRACTION (Identification Section)
+                import re
+                
+                # 1. Journal and Source URL
+                journal = "Unknown"
+                source_url = None
+                match = re.search(r"-\s+\*\*Journal:\*\*\s+(.*)", raw_content)
+                if match:
+                    val = match.group(1).strip()
+                    if val.startswith("[") and "](" in val:
+                        inner_match = re.search(r"\[(.*?)\]\((.*?)\)", val)
+                        if inner_match:
+                            journal = inner_match.group(1)
+                            source_url = inner_match.group(2)
+                    else:
+                        journal = val
+
+                # 2. Paper Date
+                match = re.search(r"-\s+\*\*Date:\*\*\s+(\d{4}-\d{2}-\d{2})", raw_content)
+                if match:
+                    try:
+                        paper_date_obj = datetime.strptime(match.group(1), "%Y-%m-%d")
+                    except ValueError:
+                        pass
+                
+                # 3. Filename Fallback for Date/Author
+                if not paper_date_obj and len(md_file.name) > 8 and md_file.name[:8].isdigit():
                     try:
                         date_str = md_file.name[:8]
                         paper_date_obj = datetime.strptime(date_str, "%Y%m%d")
                         author = md_file.name[9:-3]
                     except ValueError:
                         pass
-                
-                # Robust author extraction from content if filename didn't yield a good name
-                if author == "Unknown":
-                    import re
-                    match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", raw_content)
-                    if match:
-                        authors_str = match.group(1).strip()
-                        # Extract first author
-                        if authors_str.count(',') > authors_str.count(';'):
-                            parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
-                            if len(parts) > 1 and len(parts) % 2 == 0:
-                                author = f"{parts[1]} {parts[0]}"
-                            else:
-                                author = parts[0]
+
+                # 4. Authors
+                match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", raw_content)
+                if match:
+                    authors_str = match.group(1).strip()
+                    if authors_str.count(',') > authors_str.count(';'):
+                        parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
+                        if len(parts) > 1 and len(parts) % 2 == 0:
+                            author = f"{parts[1]} {parts[0]}"
                         else:
-                            parts = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
                             author = parts[0]
-                
+                    else:
+                        parts = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
+                        author = parts[0]
+
                 # Extract original link from metadata comment
                 original_link = "#"
                 if "<!-- metadata:original_link:" in raw_content:
@@ -239,32 +278,11 @@ class SiteGenerator:
                         pass
 
                 # Determine Added Date (for Sorting/RSS)
-                # This comes from the database (processed_date)
                 added_date_obj = added_dates_map.get(original_link)
                 if not added_date_obj:
-                    # Fallback to file mtime if not in DB
                     added_date_obj = datetime.fromtimestamp(md_file.stat().st_mtime)
 
-                # NEW: Robust date extraction for the paper (publication date)
-                # 1. Try to extract full Date from Identification section
-                import re
-                match = re.search(r"-\s+\*\*Date:\*\*\s+(\d{4}-\d{2}-\d{2})", raw_content)
-                if match:
-                    try:
-                        paper_date_obj = datetime.strptime(match.group(1), "%Y-%m-%d")
-                    except ValueError:
-                        pass
-                
-                # 2. Try filename: YYYYMMDD-Author.md
-                if not paper_date_obj and len(md_file.name) > 8 and md_file.name[:8].isdigit():
-                    try:
-                        date_str = md_file.name[:8]
-                        paper_date_obj = datetime.strptime(date_str, "%Y%m%d")
-                        author = md_file.name[9:-3]
-                    except ValueError:
-                        pass
-
-                # 3. Fallback to Year from Identification (using Year-01-01)
+                # Fallback to Year from Identification (using Year-01-01)
                 if not paper_date_obj:
                     match = re.search(r"-\s+\*\*Year:\*\*\s+(\d{4})", raw_content)
                     if match:
@@ -273,13 +291,12 @@ class SiteGenerator:
                         except ValueError:
                             pass
 
-                # 4. FINAL FALLBACK: Use DB added_date (which for backfill IS publication date)
+                # FINAL FALLBACK: Use DB added_date
                 if not paper_date_obj:
                     paper_date_obj = added_date_obj
 
-                # Parse Short Summary (between ## Short Summary and next ##)
+                # Parse Short Summary
                 preview = ""
-                # Strip warning if present for the preview
                 clean_for_preview = raw_content
                 if "<!-- warning_start -->" in clean_for_preview:
                     parts = clean_for_preview.split("<!-- warning_start -->")
@@ -295,29 +312,30 @@ class SiteGenerator:
                         pass
                 
                 if not preview:
-                    # Fallback to lines skipping the first few
                     preview = ' '.join(lines[2:5]) + '...'
 
-                # Convert to HTML (for summary page we keep everything except the warning comment tags)
+                # Convert to HTML
                 html_content = markdown2.markdown(
                     raw_content.replace("<!-- warning_start -->", "").replace("<!-- warning_end -->", ""),
                     extras=["fenced-code-blocks"]
                 )
                 
-                # Relative paths for links
-                # Page will be at: public/summaries/YYYY/filename.html
-                
                 rel_path = f"summaries/{year_dir.name}/{md_file.stem}.html"
                 
+                if journal != "Unknown" and source_url:
+                    self.journal_url_map[journal] = source_url
+
                 papers.append({
                     'title': title,
                     'author': author,
-                    'date': paper_date_obj.strftime("%Y-%m-%d"), # Display date (Paper date)
-                    'date_obj': paper_date_obj, # Keep for archive logic?
-                    'added_date_obj': added_date_obj, # For Sorting/RSS
+                    'journal': journal,
+                    'source_url': source_url,
+                    'date': paper_date_obj.strftime("%Y-%m-%d"),
+                    'date_obj': paper_date_obj,
+                    'added_date_obj': added_date_obj,
                     'preview': preview,
                     'content': html_content,
-                    'raw_content': raw_content, # for RSS
+                    'raw_content': raw_content,
                     'rel_path': rel_path,
                     'original_link': original_link,
                     'year': year_dir.name,
@@ -363,6 +381,16 @@ class SiteGenerator:
                 
                 # Replace in HTML
                 content_html = content_html.replace(original_authors_html, linked_authors)
+
+        # Post-process journal name to be clickable
+        journal_match = re.search(r"<li><strong>Journal:</strong>\s*(.*?)</li>", content_html)
+        if journal_match:
+            original_journal = journal_match.group(1).strip()
+            # If it's already a link (for new papers), don't replace
+            if not original_journal.startswith("<a"):
+                url = self.journal_url_map.get(original_journal)
+                if url:
+                    content_html = content_html.replace(f"<strong>Journal:</strong> {original_journal}", f'<strong>Journal:</strong> <a href="{url}" target="_blank" rel="noopener noreferrer">{original_journal}</a>')
 
         output = template.render(
             title=paper['title'],
@@ -465,19 +493,16 @@ class SiteGenerator:
         # 1. Top 10 Journals
         journals = []
         for paper in papers:
-            # Try to extract Journal from raw_content
-            # Format: - **Journal:** Name
-            import re
-            match = re.search(r"-\s+\*\*Journal:\*\*\s+(.*)", paper['raw_content'])
-            if match:
-                journals.append(match.group(1).strip())
-            else:
-                # Fallback to 'author' field if it looks like a journal? 
-                # Better to use a dedicated field if available.
-                # For now, if we can't find it, skip or use 'Unknown'
-                pass
+            journals.append(paper['journal'])
         
-        top_journals = Counter(journals).most_common(10)
+        top_journals_counts = Counter(journals).most_common(10)
+        top_journals = []
+        for journal, count in top_journals_counts:
+            top_journals.append({
+                'name': journal,
+                'count': count,
+                'url': self.journal_url_map.get(journal)
+            })
         
         # 2. Top 10 Authors
         all_authors = []

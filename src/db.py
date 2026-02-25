@@ -35,6 +35,10 @@ class Database:
         if 'type' not in columns:
             logger.info("Migrating database: adding type column to seen_papers.")
             cursor.execute('ALTER TABLE seen_papers ADD COLUMN type TEXT')
+        
+        if 'source_url' not in columns:
+            logger.info("Migrating database: adding source_url column to seen_papers.")
+            cursor.execute('ALTER TABLE seen_papers ADD COLUMN source_url TEXT')
 
         # 3. Create Promotion Tables
         cursor.execute('''
@@ -184,7 +188,16 @@ class Database:
                     pass
         return results
 
-    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None, type: str = None):
+    def get_journal_urls(self) -> dict:
+        """Returns a mapping of paper_link -> (source_id, source_url)."""
+        conn = sqlite3.connect(self.db_path, timeout=30)
+        cursor = conn.cursor()
+        cursor.execute('SELECT link, source_id, source_url FROM seen_papers WHERE source_url IS NOT NULL')
+        rows = cursor.fetchall()
+        conn.close()
+        return {row[0]: (row[1], row[2]) for row in rows}
+
+    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None, type: str = None, source_url: str = None):
         """Mark a paper as seen and record its authors."""
         import time
         retries = 3
@@ -194,13 +207,13 @@ class Database:
                     cursor = conn.cursor()
                     if processed_date:
                         cursor.execute(
-                            'INSERT INTO seen_papers (link, doi, title, source_id, processed_date, type) VALUES (?, ?, ?, ?, ?, ?)', 
-                            (link, doi, title, source_id, processed_date, type)
+                            'INSERT INTO seen_papers (link, doi, title, source_id, processed_date, type, source_url) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+                            (link, doi, title, source_id, processed_date, type, source_url)
                         )
                     else:
                         cursor.execute(
-                            'INSERT INTO seen_papers (link, doi, title, source_id, type) VALUES (?, ?, ?, ?, ?)', 
-                            (link, doi, title, source_id, type)
+                            'INSERT INTO seen_papers (link, doi, title, source_id, type, source_url) VALUES (?, ?, ?, ?, ?, ?)', 
+                            (link, doi, title, source_id, type, source_url)
                         )
                     paper_id = cursor.lastrowid
                     
