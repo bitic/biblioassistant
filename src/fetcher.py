@@ -94,6 +94,7 @@ class Fetcher:
                         link=link,
                         published=published_date,
                         source=source,
+                        source_url=None, # RSS doesn't provide this easily
                         abstract=clean_abstract,
                         authors=authors,
                         doi=self._extract_doi(entry),

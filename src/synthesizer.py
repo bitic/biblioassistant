@@ -214,8 +214,12 @@ class Synthesizer:
         authors_list = ", ".join(paper.authors) if paper.authors else "Unknown"
         doi_link = f"https://doi.org/{paper.doi}" if paper.doi else paper.link
         
+        journal_display = paper.source
+        if paper.source_url:
+            journal_display = f"[{paper.source}]({paper.source_url})"
+            
         section = f"## Identification\n"
-        section += f"- **Journal:** {paper.source}\n"
+        section += f"- **Journal:** {journal_display}\n"
         section += f"- **Year:** {year}\n"
         section += f"- **Date:** {full_date}\n"
         section += f"- **Authors:** {authors_list}\n"

@@ -2,6 +2,7 @@ import shutil
 import markdown2
 import html
 import json
+import sqlite3
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
@@ -223,6 +224,15 @@ class SiteGenerator:
                 # DETERMINISTIC EXTRACTION (Identification Section)
                 import re
                 
+                # Extract original link from metadata comment (needed for DB lookups)
+                original_link = "#"
+                if "<!-- metadata:original_link:" in raw_content:
+                    try:
+                        part = raw_content.split("<!-- metadata:original_link:")[1]
+                        original_link = part.split(" -->")[0].strip()
+                    except IndexError:
+                        pass
+
                 # 1. Journal and Source URL
                 journal = "Unknown"
                 source_url = None
@@ -236,6 +246,13 @@ class SiteGenerator:
                             source_url = inner_match.group(2)
                     else:
                         journal = val
+
+                # If source_url not in MD, check DB mapping
+                if not source_url and original_link in self.paper_journal_links:
+                    _, source_url = self.paper_journal_links[original_link]
+
+                if journal != "Unknown" and source_url:
+                    self.journal_url_map[journal] = source_url
 
                 # 2. Paper Date
                 match = re.search(r"-\s+\*\*Date:\*\*\s+(\d{4}-\d{2}-\d{2})", raw_content)
@@ -267,15 +284,6 @@ class SiteGenerator:
                     else:
                         parts = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
                         author = parts[0]
-
-                # Extract original link from metadata comment
-                original_link = "#"
-                if "<!-- metadata:original_link:" in raw_content:
-                    try:
-                        part = raw_content.split("<!-- metadata:original_link:")[1]
-                        original_link = part.split(" -->")[0].strip()
-                    except IndexError:
-                        pass
 
                 # Determine Added Date (for Sorting/RSS)
                 added_date_obj = added_dates_map.get(original_link)
@@ -322,9 +330,6 @@ class SiteGenerator:
                 
                 rel_path = f"summaries/{year_dir.name}/{md_file.stem}.html"
                 
-                if journal != "Unknown" and source_url:
-                    self.journal_url_map[journal] = source_url
-
                 papers.append({
                     'title': title,
                     'author': author,

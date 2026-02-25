@@ -9,6 +9,7 @@ class Paper:
     published: datetime
     source: str  # Journal name or Feed title
     source_id: Optional[str] = None # OpenAlex Source ID or similar
+    source_url: Optional[str] = None # Journal homepage URL
     abstract: str = ""
     authors: List[str] = field(default_factory=list)
     author_ids: List[str] = field(default_factory=list) # OpenAlex Author IDs
