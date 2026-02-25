@@ -29,10 +29,11 @@ The user works on Land Surface Interactions, Hydrometeorological Modeling, and C
 **Criteria for NOT RELEVANT:**
 - Purely marine/oceanography (unless coastal aquifers).
 - Purely atmospheric dynamics without surface coupling.
-- Social sciences/policy without quantitative physical basis.
+- **Social Sciences:** Policy, management, or sociological studies without a quantitative physical/hydrological basis. This includes qualitative analyses of "post-modern transformations", "digitalization challenges", or "sustainability narratives".
 - **Plant Physiology / Eco-physiology:** REJECT purely physiological studies (e.g., sap flow, xylem dynamics, stomatal conductance, leaf-level gas exchange) unless they are directly integrated into a catchment-scale or regional hydrological context.
 - **Engineering & IoT:** Technical studies on sensor hardware, IoT protocols, cloud platforms, or general AI frameworks for "Smart Agriculture" if they lack a rigorous physical evaluation of the water cycle or land surface processes. Also REJECT purely hydraulic engineering of irrigation systems (e.g., emitter discharge rates, pump efficiency, pipe design) without a larger hydrological or water resource context.
-- **Purely Agricultural:** Studies on specific crops, yield optimization, pests, or fertilizer management that do not have a primary hydrological or water resource focus. This includes purely agronomic studies of water requirements for a single crop (e.g., "crop water requirement of ginger") without a catchment-scale or regional resource management context.
+- **Smart Agriculture (Management):** REJECT articles focusing on the adoption, market analysis, or business management of "smart farming" technologies.
+- **Purely Agricultural:** Studies on specific crops (e.g., sugar cane, ginger, etc.), yield optimization, pests, or fertilizer management that do not have a primary hydrological or water resource focus. This includes purely agronomic studies of water requirements for a single crop without a catchment-scale or regional resource management context.
 - **Geophysics & Geomechanics:** Seismology, tectonics, or structural geology studies (e.g., "mountain bangs", fault dynamics, seismic monitoring) even if they occur within an aquifer, unless the primary focus is the water balance or resource management.
 - **Purely Hydrogeological or Geochemical:** Studies on groundwater potential mapping (e.g., using AHP, GIS overlay for zonation), aquifer characterization without physical modeling of the water cycle, or water quality/chemistry/isotopic analysis without a primary focus on water quantity or surface-subsurface coupling.
 
