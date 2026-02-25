@@ -18,6 +18,7 @@
     <div class="paper-item">
         <a href="{{ paper.rel_path }}" class="paper-title">{{ paper.title }}</a>
         <div class="meta">
+            <span>By <a href="/authors/{{ paper.author|slugify }}.html">{{ paper.author }}</a></span> |
             <span>Published on {{ paper.date }}</span>
         </div>
         <div class="paper-preview">

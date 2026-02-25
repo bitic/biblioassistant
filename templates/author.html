@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Articles by {{ author_name }} - BiblioAssistant{% endblock %}
+
+{% block content %}
+<h1>Articles by {{ author_name }}</h1>
+
+<div class="author-papers">
+    {% for paper in papers %}
+    <div class="paper-item" style="margin-bottom: 1.5em; border-left: 3px solid var(--accent-color); padding-left: 15px;">
+        <div class="meta" style="margin-bottom: 5px;">
+            <strong>{{ author_name }}{% if paper.other_authors_count > 0 %} et al.{% endif %}</strong> ({{ paper.year }})
+        </div>
+        <a href="/{{ paper.rel_path }}" class="paper-title" style="font-size: 1.1em; line-height: 1.3;">{{ paper.title }}</a>
+    </div>
+    {% endfor %}
+</div>
+
+<p style="margin-top: 40px;">
+    <a href="/stats.html" class="btn">&larr; Back to Stats</a>
+</p>
+{% endblock %}

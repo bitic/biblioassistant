@@ -13,6 +13,7 @@ from src.logger import logger
 class SiteGenerator:
     def __init__(self):
         self.env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
+        self.env.filters['slugify'] = self._slugify
         self.generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def build(self):
@@ -62,7 +63,65 @@ class SiteGenerator:
         # Generate News RSS
         self._generate_news_rss()
         
+        # Generate Author Pages
+        self._render_author_pages(papers)
+        
         logger.info("Site generation complete.")
+
+    def _render_author_pages(self, papers):
+        """Generates a separate page for each author with their list of papers."""
+        author_map = {}
+        for paper in papers:
+            import re
+            match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", paper['raw_content'])
+            authors_to_index = []
+            if match:
+                authors_str = match.group(1).strip()
+                if authors_str.count(',') > authors_str.count(';'):
+                    parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
+                    if len(parts) > 1 and len(parts) % 2 == 0:
+                        for i in range(0, len(parts), 2):
+                            authors_to_index.append(f"{parts[i+1]} {parts[i]}")
+                    else:
+                        authors_to_index.extend(parts)
+                else:
+                    authors_to_index.extend([a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()])
+            else:
+                authors_to_index.append(paper['author'])
+
+            for name in authors_to_index:
+                if len(name) < 4 or "Geological Survey" in name: continue
+                if name not in author_map:
+                    author_map[name] = []
+                
+                author_map[name].append({
+                    'title': paper['title'],
+                    'year': paper['date_obj'].year,
+                    'rel_path': paper['rel_path'],
+                    'other_authors_count': len(authors_to_index) - 1
+                })
+
+        template = self.env.get_template("author.html")
+        out_dir = PUBLIC_DIR / "authors"
+        out_dir.mkdir(exist_ok=True)
+
+        for name, author_papers in author_map.items():
+            author_papers.sort(key=lambda x: x['year'], reverse=True)
+            slug = self._slugify(name)
+            output = template.render(
+                author_name=name,
+                papers=author_papers,
+                generated_at=self.generated_at
+            )
+            with open(out_dir / f"{slug}.html", "w") as f:
+                f.write(output)
+
+    def _slugify(self, text):
+        import re
+        import unicodedata
+        text = str(unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii'))
+        text = text.lower()
+        return re.sub(r'[^\w\s-]', '', text).strip().replace(' ', '-')
 
     def _generate_news_rss(self):
         """Generates an RSS feed for the news section."""
@@ -253,9 +312,44 @@ class SiteGenerator:
     def _render_paper(self, paper):
         template = self.env.get_template("paper.html")
         summary_link = f"{SITE_URL}/{paper['rel_path']}"
+        
+        # Post-process content to make authors clickable
+        # We look for the "Authors:** Name1, Name2" line in the HTML
+        content_html = paper['content']
+        import re
+        authors_match = re.search(r"<li><strong>Authors:</strong>\s*(.*?)</li>", content_html)
+        if authors_match:
+            original_authors_html = authors_match.group(1)
+            # Split by comma or 'and' while preserving commas for the final string
+            # This is tricky in HTML, but we can try to find names.
+            # A simpler way is to use the raw_content authors if we can map them back.
+            
+            # Let's extract authors from raw_content (more reliable)
+            raw_match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", paper['raw_content'])
+            if raw_match:
+                raw_authors_str = raw_match.group(1).strip()
+                # Use logic similar to author indexing
+                if raw_authors_str.count(',') > raw_authors_str.count(';'):
+                    parts = [p.strip() for p in re.split(r",| and ", raw_authors_str) if p.strip()]
+                    if len(parts) > 1 and len(parts) % 2 == 0:
+                        processed_parts = []
+                        for i in range(0, len(parts), 2):
+                            name = f"{parts[i+1]} {parts[i]}"
+                            slug = self._slugify(name)
+                            processed_parts.append(f'<a href="/authors/{slug}.html">{name}</a>')
+                        linked_authors = ", ".join(processed_parts)
+                    else:
+                        linked_authors = ", ".join([f'<a href="/authors/{self._slugify(a)}.html">{a}</a>' for a in parts])
+                else:
+                    parts = [a.strip() for a in re.split(r",| and |;", raw_authors_str) if a.strip()]
+                    linked_authors = ", ".join([f'<a href="/authors/{self._slugify(a)}.html">{a}</a>' for a in parts])
+                
+                # Replace in HTML
+                content_html = content_html.replace(original_authors_html, linked_authors)
+
         output = template.render(
             title=paper['title'],
-            content=paper['content'],
+            content=content_html,
             original_link=paper['original_link'],
             summary_link=summary_link,
             generated_at=self.generated_at
@@ -369,24 +463,40 @@ class SiteGenerator:
         top_journals = Counter(journals).most_common(10)
         
         # 2. Top 10 Authors
-        # paper['author'] usually contains the primary author from filename.
-        # But for stats we might want ALL authors if available.
         all_authors = []
         for paper in papers:
-            # Extract Authors from Identification or Bibliographic info
-            # Format: - **Authors:** Name1, Name2...
             import re
             match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", paper['raw_content'])
             if match:
                 authors_str = match.group(1).strip()
-                # Split by comma or 'and'
-                authors_list = [a.strip() for a in re.split(r",| and ", authors_str) if a.strip()]
-                all_authors.extend(authors_list)
+                # 1. Handle "Last, First" by temporarily replacing that comma with something else
+                # A common pattern is "Last, First, Last2, First2" or "Last, First and Last2, First2"
+                # If there are many commas, it's likely "Last, First"
+                if authors_str.count(',') > authors_str.count(';'):
+                    # Heuristic: if it's "Last, First, Last, First", we group pairs
+                    parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
+                    # If we have an even number of parts and many commas, they might be pairs
+                    if len(parts) > 1 and len(parts) % 2 == 0:
+                        # Join pairs: "Bradford, John" -> "John Bradford"
+                        for i in range(0, len(parts), 2):
+                            all_authors.append(f"{parts[i+1]} {parts[i]}")
+                    else:
+                        all_authors.extend(parts)
+                else:
+                    # Normal "First Last, First Last"
+                    authors_list = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
+                    all_authors.extend(authors_list)
             else:
-                # Fallback to the primary author from metadata
                 all_authors.append(paper['author'])
         
-        top_authors = Counter(all_authors).most_common(10)
+        # Clean up: Remove very short names (likely artifacts) and normalize
+        cleaned_authors = []
+        for a in all_authors:
+            # Remove "U S Geological Survey" and similar non-human authors if needed
+            if len(a) > 3 and "Geological Survey" not in a:
+                cleaned_authors.append(a)
+
+        top_authors = Counter(cleaned_authors).most_common(10)
         
         # 3. Articles per Year
         years = [paper['date_obj'].year for paper in papers]
