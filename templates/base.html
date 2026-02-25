@@ -96,7 +96,9 @@
         header nav a { color: #555; font-weight: 600; }
         header nav a:hover { color: var(--accent-color); }
         
-        .nav-item { display: flex; align-items: center; gap: 5px; color: #555; font-weight: 600; }
+        .nav-item { display: flex; align-items: center; gap: 8px; color: #555; font-weight: 600; }
+        .rss-icon { color: #f26522; vertical-align: middle; transition: transform 0.2s; }
+        .rss-icon:hover { transform: scale(1.2); }
 
         .paper-item { margin-bottom: 40px; }
         .paper-title { font-size: 1.4em; margin-bottom: 5px; display: block; font-weight: 600; font-family: var(--font-sans); }
@@ -166,8 +168,26 @@
             <h1><a href="/index.html">Hydrology and Climate Change Article Summaries</a></h1>
         </div>
         <nav>
-            <span class="nav-item"><a href="/index.html">Latest</a> (<a href="/feed.xml">RSS</a>)</span>
-            <span class="nav-item"><a href="/news.html">News</a> (<a href="/news.xml">RSS</a>)</span>
+            <span class="nav-item">
+                <a href="/index.html">Latest</a>
+                <a href="/feed.xml" title="Latest Articles RSS">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="rss-icon">
+                        <path d="M4 11a9 9 0 0 1 9 9"></path>
+                        <path d="M4 4a16 16 0 0 1 16 16"></path>
+                        <circle cx="5" cy="19" r="1"></circle>
+                    </svg>
+                </a>
+            </span>
+            <span class="nav-item">
+                <a href="/news.html">News</a>
+                <a href="/news.xml" title="News RSS">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="rss-icon">
+                        <path d="M4 11a9 9 0 0 1 9 9"></path>
+                        <path d="M4 4a16 16 0 0 1 16 16"></path>
+                        <circle cx="5" cy="19" r="1"></circle>
+                    </svg>
+                </a>
+            </span>
             <a href="/archive.html">Archive</a>
             <a href="/stats.html">Stats</a>
             <a href="/about.html">About</a>
