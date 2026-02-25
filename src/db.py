@@ -31,6 +31,10 @@ class Database:
         if 'source_id' not in columns:
             logger.info("Migrating database: adding source_id column to seen_papers.")
             cursor.execute('ALTER TABLE seen_papers ADD COLUMN source_id TEXT')
+        
+        if 'type' not in columns:
+            logger.info("Migrating database: adding type column to seen_papers.")
+            cursor.execute('ALTER TABLE seen_papers ADD COLUMN type TEXT')
 
         # 3. Create Promotion Tables
         cursor.execute('''
@@ -180,7 +184,7 @@ class Database:
                     pass
         return results
 
-    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None):
+    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None, type: str = None):
         """Mark a paper as seen and record its authors."""
         import time
         retries = 3
@@ -190,13 +194,13 @@ class Database:
                     cursor = conn.cursor()
                     if processed_date:
                         cursor.execute(
-                            'INSERT INTO seen_papers (link, doi, title, source_id, processed_date) VALUES (?, ?, ?, ?, ?)', 
-                            (link, doi, title, source_id, processed_date)
+                            'INSERT INTO seen_papers (link, doi, title, source_id, processed_date, type) VALUES (?, ?, ?, ?, ?, ?)', 
+                            (link, doi, title, source_id, processed_date, type)
                         )
                     else:
                         cursor.execute(
-                            'INSERT INTO seen_papers (link, doi, title, source_id) VALUES (?, ?, ?, ?)', 
-                            (link, doi, title, source_id)
+                            'INSERT INTO seen_papers (link, doi, title, source_id, type) VALUES (?, ?, ?, ?, ?)', 
+                            (link, doi, title, source_id, type)
                         )
                     paper_id = cursor.lastrowid
                     

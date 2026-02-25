@@ -219,6 +219,28 @@ class Discovery:
                 doi = raw_doi.replace("https://doi.org/", "") if raw_doi else None
                 link = raw_doi or work.get("id")
 
+                # Type and Source filtering
+                work_type = work.get("type")
+                
+                source = "Unknown Source"
+                source_id = None
+                location = work.get("primary_location")
+                if location and location.get("source"):
+                    source = location["source"].get("display_name", source)
+                    full_source_id = location["source"].get("id")
+                    if full_source_id:
+                        source_id = full_source_id.split("/")[-1]
+
+                # EXCLUSIONS: Zenodo, Figshare, Unknown Source, Preprints
+                excluded_sources = ["Zenodo", "Figshare", "Unknown Source"]
+                if any(excl in source for excl in excluded_sources):
+                    logger.debug(f"Skipping {title[:30]}... due to excluded source: {source}")
+                    continue
+                
+                if work_type == "preprint":
+                    logger.debug(f"Skipping {title[:30]}... as it is a preprint.")
+                    continue
+
                 # QUICK CHECK: Skip if already in DB
                 if db.is_seen(link, doi):
                     continue
@@ -229,16 +251,6 @@ class Discovery:
                     published = datetime.strptime(pub_date_str, "%Y-%m-%d")
                 else:
                     published = datetime.now()
-                
-                # Source and Source ID
-                source = "Unknown Source"
-                source_id = None
-                location = work.get("primary_location")
-                if location and location.get("source"):
-                    source = location["source"].get("display_name", source)
-                    full_source_id = location["source"].get("id")
-                    if full_source_id:
-                        source_id = full_source_id.split("/")[-1]
                 
                 # Abstract (OpenAlex uses an Inverted Index for abstracts)
                 abstract = self._reconstruct_abstract(work.get("abstract_inverted_index"))
@@ -264,7 +276,8 @@ class Discovery:
                     abstract=abstract,
                     authors=authors,
                     author_ids=author_ids,
-                    doi=doi
+                    doi=doi,
+                    type=work_type
                 )
                 papers.append(paper)
             return papers

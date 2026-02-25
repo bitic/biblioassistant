@@ -14,6 +14,7 @@ class Paper:
     author_ids: List[str] = field(default_factory=list) # OpenAlex Author IDs
     doi: Optional[str] = None
     pdf_link: Optional[str] = None
+    type: Optional[str] = None # e.g., 'article', 'preprint', 'book'
     
     # Filtering status
     is_relevant: bool = False

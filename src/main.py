@@ -145,7 +145,7 @@ def main():
                     processed_count += 1
                     # Mark as seen in DB only after successful processing
                     p_date = paper.published.strftime("%Y-%m-%d %H:%M:%S") if args.backfill_mode else None
-                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date)
+                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type)
                 
                 synthesizer.engine = original_engine
             else:
@@ -155,7 +155,7 @@ def main():
         else:
             # Mark irrelevant papers as seen too, so we don't re-check them
             p_date = paper.published.strftime("%Y-%m-%d %H:%M:%S") if args.backfill_mode else None
-            db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date)
+            db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type)
 
     end_cost = db.get_monthly_cost()
     run_cost = end_cost - start_cost

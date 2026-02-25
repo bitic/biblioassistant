@@ -42,6 +42,14 @@ class Fetcher:
                     authors = []
                     summary_text = entry.get('summary', '') or entry.get('description', '')
                     
+                    source = feed.feed.get('title', 'Unknown Journal')
+
+                    # EXCLUSIONS: Zenodo, Figshare, Unknown Source
+                    excluded_sources = ["Zenodo", "Figshare", "Unknown Source", "Unknown Journal"]
+                    if any(excl in source for excl in excluded_sources):
+                        logger.debug(f"Skipping RSS entry {entry.get('title', '')[:30]}... due to excluded source: {source}")
+                        continue
+
                     if 'authors' in entry:
                         authors = [a.get('name', '') for a in entry.authors]
                     elif 'author' in entry:
@@ -85,10 +93,11 @@ class Fetcher:
                         title=entry.get('title', 'No Title'),
                         link=link,
                         published=published_date,
-                        source=feed.feed.get('title', 'Unknown Journal'),
+                        source=source,
                         abstract=clean_abstract,
                         authors=authors,
-                        doi=self._extract_doi(entry)
+                        doi=self._extract_doi(entry),
+                        type="article" # Default for RSS as most are journals
                     )
                     
                     new_papers.append(paper)
