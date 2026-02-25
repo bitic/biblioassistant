@@ -133,22 +133,56 @@ class Discovery:
         return self._fetch_openalex(params)
 
     def search_by_author(self, author_id: str) -> List[Paper]:
-        params = self.params.copy()
-        params.update({
-            "filter": f"author.id:{author_id},from_publication_date:{self.from_date},to_publication_date:{self.to_date}",
-            "sort": "publication_date:desc",
-            "per_page": 10
-        })
-        return self._fetch_openalex(params)
+        """Fetch papers by author ID(s). Supports multiple IDs separated by | with batching."""
+        import time
+        ids = author_id.split("|")
+        all_papers = []
+        batch_size = 50
+        
+        for i in range(0, len(ids), batch_size):
+            batch = ids[i:i + batch_size]
+            batch_str = "|".join(batch)
+            
+            params = self.params.copy()
+            params.update({
+                "filter": f"author.id:{batch_str},from_publication_date:{self.from_date},to_publication_date:{self.to_date}",
+                "sort": "publication_date:desc",
+                "per_page": min(100, 10 * len(batch)) # Adjust per_page based on batch size
+            })
+            
+            papers = self._fetch_openalex(params)
+            all_papers.extend(papers)
+            
+            if len(ids) > batch_size:
+                time.sleep(0.5) # Politeness delay for large batches
+                
+        return all_papers
 
     def search_by_journal(self, source_id: str) -> List[Paper]:
-        params = self.params.copy()
-        params.update({
-            "filter": f"primary_location.source.id:{source_id},from_publication_date:{self.from_date},to_publication_date:{self.to_date}",
-            "sort": "publication_date:desc",
-            "per_page": 50
-        })
-        return self._fetch_openalex(params)
+        """Fetch papers by journal ID(s). Supports multiple IDs separated by | with batching."""
+        import time
+        ids = source_id.split("|")
+        all_papers = []
+        batch_size = 50
+        
+        for i in range(0, len(ids), batch_size):
+            batch = ids[i:i + batch_size]
+            batch_str = "|".join(batch)
+            
+            params = self.params.copy()
+            params.update({
+                "filter": f"primary_location.source.id:{batch_str},from_publication_date:{self.from_date},to_publication_date:{self.to_date}",
+                "sort": "publication_date:desc",
+                "per_page": 50
+            })
+            
+            papers = self._fetch_openalex(params)
+            all_papers.extend(papers)
+            
+            if len(ids) > batch_size:
+                time.sleep(0.5)
+                
+        return all_papers
 
     def search_by_issn(self, issn: str) -> List[Paper]:
         params = self.params.copy()
@@ -224,9 +258,11 @@ class Discovery:
                 
                 source = "Unknown Source"
                 source_id = None
+                source_url = None
                 location = work.get("primary_location")
                 if location and location.get("source"):
                     source = location["source"].get("display_name", source)
+                    source_url = location["source"].get("homepage_url")
                     full_source_id = location["source"].get("id")
                     if full_source_id:
                         source_id = full_source_id.split("/")[-1]
@@ -273,6 +309,7 @@ class Discovery:
                     published=published,
                     source=source,
                     source_id=source_id,
+                    source_url=source_url,
                     abstract=abstract,
                     authors=authors,
                     author_ids=author_ids,
