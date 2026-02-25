@@ -212,6 +212,23 @@ class SiteGenerator:
                     except ValueError:
                         pass
                 
+                # Robust author extraction from content if filename didn't yield a good name
+                if author == "Unknown":
+                    import re
+                    match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", raw_content)
+                    if match:
+                        authors_str = match.group(1).strip()
+                        # Extract first author
+                        if authors_str.count(',') > authors_str.count(';'):
+                            parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
+                            if len(parts) > 1 and len(parts) % 2 == 0:
+                                author = f"{parts[1]} {parts[0]}"
+                            else:
+                                author = parts[0]
+                        else:
+                            parts = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
+                            author = parts[0]
+                
                 # Extract original link from metadata comment
                 original_link = "#"
                 if "<!-- metadata:original_link:" in raw_content:
