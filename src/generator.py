@@ -59,7 +59,62 @@ class SiteGenerator:
         # Generate Hidden Events RSS
         self._generate_events_rss()
         
+        # Generate News RSS
+        self._generate_news_rss()
+        
         logger.info("Site generation complete.")
+
+    def _generate_news_rss(self):
+        """Generates an RSS feed for the news section."""
+        news_file = Path("data/news.json")
+        if not news_file.exists():
+            return
+
+        try:
+            with open(news_file, "r") as f:
+                news_data = json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading news data for RSS: {e}")
+            return
+
+        rss_items = []
+        base_url = SITE_URL
+        for item in news_data:
+            # Parse date (YYYY.MM.DD)
+            try:
+                dt = datetime.strptime(item['date'], "%Y.%m.%d")
+                pub_date = dt.strftime("%a, %d %b %Y %H:%M:%S +0000")
+            except:
+                pub_date = datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0000")
+
+            # Clean content
+            clean_text = html.escape(item['text'])
+            title = html.escape(f"{item.get('emoji', '📢')} News Update - {item['date']}")
+
+            rss_item = f"""
+            <item>
+                <title>{title}</title>
+                <link>{base_url}/news.html</link>
+                <description><![CDATA[{item['text']}]]></description>
+                <pubDate>{pub_date}</pubDate>
+                <guid>{item['date']}-{hash(item['text'])}</guid>
+            </item>
+            """
+            rss_items.append(rss_item)
+
+        rss_feed = f'''<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+    <title>{SITE_TITLE} - News</title>
+    <link>{base_url}/news.html</link>
+    <description>Latest updates about the BiblioAssistant project</description>
+    <lastBuildDate>{datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0000")}</lastBuildDate>
+    {''.join(rss_items)}
+</channel>
+</rss>
+'''
+        with open(PUBLIC_DIR / "news.xml", "w") as f:
+            f.write(rss_feed)
 
     def _collect_papers(self) -> List[Dict]:
         papers = []
