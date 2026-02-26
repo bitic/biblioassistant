@@ -227,7 +227,7 @@ class Discovery:
         })
         return self._fetch_openalex(params)
 
-    def fetch_by_doi(self, doi: str) -> List[Paper]:
+    def fetch_by_doi(self, doi: str, ignore_seen: bool = False) -> List[Paper]:
         """Fetches metadata for a single specific DOI."""
         params = self.params.copy()
         # Clean DOI if it's a URL
@@ -235,9 +235,9 @@ class Discovery:
         params.update({
             "filter": f"doi:{clean_doi}"
         })
-        return self._fetch_openalex(params)
+        return self._fetch_openalex(params, ignore_seen=ignore_seen)
 
-    def _fetch_openalex(self, params: dict) -> List[Paper]:
+    def _fetch_openalex(self, params: dict, ignore_seen: bool = False) -> List[Paper]:
         try:
             response = requests.get(self.base_url, params=params, timeout=30)
             response.raise_for_status()
@@ -278,7 +278,7 @@ class Discovery:
                     continue
 
                 # QUICK CHECK: Skip if already in DB
-                if db.is_seen(link, doi):
+                if not ignore_seen and db.is_seen(link, doi):
                     continue
                 
                 # Published date
@@ -303,6 +303,20 @@ class Discovery:
                     if full_id:
                         author_ids.append(full_id.split("/")[-1])
 
+                # Extract Topics and Concepts
+                topics = []
+                for topic_data in work.get("topics", []):
+                    name = topic_data.get("display_name")
+                    if name:
+                        topics.append(name)
+                
+                # Concepts (legacy but still useful)
+                for concept in work.get("concepts", []):
+                    if concept.get("level", 5) <= 1: # Only top-level concepts
+                        name = concept.get("display_name")
+                        if name and name not in topics:
+                            topics.append(name)
+
                 paper = Paper(
                     title=title,
                     link=link,
@@ -314,7 +328,8 @@ class Discovery:
                     authors=authors,
                     author_ids=author_ids,
                     doi=doi,
-                    type=work_type
+                    type=work_type,
+                    topics=topics
                 )
                 papers.append(paper)
             return papers

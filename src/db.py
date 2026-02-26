@@ -263,7 +263,7 @@ class Database:
             logger.error(f"Error getting metadata {key}: {e}")
             return None
 
-    def get_promotable_journals(self, threshold: int = 3) -> list[str]:
+    def get_promotable_journals(self, threshold: int = 5) -> list[str]:
         """Finds source_ids that have at least 'threshold' papers but aren't monitored yet."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
@@ -301,7 +301,7 @@ class Database:
         conn.close()
         return results
 
-    def get_promotable_authors(self, threshold: int = 3) -> list[str]:
+    def get_promotable_authors(self, threshold: int = 5) -> list[str]:
         """Finds author_ids that appear in at least 'threshold' papers but aren't monitored yet."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()

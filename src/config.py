@@ -16,9 +16,6 @@ PUBLIC_DIR = BASE_DIR / "public"
 # Database (Simple JSON or SQLite path)
 DB_PATH = DATA_DIR / "db.sqlite3"
 
-# Feeds (Deprecated: using OpenAlex Journal Watch instead)
-RSS_FEEDS = []
-
 # Local LLM (Ollama)
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_FILTER_MODEL = os.getenv("OLLAMA_FILTER_MODEL", "llama3.1:8b")

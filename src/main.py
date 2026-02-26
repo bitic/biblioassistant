@@ -1,7 +1,6 @@
 import argparse
 import subprocess
 from src.config import REMOTE_HOST, REMOTE_USER, REMOTE_PATH, PUBLIC_DIR
-from src.fetcher import Fetcher
 from src.discovery import Discovery
 from src.filter import RelevanceFilter
 from src.extractor import Extractor
@@ -42,7 +41,6 @@ def main():
     parser.add_argument("--deploy", action="store_true", help="Deploy to remote server after generation")
     parser.add_argument("--force-all", action="store_true", help="Ignore 'seen' DB (use with caution)")
     parser.add_argument("--generate-only", action="store_true", help="Skip fetch/filter/synthesize and only generate the site")
-    parser.add_argument("--rss", action="store_true", help="Enable legacy RSS feeds (default: False)")
     parser.add_argument("--add-doi", type=str, help="Manually add a single paper by DOI")
     parser.add_argument("--backfill", type=int, help="Number of days to go back for discovery (overrides last run date)")
     parser.add_argument("--to-date", type=str, help="End date for discovery (YYYY-MM-DD)")
@@ -58,7 +56,6 @@ def main():
         return
 
     # Initialize components
-    fetcher = Fetcher()
     
     # Calculate backfill date if requested
     from_date_override = None
@@ -77,7 +74,7 @@ def main():
     
     if args.add_doi:
         logger.info(f"Manual mode: Fetching metadata for DOI {args.add_doi}")
-        manual_papers = discovery.fetch_by_doi(args.add_doi)
+        manual_papers = discovery.fetch_by_doi(args.add_doi, ignore_seen=True)
         if manual_papers:
             # For manual mode, we force relevance to True to skip filter
             p = manual_papers[0]
@@ -90,13 +87,7 @@ def main():
             db.add_event("ERROR", msg)
             return
     else:
-        rss_papers = []
-        if args.rss:
-            logger.info("RSS feeds enabled.")
-            rss_papers = fetcher.fetch_all(ignore_seen=args.force_all)
-        
-        discovered_papers = discovery.run_all_tasks(ignore_seen=args.force_all)
-        papers = rss_papers + discovered_papers
+        papers = discovery.run_all_tasks(ignore_seen=args.force_all)
     
     if not papers:
         logger.info("No new papers found.")
@@ -165,7 +156,7 @@ def main():
     db.add_event("SUMMARY", msg)
 
     # 5. Journal Promotion Logic
-    promotable_journals = db.get_promotable_journals(threshold=3)
+    promotable_journals = db.get_promotable_journals(threshold=5)
     if promotable_journals:
         # Get existing journal IDs from config to avoid double monitoring
         from src.config import DISCOVERY_TASKS
@@ -182,7 +173,7 @@ def main():
                 db.add_event("PROMOTION", msg)
 
     # 6. Author Promotion Logic
-    promotable_authors = db.get_promotable_authors(threshold=3)
+    promotable_authors = db.get_promotable_authors(threshold=5)
     if promotable_authors:
         # Get existing author IDs from config to avoid double monitoring
         from src.config import DISCOVERY_TASKS
