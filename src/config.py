@@ -71,7 +71,11 @@ DISCOVERY_TASKS = [
     {"name": "Yves Tramblay", "type": "author", "id": "A5053663113"},
     {"name": "Yves Tramblay Citations", "type": "author_citations", "id": "A5053663113"},
 
-    # 6. Journal Watch: Monitor core and high-impact journals directly via OpenAlex
+    # 6. Author Watch: Jean-Philippe Vidal
+    {"name": "Jean-Philippe Vidal", "type": "author", "id": "A5078238635"},
+    {"name": "Jean-Philippe Vidal Citations", "type": "author_citations", "id": "A5078238635"},
+
+    # 7. Journal Watch: Monitor core and high-impact journals directly via OpenAlex
     {
         "name": "Journal Watch", 
         "type": "journal", 
