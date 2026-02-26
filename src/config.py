@@ -59,7 +59,19 @@ DISCOVERY_TASKS = [
     # 2. Citation Watch: Automated tracking for all papers by Pere Quintana Seguí
     {"name": "My Citation Watch", "type": "author_citations", "id": "A5053499463"}, 
 
-    # 3. Journal Watch: Monitor core and high-impact journals directly via OpenAlex
+    # 3. Author Watch: Sergio Vicente-Serrano
+    {"name": "Sergio Vicente-Serrano", "type": "author", "id": "A5086586401"},
+    {"name": "Sergio Vicente-Serrano Citations", "type": "author_citations", "id": "A5086586401"},
+
+    # 4. Author Watch: Santiago Beguería
+    {"name": "Santiago Beguería", "type": "author", "id": "A5054345605"},
+    {"name": "Santiago Beguería Citations", "type": "author_citations", "id": "A5054345605"},
+
+    # 5. Author Watch: Yves Tramblay
+    {"name": "Yves Tramblay", "type": "author", "id": "A5053663113"},
+    {"name": "Yves Tramblay Citations", "type": "author_citations", "id": "A5053663113"},
+
+    # 6. Journal Watch: Monitor core and high-impact journals directly via OpenAlex
     {
         "name": "Journal Watch", 
         "type": "journal", 
