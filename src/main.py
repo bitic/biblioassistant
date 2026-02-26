@@ -109,8 +109,23 @@ def main():
     for paper in papers:
         # 2. Filter
         # Check if already seen unless --force-all or --add-doi is used
-        if not args.force_all and not args.add_doi and db.is_seen(paper.link, paper.doi):
-            continue
+        if not args.force_all and not args.add_doi:
+            if db.is_seen(paper.link, paper.doi):
+                continue
+            
+            # PHYSICAL DISK CHECK: Avoid processing if file exists in any year folder
+            filename = paper.to_filename()
+            exists_locally = False
+            for year_dir in SUMMARIES_DIR.glob("*"):
+                if (year_dir / filename).exists():
+                    logger.info(f"Skipping {paper.title}: already exists on disk at {year_dir / filename}")
+                    # Sync DB with reality
+                    p_date = paper.published.strftime("%Y-%m-%d %H:%M:%S") if args.backfill_mode else None
+                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type, source_url=paper.source_url)
+                    exists_locally = True
+                    break
+            if exists_locally:
+                continue
 
         # Skip filter if manually added or if it passes relevance
         if args.add_doi or relevance_filter.check_relevance(paper):
