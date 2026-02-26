@@ -44,6 +44,13 @@ class SiteGenerator:
             # shutil.copytree with dirs_exist_ok=True (Python 3.8+)
             shutil.copytree(assets_src, PUBLIC_DIR / "assets", dirs_exist_ok=True)
 
+        # Copy static files (that go to the root, like robots.txt or verification files)
+        static_src = Path("static")
+        if static_src.exists():
+            for static_file in static_src.iterdir():
+                if static_file.is_file():
+                    shutil.copy2(static_file, PUBLIC_DIR / static_file.name)
+
         # Fetch added dates and journal URLs from DB
         try:
             added_dates_map = db.get_all_processed_dates()

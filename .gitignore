@@ -12,6 +12,8 @@ public/
 # Secrets
 .env
 .gemini/
+google*.html
+static/
 
 # Logs
 *.log
