@@ -16,6 +16,7 @@ class SiteGenerator:
         self.env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
         self.env.filters['slugify'] = self._slugify
         self.journal_url_map = {} # Name -> URL
+        self.urls = [] # List of relative paths for the sitemap
 
     def _write_if_changed(self, file_path: Path, content: str):
         """Writes content to file_path only if it differs from existing content."""
@@ -96,8 +97,57 @@ class SiteGenerator:
         
         # Generate Author Pages
         self._render_author_pages(papers)
+
+        # Generate Sitemap
+        self._generate_sitemap()
         
         logger.info("Site generation complete.")
+
+    def _generate_sitemap(self):
+        """Generates a sitemap.xml file with all collected URLs."""
+        logger.info(f"Generating sitemap for {len(self.urls)} pages...")
+        
+        xml_lines = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        ]
+        
+        # Add a unique list of URLs
+        seen = set()
+        # Add root index manually if not already added
+        if "/" not in self.urls:
+            self.urls.append("/")
+
+        for path in sorted(set(self.urls)):
+            if path in seen: continue
+            seen.add(path)
+            
+            # Ensure path starts with / but not duplicated
+            if not path.startswith("/"):
+                path = "/" + path
+            
+            # Avoid double slashes if SITE_URL ends with one
+            base_url = SITE_URL.rstrip("/")
+            full_url = f"{base_url}{path}"
+            
+            xml_lines.append("  <url>")
+            xml_lines.append(f"    <loc>{full_url}</loc>")
+            # Priority logic: home is 1.0, papers 0.8, archive/authors 0.5
+            priority = "0.5"
+            if path == "/": priority = "1.0"
+            elif "/summaries/" in path: priority = "0.8"
+            elif path in ["/news.html", "/about.html"]: priority = "0.7"
+            
+            xml_lines.append(f"    <priority>{priority}</priority>")
+            xml_lines.append("  </url>")
+            
+        xml_lines.append("</urlset>")
+        
+        self._write_if_changed(PUBLIC_DIR / "sitemap.xml", "\n".join(xml_lines))
+        
+        # Also ensure robots.txt points to it
+        robots_txt = f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL.rstrip('/')}/sitemap.xml\n"
+        self._write_if_changed(PUBLIC_DIR / "robots.txt", robots_txt)
 
     def _render_author_pages(self, papers):
         """Generates a separate page for each author with their list of papers."""
@@ -143,6 +193,8 @@ class SiteGenerator:
                 author_name=name,
                 papers=author_papers
             )
+            slug = self._slugify(name)
+            self.urls.append(f"/authors/{slug}.html")
             self._write_if_changed(out_dir / f"{slug}.html", output)
 
     def _slugify(self, text):
@@ -425,6 +477,7 @@ class SiteGenerator:
         out_dir.mkdir(parents=True, exist_ok=True)
         
         out_path = out_dir / f"{paper['filename']}.html"
+        self.urls.append(f"/{paper['rel_path']}")
         self._write_if_changed(out_path, output)
 
     def _render_index(self, papers):
@@ -432,6 +485,7 @@ class SiteGenerator:
         output = template.render(
             papers=papers
         )
+        self.urls.append("/")
         self._write_if_changed(PUBLIC_DIR / "index.html", output)
 
     def _render_archive(self, papers):
@@ -455,6 +509,7 @@ class SiteGenerator:
         output = template.render(
             archive=archive
         )
+        self.urls.append("/archive.html")
         self._write_if_changed(PUBLIC_DIR / "archive.html", output)
             
         # Render individual monthly pages
@@ -473,11 +528,13 @@ class SiteGenerator:
                     papers=data['papers']
                 )
                 month_path = year_dir / f"{data['month_num']}.html"
+                self.urls.append(f"/archive/{year}/{data['month_num']}.html")
                 self._write_if_changed(month_path, output)
 
     def _render_about(self):
         template = self.env.get_template("about.html")
         output = template.render()
+        self.urls.append("/about.html")
         self._write_if_changed(PUBLIC_DIR / "about.html", output)
 
     def _render_news(self):
@@ -494,6 +551,7 @@ class SiteGenerator:
         output = template.render(
             news=news_data
         )
+        self.urls.append("/news.html")
         self._write_if_changed(PUBLIC_DIR / "news.html", output)
 
     def _render_stats(self, papers: List[Dict]):
@@ -559,6 +617,7 @@ class SiteGenerator:
             top_authors=top_authors,
             articles_per_year=articles_per_year
         )
+        self.urls.append("/stats.html")
         self._write_if_changed(PUBLIC_DIR / "stats.html", output)
 
     def _generate_rss(self, papers):
