@@ -15,21 +15,34 @@ class SiteGenerator:
     def __init__(self):
         self.env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
         self.env.filters['slugify'] = self._slugify
-        self.generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.journal_url_map = {} # Name -> URL
+
+    def _write_if_changed(self, file_path: Path, content: str):
+        """Writes content to file_path only if it differs from existing content."""
+        if file_path.exists():
+            existing_content = file_path.read_text()
+            if existing_content == content:
+                # No change, skip write to preserve timestamp
+                return
+        
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(file_path, "w") as f:
+            f.write(content)
 
     def build(self):
         logger.info("Starting static site generation...")
         
-        # Prepare public directory
-        if PUBLIC_DIR.exists():
-            shutil.rmtree(PUBLIC_DIR)
-        PUBLIC_DIR.mkdir()
+        # Ensure public directory exists
+        PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
         
-        # Copy assets
+        # Copy assets (only if changed or missing)
         assets_src = Path("assets")
         if assets_src.exists():
-            shutil.copytree(assets_src, PUBLIC_DIR / "assets")
+            # Use a more efficient copy that only updates if needed
+            # For simplicity here, we'll keep it but we could use a similar logic for assets
+            # but usually assets change less frequently than HTML.
+            # shutil.copytree with dirs_exist_ok=True (Python 3.8+)
+            shutil.copytree(assets_src, PUBLIC_DIR / "assets", dirs_exist_ok=True)
 
         # Fetch added dates and journal URLs from DB
         try:
@@ -121,11 +134,9 @@ class SiteGenerator:
             slug = self._slugify(name)
             output = template.render(
                 author_name=name,
-                papers=author_papers,
-                generated_at=self.generated_at
+                papers=author_papers
             )
-            with open(out_dir / f"{slug}.html", "w") as f:
-                f.write(output)
+            self._write_if_changed(out_dir / f"{slug}.html", output)
 
     def _slugify(self, text):
         import re
@@ -183,8 +194,7 @@ class SiteGenerator:
 </channel>
 </rss>
 '''
-        with open(PUBLIC_DIR / "news.xml", "w") as f:
-            f.write(rss_feed)
+        self._write_if_changed(PUBLIC_DIR / "news.xml", rss_feed)
 
     def _collect_papers(self, added_dates_map: dict) -> List[Dict]:
         papers = []
@@ -401,25 +411,21 @@ class SiteGenerator:
             title=paper['title'],
             content=content_html,
             original_link=paper['original_link'],
-            summary_link=summary_link,
-            generated_at=self.generated_at
+            summary_link=summary_link
         )
         
         out_dir = PUBLIC_DIR / "summaries" / paper['year']
         out_dir.mkdir(parents=True, exist_ok=True)
         
         out_path = out_dir / f"{paper['filename']}.html"
-        with open(out_path, "w") as f:
-            f.write(output)
+        self._write_if_changed(out_path, output)
 
     def _render_index(self, papers):
         template = self.env.get_template("index.html")
         output = template.render(
-            papers=papers,
-            generated_at=self.generated_at
+            papers=papers
         )
-        with open(PUBLIC_DIR / "index.html", "w") as f:
-            f.write(output)
+        self._write_if_changed(PUBLIC_DIR / "index.html", output)
 
     def _render_archive(self, papers):
         # Group by Year -> Month
@@ -440,11 +446,9 @@ class SiteGenerator:
         # Render main archive page
         template = self.env.get_template("archive.html")
         output = template.render(
-            archive=archive,
-            generated_at=self.generated_at
+            archive=archive
         )
-        with open(PUBLIC_DIR / "archive.html", "w") as f:
-            f.write(output)
+        self._write_if_changed(PUBLIC_DIR / "archive.html", output)
             
         # Render individual monthly pages
         month_template = self.env.get_template("month.html")
@@ -459,20 +463,15 @@ class SiteGenerator:
                 output = month_template.render(
                     year=year,
                     month=month_name,
-                    papers=data['papers'],
-                    generated_at=self.generated_at
+                    papers=data['papers']
                 )
                 month_path = year_dir / f"{data['month_num']}.html"
-                with open(month_path, "w") as f:
-                    f.write(output)
+                self._write_if_changed(month_path, output)
 
     def _render_about(self):
         template = self.env.get_template("about.html")
-        output = template.render(
-            generated_at=self.generated_at
-        )
-        with open(PUBLIC_DIR / "about.html", "w") as f:
-            f.write(output)
+        output = template.render()
+        self._write_if_changed(PUBLIC_DIR / "about.html", output)
 
     def _render_news(self):
         news_file = Path("data/news.json")
@@ -486,11 +485,9 @@ class SiteGenerator:
         
         template = self.env.get_template("news.html")
         output = template.render(
-            news=news_data,
-            generated_at=self.generated_at
+            news=news_data
         )
-        with open(PUBLIC_DIR / "news.html", "w") as f:
-            f.write(output)
+        self._write_if_changed(PUBLIC_DIR / "news.html", output)
 
     def _render_stats(self, papers: List[Dict]):
         from collections import Counter
@@ -553,11 +550,9 @@ class SiteGenerator:
         output = template.render(
             top_journals=top_journals,
             top_authors=top_authors,
-            articles_per_year=articles_per_year,
-            generated_at=self.generated_at
+            articles_per_year=articles_per_year
         )
-        with open(PUBLIC_DIR / "stats.html", "w") as f:
-            f.write(output)
+        self._write_if_changed(PUBLIC_DIR / "stats.html", output)
 
     def _generate_rss(self, papers):
         # Basic RSS 2.0 generation
@@ -589,8 +584,7 @@ class SiteGenerator:
 </channel>
 </rss>
 '''
-        with open(PUBLIC_DIR / "feed.xml", "w") as f:
-            f.write(rss_feed)
+        self._write_if_changed(PUBLIC_DIR / "feed.xml", rss_feed)
 
     def _generate_events_rss(self):
         """Generates a hidden events RSS feed for system monitoring."""
@@ -628,5 +622,4 @@ class SiteGenerator:
 </channel>
 </rss>
 '''
-        with open(PUBLIC_DIR / "events.xml", "w") as f:
-            f.write(rss_feed)
+        self._write_if_changed(PUBLIC_DIR / "events.xml", rss_feed)
