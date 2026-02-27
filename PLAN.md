@@ -60,9 +60,12 @@ This document outlines the iterative development phases for the [BiblioAssistant
 ## Phase 7: Orchestration & Automation
 
 - [x] **Main Entrypoint:** Create `src/main.py` to tie all modules together.
-
 - [x] **Error Handling:** Robust retries for network-dependent tasks.
-
 - [x] **CLI Interface:** Basic commands to trigger manual runs or status checks.
-
 - [x] **Backfill Engine:** Automated historical data processing with daily regression.
+
+## Phase 8: Advanced Curation & Discovery
+- [x] **Author Monitoring via DOI:** Utility to expand the monitored authors list by extracting IDs from specific papers.
+- [ ] **Citation Network Analysis:** Proactive discovery based on citation graphs.
+- [ ] **Collaborative Filtering:** Recommendation logic based on research group interests.
+

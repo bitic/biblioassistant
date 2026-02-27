@@ -78,11 +78,18 @@ uv run python -m src.main --deploy
 - `--deploy`: Sync the generated site to the remote server.
 - `--force-all`: Ignore the "seen" database and re-process all entries.
 - `--generate-only`: Skip fetching and processing; only rebuild the static site.
-- `--rss`: Enable legacy RSS feeds (default: disabled).
 - `--add-doi <DOI>`: Manually add a specific paper by DOI.
 - `--backfill <days>`: Set the start date for discovery to N days ago.
 - `--to-date <YYYY-MM-DD>`: Set the end date for discovery (useful for backfilling).
 - `--backfill-mode`: Set the "added date" to the paper's publication date. This prevents historical papers from appearing in the RSS feed or the "Recent" section.
+
+### Utility Scripts
+
+- **Add Authors by DOI:** Expand the monitored authors list by fetching all authors from a specific paper.
+  ```bash
+  uv run scripts/add_authors_by_doi.py <DOI>
+  ```
+  This script resolves the DOI via OpenAlex, extracts all author IDs, and adds them to the `monitored_authors` database table.
 
 ## Historical Backfilling
 
