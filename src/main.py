@@ -1,6 +1,6 @@
 import argparse
 import subprocess
-from src.config import REMOTE_HOST, REMOTE_USER, REMOTE_PATH, PUBLIC_DIR
+from src.config import REMOTE_HOST, REMOTE_USER, REMOTE_PATH, PUBLIC_DIR, SUMMARIES_DIR
 from src.discovery import Discovery
 from src.filter import RelevanceFilter
 from src.extractor import Extractor
