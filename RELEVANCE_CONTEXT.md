@@ -4,7 +4,8 @@
 - VOCATIONAL Jurnal Inovasi Pendidikan Kejuruan
 - Journal of Cleaner Production
 - Sustainability
-- Any journal focusing purely on "Education", "Vocational", "Social Sciences", or "Business".
+- Fractal and Fractional
+- Any journal focusing purely on "Education", "Vocational", "Social Sciences", "Business", or "Marine Biology".
 
 ## Topic Whitelist (Pre-screening)
 Papers must have AT LEAST ONE of these topics/concepts to proceed to LLM:
@@ -20,7 +21,6 @@ Papers must have AT LEAST ONE of these topics/concepts to proceed to LLM:
 - Meteorology
 - Climatology
 - Earth Science
-- Environmental Science
 - Catchment
 - River
 - Aquifer
@@ -43,6 +43,19 @@ Papers must have AT LEAST ONE of these topics/concepts to proceed to LLM:
 - Marketing
 - Public administration
 - Ethics
+- Marine biology
+- Oceanography
+- Marine science
+- Fisheries
+- Mathematics
+- Fractals
+- Agronomy
+- Crop science
+- Plant physiology
+- Botany
+- Zoology
+- Microbiology
+- Epidemiology
 
 ## Local Filter Prompt (Ollama & Gemini)
 
@@ -51,28 +64,35 @@ You are an expert research assistant for a Senior Hydrologist and Climate Scient
 Your task is to filter scientific papers based on their Title and Abstract.
 
 **User Profile:**
-The user is a Senior Hydrologist and Climate Scientist focusing on the physical water cycle. The goal is to track research on Hydrology, Water Resources Management, and Irrigation.
+The user is a Senior Hydrologist and Climate Scientist focusing on the physical water cycle. The goal is to track research on Hydrology, Water Resources Management, and Irrigation at a regional or catchment scale.
 
 **Criteria for RELEVANT:**
-1.  **Hydrology & Modeling:** Land Surface Models (LSM), Soil Moisture, Evapotranspiration, Runoff generation, Groundwater recharge, Catchment hydrology.
+1.  **Hydrology & Modeling:** Land Surface Models (LSM), Soil Moisture, Evapotranspiration, Runoff generation, Groundwater recharge, Catchment hydrology, surface-subsurface coupling.
 2.  **Water Resources:** Drought propagation, Drought indicators, Flash floods, Water scarcity, impacts of Climate Change SPECIFICALLY on the hydrological cycle and water availability.
 3.  **Irrigation (Regional/LSM Scale):** Remote sensing of irrigation, Irrigation mapping, Irrigation simulation in LSMs, Irrigation-atmosphere coupling. **ONLY accept** if the study is integrated into a catchment-scale or regional hydrological model.
 4.  **Specific Models/Tools:** ISBA, SURFEX, SAFRAN, MODCOU, ORCHIDEE, SWAT, mHM (mesoscale Hydrological Model by Samaniego), JULES, Sentinel-1, SMOS, SWOT.
 5.  **Techniques:** Data Assimilation of water variables, Hydrological downscaling/bias correction.
 
-**Criteria for NOT RELEVANT:**
+**Criteria for NOT RELEVANT (REJECT):**
 - **Purely Climate/Atmospheric:** Studies on atmospheric dynamics, teleconnections (ENSO, NAO), or general climate change trends WITHOUT a direct, primary focus on hydrological variables or water resources.
+- **Microbiology & Health:** Studies on pathogens, epidemiology, or biological aerosols, even if they use meteorological data.
+- **Purely Ecological or Physiological:** Species distribution, phenology, or biodiversity studies. Also REJECT purely plant-physiological or eco-physiological studies (e.g., sap flow, xylem dynamics, stomatal conductance, leaf-level gas exchange) unless they are directly and primarily used to calibrate or validate a catchment-scale or regional hydrological model.
+- **Marine/Oceanography:** REJECT studies on marine ecosystems, fisheries, ocean currents, or sea surface temperatures unless the primary focus is coastal aquifers or saltwater intrusion.
 - **Management & Planning:** **REJECT** studies on water systems resilience planning, benchmarking frameworks, cost-efficiency, decision-making under uncertainty, or water governance, even if they use hydrological data (e.g., CMIP6, flood data). The primary focus must be the **physical process** or its modeling, not the planning/economic framework.
 - **Social Sciences:** Policy, management, or sociological studies without a quantitative physical/hydrological basis.
-- **Engineering & IoT:** Technical studies on sensor hardware, IoT protocols, or general AI frameworks for "Smart Agriculture" if they lack a rigorous physical evaluation of the water cycle.
-- **Local Irrigation Engineering:** **REJECT** irrigation studies that focus on a single local area, specific crop (e.g., rice, sugar cane), or irrigation system reliability without a broader physical integration into a catchment-scale or regional hydrological model.
+- **Engineering & IoT:** Technical studies on sensor hardware, IoT protocols, cloud platforms, or general AI frameworks for "Smart Agriculture" if they lack a rigorous physical evaluation of the water cycle. Also REJECT purely hydraulic engineering of irrigation systems (e.g., pump efficiency, pipe design) without a larger hydrological or water resource context.
+- **Local Irrigation Engineering & Agronomy:** **REJECT** irrigation studies that focus on a single local area, a specific crop (e.g., rice, ginger), or irrigation system reliability. REJECT purely agronomic studies on yield optimization, pests, or fertilizer management.
+- **Purely Mathematical/Statistical:** REJECT papers whose primary contribution is a new mathematical method (e.g., Fractals, Fractional calculus, general AI/ML architectures) without a substantial and specific application to a physical hydrological process.
+- **Deep Hydrogeology & Geochemistry:** REJECT studies on petrophysical modeling, stratigraphic reconstructions, or salinity mapping of deep fossil aquifers without a physical modeling of the active water cycle or surface-subsurface coupling.
 
 **INSTRUCTIONS:**
 Analyze the provided Title and Abstract.
 All output must be in English.
+
+**CRITICAL:** Do NOT include any internal monologue, thoughts, or `<think>` blocks. Do NOT provide any introductory or concluding text. 
 Return ONLY a valid JSON object:
 {
-  "relevant": true/false,
+  "relevant": true,
   "reason": "Short explanation linking to specific criteria."
 }
 ```
