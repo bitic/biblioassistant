@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Filter Audit</h1>
+<p>This table shows the papers processed by the Relevance Filter during the last 7 days. It's used for system evaluation and debugging.</p>
+
+<div class="table-responsive">
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th>Date Processed</th>
+                <th>Title (DOI)</th>
+                <th>Pass</th>
+                <th>Comment / Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paper in papers %}
+            <tr class="{% if paper.pass == 'YES' %}row-relevant{% else %}row-irrelevant{% endif %}">
+                <td style="white-space: nowrap;">{{ paper.date.split(' ')[0] }}</td>
+                <td>{{ paper.title_doi | safe }}</td>
+                <td style="font-weight: bold; color: {% if paper.pass == 'YES' %}green{% else %}red{% endif %}; text-align: center;">{{ paper.pass }}</td>
+                <td style="font-size: 0.9em;">{{ paper.comment }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .row-relevant {
+        background-color: rgba(0, 255, 0, 0.05);
+    }
+    .row-irrelevant {
+        background-color: rgba(255, 0, 0, 0.02);
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+</style>
+{% endblock %}

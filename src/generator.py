@@ -86,6 +86,9 @@ class SiteGenerator:
         # Generate Stats Page
         self._render_stats(papers)
         
+        # Generate Filter Page
+        self._render_filter_page()
+        
         # Generate RSS
         self._generate_rss(papers[:20]) # Feed for last 20 items
         
@@ -553,6 +556,31 @@ class SiteGenerator:
         )
         self.urls.append("/news.html")
         self._write_if_changed(PUBLIC_DIR / "news.html", output)
+
+    def _render_filter_page(self):
+        """Generates a page showing recent filtering results for audit (last 7 days)."""
+        logger.info("Generating Filter audit page (last 7 days)...")
+        recent_papers = db.get_recent_papers_by_days(days=7)
+        
+        # Process papers for the template
+        processed_entries = []
+        for p in recent_papers:
+            # Format: Title (DOI)
+            title_doi = f"{p['title']} ({p['doi'] or 'No DOI'})"
+            
+            processed_entries.append({
+                'title_doi': title_doi,
+                'pass': "YES" if p['is_relevant'] else "NO",
+                'comment': p['relevance_reason'] or "No reason provided.",
+                'date': p['processed_date']
+            })
+
+        template = self.env.get_template("filter.html")
+        output = template.render(
+            papers=processed_entries
+        )
+        self.urls.append("/filter.html")
+        self._write_if_changed(PUBLIC_DIR / "filter.html", output)
 
     def _render_stats(self, papers: List[Dict]):
         from collections import Counter

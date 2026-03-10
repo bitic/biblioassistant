@@ -56,6 +56,12 @@ Papers must have AT LEAST ONE of these topics/concepts to proceed to LLM:
 - Zoology
 - Microbiology
 - Epidemiology
+- Geomechanics
+- Geotechnics
+- Seismology
+- Landslides
+- Subsidence
+- Structural Geology
 
 ## Local Filter Prompt (Ollama & Gemini)
 
@@ -74,6 +80,7 @@ The user is a Senior Hydrologist and Climate Scientist focusing on the physical 
 5.  **Techniques:** Data Assimilation of water variables, Hydrological downscaling/bias correction.
 
 **Criteria for NOT RELEVANT (REJECT):**
+- **Geohazards & Geomechanics:** **REJECT** studies on landslides, ground subsidence, slope stability, rockfall, soil mechanics, or structural geology (e.g., fault dynamics), even if they use precipitation, groundwater, or pore pressure as triggers or variables. The focus must be on the water cycle or resource management, not the geological hazard or mechanical failure.
 - **Purely Climate/Atmospheric:** Studies on atmospheric dynamics, teleconnections (ENSO, NAO), or general climate change trends WITHOUT a direct, primary focus on hydrological variables or water resources.
 - **Microbiology & Health:** Studies on pathogens, epidemiology, or biological aerosols, even if they use meteorological data.
 - **Purely Ecological or Physiological:** Species distribution, phenology, or biodiversity studies. Also REJECT purely plant-physiological or eco-physiological studies (e.g., sap flow, xylem dynamics, stomatal conductance, leaf-level gas exchange) unless they are directly and primarily used to calibrate or validate a catchment-scale or regional hydrological model.

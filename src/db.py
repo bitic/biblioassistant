@@ -40,6 +40,14 @@ class Database:
             logger.info("Migrating database: adding source_url column to seen_papers.")
             cursor.execute('ALTER TABLE seen_papers ADD COLUMN source_url TEXT')
 
+        if 'is_relevant' not in columns:
+            logger.info("Migrating database: adding is_relevant column to seen_papers.")
+            cursor.execute('ALTER TABLE seen_papers ADD COLUMN is_relevant INTEGER DEFAULT 0')
+        
+        if 'relevance_reason' not in columns:
+            logger.info("Migrating database: adding relevance_reason column to seen_papers.")
+            cursor.execute('ALTER TABLE seen_papers ADD COLUMN relevance_reason TEXT')
+
         # 3. Create Promotion Tables
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS monitored_journals (
@@ -197,23 +205,24 @@ class Database:
         conn.close()
         return {row[0]: (row[1], row[2]) for row in rows}
 
-    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None, type: str = None, source_url: str = None):
-        """Mark a paper as seen and record its authors."""
+    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None, type: str = None, source_url: str = None, is_relevant: bool = False, relevance_reason: str = None):
+        """Mark a paper as seen and record its authors and relevance status."""
         import time
         retries = 3
+        rel_int = 1 if is_relevant else 0
         for i in range(retries):
             try:
                 with sqlite3.connect(self.db_path, timeout=30) as conn:
                     cursor = conn.cursor()
                     if processed_date:
                         cursor.execute(
-                            'INSERT INTO seen_papers (link, doi, title, source_id, processed_date, type, source_url) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-                            (link, doi, title, source_id, processed_date, type, source_url)
+                            'INSERT INTO seen_papers (link, doi, title, source_id, processed_date, type, source_url, is_relevant, relevance_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                            (link, doi, title, source_id, processed_date, type, source_url, rel_int, relevance_reason)
                         )
                     else:
                         cursor.execute(
-                            'INSERT INTO seen_papers (link, doi, title, source_id, type, source_url) VALUES (?, ?, ?, ?, ?, ?)', 
-                            (link, doi, title, source_id, type, source_url)
+                            'INSERT INTO seen_papers (link, doi, title, source_id, type, source_url, is_relevant, relevance_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+                            (link, doi, title, source_id, type, source_url, rel_int, relevance_reason)
                         )
                     paper_id = cursor.lastrowid
                     
@@ -236,8 +245,48 @@ class Database:
                 else:
                     logger.error(f"Database error after retries: {e}")
             except sqlite3.IntegrityError:
-                # Normal if already exists
+                # Update existing record with relevance info if it was already seen but without it
+                try:
+                    with sqlite3.connect(self.db_path, timeout=30) as conn:
+                        cursor = conn.cursor()
+                        cursor.execute(
+                            'UPDATE seen_papers SET is_relevant = ?, relevance_reason = ? WHERE link = ? OR (doi IS NOT NULL AND doi = ?)',
+                            (rel_int, relevance_reason, link, doi)
+                        )
+                        conn.commit()
+                except Exception as ex:
+                    logger.error(f"Failed to update existing paper: {ex}")
                 break
+
+    def get_recent_papers_by_days(self, days: int = 7) -> list[dict]:
+        """Returns papers processed in the last X days."""
+        conn = sqlite3.connect(self.db_path, timeout=30)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT title, doi, processed_date, is_relevant, relevance_reason, source_id, source_url, link
+            FROM seen_papers 
+            WHERE processed_date >= datetime('now', ?)
+            ORDER BY processed_date DESC
+        ''', (f'-{days} days',))
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+
+    def get_recent_papers(self, limit: int = 100) -> list[dict]:
+        """Returns the most recent papers regardless of relevance."""
+        conn = sqlite3.connect(self.db_path, timeout=30)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT title, doi, processed_date, is_relevant, relevance_reason, source_id, source_url, link
+            FROM seen_papers 
+            ORDER BY processed_date DESC 
+            LIMIT ?
+        ''', (limit,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
 
     def set_metadata(self, key: str, value: str):
         """Sets a system-level metadata value."""
