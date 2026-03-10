@@ -15,6 +15,7 @@ class SiteGenerator:
     def __init__(self):
         self.env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
         self.env.filters['slugify'] = self._slugify
+        self.env.globals['generated_at'] = datetime.now().strftime("%Y-%m-%d %H:%M")
         self.journal_url_map = {} # Name -> URL
         self.urls = [] # List of relative paths for the sitemap
 
