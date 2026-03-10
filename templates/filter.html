@@ -3,6 +3,11 @@
 <h1>Filter Audit</h1>
 <p>This table shows the papers processed by the Relevance Filter during the last 7 days. It's used for system evaluation and debugging.</p>
 
+<details style="margin-bottom: 20px; border: 1px solid var(--border-color); padding: 15px; border-radius: 6px; background: #f9f9f9;">
+    <summary style="cursor: pointer; font-weight: 600; color: var(--accent-color);">Show active Filter Prompt</summary>
+    <div style="margin-top: 15px; font-size: 0.85em; font-family: monospace; white-space: pre-wrap; background: white; padding: 15px; border: 1px solid #ddd;">{{ system_prompt }}</div>
+</details>
+
 <div class="table-responsive">
     <table class="stats-table">
         <thead>

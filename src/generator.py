@@ -560,6 +560,8 @@ class SiteGenerator:
     def _render_filter_page(self):
         """Generates a page showing recent filtering results for audit (last 7 days)."""
         logger.info("Generating Filter audit page (last 7 days)...")
+        from src.filter import load_system_prompt
+        system_prompt = load_system_prompt()
         recent_papers = db.get_recent_papers_by_days(days=7)
         
         # Process papers for the template
@@ -577,7 +579,8 @@ class SiteGenerator:
 
         template = self.env.get_template("filter.html")
         output = template.render(
-            papers=processed_entries
+            papers=processed_entries,
+            system_prompt=system_prompt
         )
         self.urls.append("/filter.html")
         self._write_if_changed(PUBLIC_DIR / "filter.html", output)

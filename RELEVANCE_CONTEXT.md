@@ -73,23 +73,23 @@ Your task is to filter scientific papers based on their Title and Abstract.
 The user is a Senior Hydrologist and Climate Scientist focusing on the physical water cycle. The goal is to track research on Hydrology, Water Resources Management, and Irrigation at a regional or catchment scale.
 
 **Criteria for RELEVANT:**
-1.  **Hydrology & Modeling:** Land Surface Models (LSM), Soil Moisture, Evapotranspiration, Runoff generation, Groundwater recharge, Catchment hydrology, surface-subsurface coupling.
-2.  **Water Resources:** Drought propagation, Drought indicators, Flash floods, Water scarcity, impacts of Climate Change SPECIFICALLY on the hydrological cycle and water availability.
+1.  **Hydrology & Modeling:** Land Surface Models (LSM), Soil Moisture, Evapotranspiration, Runoff generation, Groundwater recharge, Catchment hydrology, surface-subsurface coupling, **River droughts**, and streamflow modeling.
+2.  **Water Resources & Extremes:** Drought propagation, Drought indicators, Flash floods, Water scarcity, and **Climate Extremes** (e.g., joint monitoring/forecasting of extremes). Accept impacts of Climate Change if they primarily model or analyze hydrological variables and water availability.
 3.  **Irrigation (Regional/LSM Scale):** Remote sensing of irrigation, Irrigation mapping, Irrigation simulation in LSMs, Irrigation-atmosphere coupling. **ONLY accept** if the study is integrated into a catchment-scale or regional hydrological model.
 4.  **Specific Models/Tools:** ISBA, SURFEX, SAFRAN, MODCOU, ORCHIDEE, SWAT, mHM (mesoscale Hydrological Model by Samaniego), JULES, Sentinel-1, SMOS, SWOT.
-5.  **Techniques:** Data Assimilation of water variables, Hydrological downscaling/bias correction.
+5.  **Techniques:** Data Assimilation of water variables, Hydrological downscaling/bias correction, and **Methodological Frameworks** (e.g., AHP, probabilistic characterization) when applied specifically to physical hydrological processes or risk assessment (e.g., flood/drought risk).
 
 **Criteria for NOT RELEVANT (REJECT):**
 - **Geohazards & Geomechanics:** **REJECT** studies on landslides, ground subsidence, slope stability, rockfall, soil mechanics, or structural geology (e.g., fault dynamics), even if they use precipitation, groundwater, or pore pressure as triggers or variables. The focus must be on the water cycle or resource management, not the geological hazard or mechanical failure.
-- **Purely Climate/Atmospheric:** Studies on atmospheric dynamics, teleconnections (ENSO, NAO), or general climate change trends WITHOUT a direct, primary focus on hydrological variables or water resources.
+- **Purely Climate/Atmospheric:** Studies on atmospheric dynamics, teleconnections (ENSO, NAO), or general climate change trends WITHOUT a direct, primary focus on hydrological variables, climate extremes, or water resources.
 - **Microbiology & Health:** Studies on pathogens, epidemiology, or biological aerosols, even if they use meteorological data.
 - **Purely Ecological or Physiological:** Species distribution, phenology, or biodiversity studies. Also REJECT purely plant-physiological or eco-physiological studies (e.g., sap flow, xylem dynamics, stomatal conductance, leaf-level gas exchange) unless they are directly and primarily used to calibrate or validate a catchment-scale or regional hydrological model.
 - **Marine/Oceanography:** REJECT studies on marine ecosystems, fisheries, ocean currents, or sea surface temperatures unless the primary focus is coastal aquifers or saltwater intrusion.
-- **Management & Planning:** **REJECT** studies on water systems resilience planning, benchmarking frameworks, cost-efficiency, decision-making under uncertainty, or water governance, even if they use hydrological data (e.g., CMIP6, flood data). The primary focus must be the **physical process** or its modeling, not the planning/economic framework.
+- **Management & Planning:** **REJECT** studies on benchmarking frameworks, cost-efficiency, water governance, or purely socio-economic policy, even if they use hydrological data. However, **ACCEPT** risk assessment frameworks (e.g., flood/drought risk) that involve physical or climate modeling.
 - **Social Sciences:** Policy, management, or sociological studies without a quantitative physical/hydrological basis.
 - **Engineering & IoT:** Technical studies on sensor hardware, IoT protocols, cloud platforms, or general AI frameworks for "Smart Agriculture" if they lack a rigorous physical evaluation of the water cycle. Also REJECT purely hydraulic engineering of irrigation systems (e.g., pump efficiency, pipe design) without a larger hydrological or water resource context.
 - **Local Irrigation Engineering & Agronomy:** **REJECT** irrigation studies that focus on a single local area, a specific crop (e.g., rice, ginger), or irrigation system reliability. REJECT purely agronomic studies on yield optimization, pests, or fertilizer management.
-- **Purely Mathematical/Statistical:** REJECT papers whose primary contribution is a new mathematical method (e.g., Fractals, Fractional calculus, general AI/ML architectures) without a substantial and specific application to a physical hydrological process.
+- **Purely Mathematical/Statistical:** REJECT papers whose primary contribution is a new mathematical method (e.g., Fractals, Fractional calculus, general AI/ML architectures) without a substantial and specific application to a physical hydrological process or climate extremes.
 - **Deep Hydrogeology & Geochemistry:** REJECT studies on petrophysical modeling, stratigraphic reconstructions, or salinity mapping of deep fossil aquifers without a physical modeling of the active water cycle or surface-subsurface coupling.
 
 **INSTRUCTIONS:**
