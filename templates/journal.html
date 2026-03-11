@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="journal-header" style="margin-bottom: 2em; border-bottom: 2px solid var(--accent-color); padding-bottom: 1em;">
+    <h1>{{ journal_name }}</h1>
+    {% if journal_url %}
+    <p><a href="{{ journal_url }}" target="_blank" rel="noopener noreferrer" class="btn">Visit Journal Website &rarr;</a></p>
+    {% endif %}
+    <p class="text-muted">Total articles tracked from this journal: <strong>{{ papers|length }}</strong></p>
+</div>
+
+<div class="journal-papers">
+    {% for paper in papers %}
+    <div class="paper-item" style="margin-bottom: 1.5em; border-left: 3px solid #eee; padding-left: 15px;">
+        <div class="meta" style="font-size: 0.9em; color: #666; margin-bottom: 5px;">
+            <strong>{{ paper.year }}</strong>
+        </div>
+        <a href="/{{ paper.rel_path }}" class="paper-title" style="font-size: 1.15em; font-weight: 500; text-decoration: none; color: var(--primary-color);">{{ paper.title }}</a>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 3em;">
+    <a href="/journals.html" class="btn">&larr; Back to Journals List</a>
+</div>
+{% endblock %}

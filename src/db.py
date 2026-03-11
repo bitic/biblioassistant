@@ -26,34 +26,35 @@ class Database:
             )
         ''')
         
-        # 2. Migration: Add source_id column if it doesn't exist
+        # 2. Migration: Add columns if they don't exist
         cursor.execute("PRAGMA table_info(seen_papers)")
         columns = [row[1] for row in cursor.fetchall()]
-        if 'source_id' not in columns:
-            logger.info("Migrating database: adding source_id column to seen_papers.")
-            cursor.execute('ALTER TABLE seen_papers ADD COLUMN source_id TEXT')
-        
-        if 'type' not in columns:
-            logger.info("Migrating database: adding type column to seen_papers.")
-            cursor.execute('ALTER TABLE seen_papers ADD COLUMN type TEXT')
-        
-        if 'source_url' not in columns:
-            logger.info("Migrating database: adding source_url column to seen_papers.")
-            cursor.execute('ALTER TABLE seen_papers ADD COLUMN source_url TEXT')
+        for col, col_type in [
+            ('source_id', 'TEXT'),
+            ('type', 'TEXT'),
+            ('source_url', 'TEXT'),
+            ('is_relevant', 'INTEGER DEFAULT 0'),
+            ('relevance_reason', 'TEXT')
+        ]:
+            if col not in columns:
+                logger.info(f"Migrating database: adding {col} column to seen_papers.")
+                cursor.execute(f'ALTER TABLE seen_papers ADD COLUMN {col} {col_type}')
 
-        if 'is_relevant' not in columns:
-            logger.info("Migrating database: adding is_relevant column to seen_papers.")
-            cursor.execute('ALTER TABLE seen_papers ADD COLUMN is_relevant INTEGER DEFAULT 0')
-        
-        if 'relevance_reason' not in columns:
-            logger.info("Migrating database: adding relevance_reason column to seen_papers.")
-            cursor.execute('ALTER TABLE seen_papers ADD COLUMN relevance_reason TEXT')
-
-        # 3. Create Promotion Tables
+        # 3. Create Supporting Tables
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS monitored_journals (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 source_id TEXT UNIQUE,
+                added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS journals (
+                id TEXT PRIMARY KEY,
+                name TEXT,
+                url TEXT,
+                issn TEXT,
                 added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -84,7 +85,6 @@ class Database:
             )
         ''')
 
-        # Events table for the hidden RSS feed
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS events (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,7 +94,6 @@ class Database:
             )
         ''')
 
-        # Usage table for API cost tracking
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS usage (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -121,18 +120,6 @@ class Database:
         conn.close()
         return result is not None
 
-    def get_processed_date(self, link: str) -> Optional[str]:
-        """Returns the processed date for a given paper link."""
-        conn = sqlite3.connect(self.db_path, timeout=30)
-        cursor = conn.cursor()
-        cursor.execute('SELECT processed_date FROM seen_papers WHERE link = ?', (link,))
-        result = cursor.fetchone()
-        conn.close()
-        if result and result[0]:
-            # SQLite timestamp is YYYY-MM-DD HH:MM:SS
-            return result[0].split(" ")[0]
-        return None
-
     def get_all_processed_dates(self) -> dict:
         """Returns a dictionary mapping link -> processed_date (datetime object)."""
         from datetime import datetime
@@ -146,7 +133,6 @@ class Database:
         for link, date_str in rows:
             if date_str:
                 try:
-                    # SQLite timestamp is usually YYYY-MM-DD HH:MM:SS
                     dt = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
                     results[link] = dt
                 except ValueError:
@@ -163,7 +149,7 @@ class Database:
         return {row[0]: (row[1], row[2]) for row in rows}
 
     def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None, type: str = None, source_url: str = None, is_relevant: bool = False, relevance_reason: str = None, authors_data: dict = None):
-        """Mark a paper as seen and record its authors and relevance status."""
+        """Mark a paper as seen and record its authors, journal and relevance status."""
         import time
         retries = 3
         rel_int = 1 if is_relevant else 0
@@ -183,7 +169,16 @@ class Database:
                         )
                     paper_id = cursor.lastrowid
                     
-                    # Record authors for frequency tracking
+                    # Record journal metadata if available
+                    if source_id:
+                        clean_sid = source_id.split("/")[-1]
+                        # We don't have the official name here easily, but we'll update it during migration/discovery
+                        cursor.execute(
+                            'INSERT OR IGNORE INTO journals (id, url) VALUES (?, ?)',
+                            (clean_sid, source_url)
+                        )
+
+                    # Record authors
                     to_process = []
                     if authors_data:
                         for auth_id, name in authors_data.items():
@@ -203,10 +198,9 @@ class Database:
                                 (paper_id, clean_auth_id)
                             )
                     conn.commit()
-                break # Success
+                break 
             except sqlite3.OperationalError as e:
                 if "locked" in str(e) and i < retries - 1:
-                    logger.warning(f"Database locked. Retrying ({i+1}/{retries})...")
                     time.sleep(1)
                 else:
                     logger.error(f"Database error in add_seen: {e}")
@@ -225,21 +219,9 @@ class Database:
         ''', (f'-{days} days',))
         rows = cursor.fetchall()
         conn.close()
-        
-        results = []
-        for row in rows:
-            results.append({
-                'title': row['title'],
-                'link': row['link'],
-                'doi': row['doi'],
-                'date': row['processed_date'],
-                'is_relevant': bool(row['is_relevant']),
-                'relevance_reason': row['relevance_reason']
-            })
-        return results
+        return [{'title': r['title'], 'link': r['link'], 'doi': r['doi'], 'date': r['processed_date'], 'is_relevant': bool(r['is_relevant']), 'relevance_reason': r['relevance_reason']} for r in rows]
 
     def add_event(self, event_type: str, message: str):
-        """Record an event for the internal activity feed."""
         try:
             with sqlite3.connect(self.db_path, timeout=30) as conn:
                 cursor = conn.cursor()
@@ -249,7 +231,6 @@ class Database:
             logger.error(f"Error adding event: {e}")
 
     def get_recent_events(self, limit: int = 50) -> list:
-        """Returns recent system events."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
@@ -259,20 +240,15 @@ class Database:
         return [dict(row) for row in rows]
 
     def record_usage(self, model: str, prompt_tokens: int, completion_tokens: int, total_tokens: int, cost: float):
-        """Record LLM API usage and cost."""
         try:
             with sqlite3.connect(self.db_path, timeout=30) as conn:
                 cursor = conn.cursor()
-                cursor.execute(
-                    'INSERT INTO usage (model, prompt_tokens, completion_tokens, total_tokens, cost) VALUES (?, ?, ?, ?, ?)',
-                    (model, prompt_tokens, completion_tokens, total_tokens, cost)
-                )
+                cursor.execute('INSERT INTO usage (model, prompt_tokens, completion_tokens, total_tokens, cost) VALUES (?, ?, ?, ?, ?)', (model, prompt_tokens, completion_tokens, total_tokens, cost))
                 conn.commit()
         except Exception as e:
             logger.error(f"Error recording usage: {e}")
 
     def get_monthly_cost(self) -> float:
-        """Calculate total LLM cost for the current month."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute("SELECT SUM(cost) FROM usage WHERE timestamp >= date('now', 'start of month')")
@@ -281,7 +257,6 @@ class Database:
         return result[0] if result[0] is not None else 0.0
 
     def get_promotable_journals(self, threshold: int = 5) -> list:
-        """Find journals with many relevant papers that aren't monitored yet."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute('''
@@ -289,16 +264,14 @@ class Database:
             FROM seen_papers
             WHERE is_relevant = 1 AND source_id IS NOT NULL
             AND source_id NOT IN (SELECT source_id FROM monitored_journals)
-            GROUP BY source_id
-            HAVING count >= ?
+            GROUP BY source_id HAVING count >= ?
             ORDER BY count DESC
         ''', (threshold,))
-        results = cursor.fetchall()
+        results = [row[0] for row in cursor.fetchall()]
         conn.close()
         return results
 
     def add_monitored_journal(self, source_id: str):
-        """Add a journal to the monitored list (auto-promotion)."""
         try:
             with sqlite3.connect(self.db_path, timeout=30) as conn:
                 cursor = conn.cursor()
@@ -307,18 +280,7 @@ class Database:
         except Exception as e:
             logger.error(f"Error adding monitored journal: {e}")
 
-    def add_monitored_author(self, author_id: str):
-        """Add an author to the monitored list (auto-promotion)."""
-        try:
-            with sqlite3.connect(self.db_path, timeout=30) as conn:
-                cursor = conn.cursor()
-                cursor.execute('INSERT OR IGNORE INTO monitored_authors (author_id) VALUES (?)', (author_id,))
-                conn.commit()
-        except Exception as e:
-            logger.error(f"Error adding monitored author: {e}")
-
     def get_monitored_journals(self) -> list[str]:
-        """Returns list of source_ids that have been promoted."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute('SELECT source_id FROM monitored_journals')
@@ -326,17 +288,7 @@ class Database:
         conn.close()
         return results
 
-    def get_monitored_authors(self) -> list[str]:
-        """Returns list of author_ids that have been promoted."""
-        conn = sqlite3.connect(self.db_path, timeout=30)
-        cursor = conn.cursor()
-        cursor.execute('SELECT author_id FROM monitored_authors')
-        results = [row[0] for row in cursor.fetchall()]
-        conn.close()
-        return results
-
     def get_promotable_authors(self, threshold: int = 5) -> list:
-        """Find authors with many relevant papers that aren't monitored yet."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute('''
@@ -345,16 +297,31 @@ class Database:
             JOIN seen_papers p ON pa.paper_id = p.id
             WHERE p.is_relevant = 1
             AND pa.author_id NOT IN (SELECT author_id FROM monitored_authors)
-            GROUP BY pa.author_id
-            HAVING count >= ?
+            GROUP BY pa.author_id HAVING count >= ?
             ORDER BY count DESC
         ''', (threshold,))
         results = [row[0] for row in cursor.fetchall()]
         conn.close()
         return results
 
+    def add_monitored_author(self, author_id: str):
+        try:
+            with sqlite3.connect(self.db_path, timeout=30) as conn:
+                cursor = conn.cursor()
+                cursor.execute('INSERT OR IGNORE INTO monitored_authors (author_id) VALUES (?)', (author_id,))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"Error adding monitored author: {e}")
+
+    def get_monitored_authors(self) -> list[str]:
+        conn = sqlite3.connect(self.db_path, timeout=30)
+        cursor = conn.cursor()
+        cursor.execute('SELECT author_id FROM monitored_authors')
+        results = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        return results
+
     def get_all_authors(self) -> list:
-        """Returns a list of all authors with their paper counts, sorted by name."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute('''
@@ -368,23 +335,22 @@ class Database:
         conn.close()
         return [{"id": r[0], "name": r[1], "count": r[2]} for r in rows]
 
-    def get_paper_authors(self, paper_link: str) -> list:
-        """Returns a list of authors (id, name) for a given paper link."""
+    def get_all_journals(self) -> list:
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT a.id, a.name
-            FROM authors a
-            JOIN paper_authors pa ON a.id = pa.author_id
-            JOIN seen_papers p ON p.id = pa.paper_id
-            WHERE p.link = ?
-        ''', (paper_link,))
+            SELECT p.source_id, COALESCE(j.name, p.source_id) as name, COUNT(p.id) as count, j.url
+            FROM seen_papers p
+            LEFT JOIN journals j ON p.source_id = j.id
+            WHERE p.source_id IS NOT NULL AND p.is_relevant = 1
+            GROUP BY p.source_id
+            ORDER BY name ASC
+        ''')
         rows = cursor.fetchall()
         conn.close()
-        return [{"id": r[0], "name": r[1]} for r in rows]
+        return [{"id": r[0], "name": r[1], "count": r[2], "url": r[3]} for r in rows]
 
     def get_all_paper_authors(self) -> dict:
-        """Returns a mapping of paper_link -> list of author dicts (id, name)."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute('''
@@ -395,12 +361,24 @@ class Database:
         ''')
         rows = cursor.fetchall()
         conn.close()
-        
         results = {}
         for link, aid, name in rows:
-            if link not in results:
-                results[link] = []
-            results[link].append({"id": aid, "name": name or aid}) # Use ID as name if unknown
+            if link not in results: results[link] = []
+            results[link].append({"id": aid, "name": name or aid})
         return results
+
+    def get_all_paper_journals(self) -> dict:
+        """Returns mapping of link -> {id, name, url}."""
+        conn = sqlite3.connect(self.db_path, timeout=30)
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT p.link, p.source_id, j.name, j.url
+            FROM seen_papers p
+            LEFT JOIN journals j ON p.source_id = j.id
+            WHERE p.source_id IS NOT NULL
+        ''')
+        rows = cursor.fetchall()
+        conn.close()
+        return {r[0]: {"id": r[1], "name": r[2] or r[1], "url": r[3]} for r in rows}
 
 db = Database()

@@ -58,11 +58,13 @@ class SiteGenerator:
             added_dates_map = db.get_all_processed_dates()
             self.paper_journal_links = db.get_journal_urls()
             self.paper_authors_map = db.get_all_paper_authors() # Link -> list of {id, name}
+            self.paper_journals_map = db.get_all_paper_journals() # Link -> {id, name, url}
         except Exception as e:
             logger.warning(f"Could not fetch metadata from DB: {e}")
             added_dates_map = {}
             self.paper_journal_links = {}
             self.paper_authors_map = {}
+            self.paper_journals_map = {}
 
         # Collect all summaries
         papers = self._collect_papers(added_dates_map)
@@ -106,6 +108,12 @@ class SiteGenerator:
 
         # Generate Authors List Page
         self._render_authors_list_page(papers)
+
+        # Generate Journal Pages
+        self._render_journal_pages(papers)
+
+        # Generate Journals List Page
+        self._render_journals_list_page(papers)
 
         # Generate Sitemap
         self._generate_sitemap()
@@ -286,6 +294,70 @@ class SiteGenerator:
         )
         self.urls.append("/authors.html")
         self._write_if_changed(PUBLIC_DIR / "authors.html", output)
+
+    def _render_journal_pages(self, papers):
+        """Generates a separate page for each journal with its list of papers."""
+        # journal_id -> {name: str, url: str, papers: list}
+        journal_map = {}
+        
+        for paper in papers:
+            journal_data = paper.get('db_journal')
+            if journal_data:
+                jid = journal_data['id']
+                if jid not in journal_map:
+                    journal_map[jid] = {
+                        'name': journal_data['name'], 
+                        'url': journal_data['url'], 
+                        'papers': []
+                    }
+                
+                journal_map[jid]['papers'].append({
+                    'title': paper['title'],
+                    'year': paper['date_obj'].year,
+                    'rel_path': paper['rel_path']
+                })
+
+        template = self.env.get_template("journal.html")
+        out_dir = PUBLIC_DIR / "journals"
+        out_dir.mkdir(exist_ok=True)
+
+        for jid, data in journal_map.items():
+            data['papers'].sort(key=lambda x: x['year'], reverse=True)
+            output = template.render(
+                journal_name=data['name'],
+                journal_url=data['url'],
+                papers=data['papers']
+            )
+            self.urls.append(f"/journals/{jid}.html")
+            self._write_if_changed(out_dir / f"{jid}.html", output)
+
+    def _render_journals_list_page(self, papers):
+        """Generates a master list of all journals, sorted by name."""
+        logger.info("Generating Journals list page...")
+        
+        journal_stats = {}
+        for paper in papers:
+            journal_data = paper.get('db_journal')
+            if journal_data:
+                jid = journal_data['id']
+                if jid not in journal_stats:
+                    journal_stats[jid] = {'name': journal_data['name'], 'count': 0}
+                journal_stats[jid]['count'] += 1
+
+        journals_list = []
+        for jid, data in journal_stats.items():
+            journals_list.append({
+                'id': jid,
+                'name': data['name'],
+                'count': data['count']
+            })
+
+        journals_list.sort(key=lambda x: x['name'].lower())
+
+        template = self.env.get_template("journals.html")
+        output = template.render(journals=journals_list)
+        self.urls.append("/journals.html")
+        self._write_if_changed(PUBLIC_DIR / "journals.html", output)
     def _author_sort_key(self, name):
         """Returns a sort key for (Surname, Name) sorting."""
         parts = name.strip().split()
@@ -401,21 +473,26 @@ class SiteGenerator:
                     except IndexError:
                         pass
 
-                # 1. Journal and Source URL
-                journal = "Unknown"
-                source_url = None
-                match = re.search(r"-\s+\*\*Journal:\*\*\s+(.*)", raw_content)
-                if match:
-                    val = match.group(1).strip()
-                    if val.startswith("[") and "](" in val:
-                        inner_match = re.search(r"\[(.*?)\]\((.*?)\)", val)
-                        if inner_match:
-                            journal = inner_match.group(1)
-                            source_url = inner_match.group(2)
-                    else:
-                        journal = val
+                # 1. Journal and Source URL (Now from DB if available)
+                db_journal = self.paper_journals_map.get(original_link)
+                if db_journal:
+                    journal = db_journal['name']
+                    source_url = db_journal['url']
+                else:
+                    journal = "Unknown"
+                    source_url = None
+                    match = re.search(r"-\s+\*\*Journal:\*\*\s+(.*)", raw_content)
+                    if match:
+                        val = match.group(1).strip()
+                        if val.startswith("[") and "](" in val:
+                            inner_match = re.search(r"\[(.*?)\]\((.*?)\)", val)
+                            if inner_match:
+                                journal = inner_match.group(1)
+                                source_url = inner_match.group(2)
+                        else:
+                            journal = val
 
-                # If source_url not in MD, check DB mapping
+                # If source_url not in MD, check legacy DB mapping
                 if not source_url and original_link in self.paper_journal_links:
                     _, source_url = self.paper_journal_links[original_link]
 
@@ -518,6 +595,7 @@ class SiteGenerator:
                     'added_date_obj': added_date_obj,
                     'preview': preview,
                     'db_authors': db_authors,
+                    'db_journal': db_journal,
                     'content': html_content,
                     'raw_content': raw_content,
                     'rel_path': rel_path,
@@ -568,12 +646,18 @@ class SiteGenerator:
         # Post-process journal name to be clickable
         journal_match = re.search(r"<li><strong>Journal:</strong>\s*(.*?)</li>", content_html)
         if journal_match:
-            original_journal = journal_match.group(1).strip()
-            # If it's already a link (for new papers), don't replace
-            if not original_journal.startswith("<a"):
-                url = self.journal_url_map.get(original_journal)
+            original_journal_html = journal_match.group(1).strip()
+            db_journal = paper.get('db_journal')
+            
+            if db_journal:
+                jid = db_journal['id']
+                name = db_journal['name']
+                linked_journal_html = f'<a href="/journals/{jid}.html">{name}</a>'
+                content_html = content_html.replace(original_journal_html, linked_journal_html)
+            elif not original_journal_html.startswith("<a"):
+                url = self.journal_url_map.get(original_journal_html)
                 if url:
-                    content_html = content_html.replace(f"<strong>Journal:</strong> {original_journal}", f'<strong>Journal:</strong> <a href="{url}" target="_blank" rel="noopener noreferrer">{original_journal}</a>')
+                    content_html = content_html.replace(original_journal_html, f'<a href="{url}" target="_blank" rel="noopener noreferrer">{original_journal_html}</a>')
 
         output = template.render(
             title=paper['title'],
@@ -694,19 +778,25 @@ class SiteGenerator:
     def _render_stats(self, papers: List[Dict]):
         from collections import Counter
         
-        # 1. Top 10 Journals
-        journals = []
+        # 1. Top 10 Journals (Now by ID)
+        journal_stats = {}
         for paper in papers:
-            journals.append(paper['journal'])
+            journal_data = paper.get('db_journal')
+            if journal_data:
+                jid = journal_data['id']
+                if jid not in journal_stats:
+                    journal_stats[jid] = {'name': journal_data['name'], 'count': 0}
+                journal_stats[jid]['count'] += 1
         
-        top_journals_counts = Counter(journals).most_common(10)
-        top_journals = []
-        for journal, count in top_journals_counts:
-            top_journals.append({
-                'name': journal,
-                'count': count,
-                'url': self.journal_url_map.get(journal)
+        top_journals_list = []
+        for jid, data in journal_stats.items():
+            top_journals_list.append({
+                'id': jid, 
+                'name': data['name'], 
+                'count': data['count']
             })
+        
+        top_journals = sorted(top_journals_list, key=lambda x: x['count'], reverse=True)[:10]
         
         # 2. Top 10 Authors
         author_stats = {} # id -> {name, count}

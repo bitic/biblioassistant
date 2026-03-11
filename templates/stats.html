@@ -60,11 +60,7 @@
                                 {% for journal in top_journals %}
                                 <tr>
                                     <td class="py-3 text-dark">
-                                        {% if journal.url %}
-                                        <a href="{{ journal.url }}" target="_blank" rel="noopener noreferrer">{{ journal.name }}</a>
-                                        {% else %}
-                                        {{ journal.name }}
-                                        {% endif %}
+                                        <a href="/journals/{{ journal.id }}.html">{{ journal.name }}</a>
                                     </td>
                                     <td class="text-end py-3">
                                         <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3">{{ journal.count }}</span>

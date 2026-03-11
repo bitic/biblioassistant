@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Journals</h1>
+<p>Total scientific journals in our database: <strong>{{ journals|length }}</strong></p>
+
+<div class="journals-grid">
+    {% for journal in journals %}
+    <div class="journal-item">
+        <a href="/journals/{{ journal.id }}.html">{{ journal.name }}</a>
+        <span class="paper-count">({{ journal.count }} papers)</span>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .journals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .journal-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .paper-count {
+        font-size: 0.85em;
+        color: #666;
+    }
+</style>
+{% endblock %}
