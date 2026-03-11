@@ -88,11 +88,11 @@
                     <div class="table-responsive">
                         <table class="table table-sm table-hover align-middle mb-0">
                             <tbody>
-                                {% for author, count in top_authors %}
+                                {% for author in top_authors %}
                                 <tr>
-                                    <td class="py-3 text-dark"><a href="/authors/{{ author|slugify }}.html">{{ author }}</a></td>
+                                    <td class="py-3 text-dark"><a href="/authors/{{ author.id }}.html">{{ author.name }}</a></td>
                                     <td class="text-end py-3">
-                                        <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3">{{ count }}</span>
+                                        <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3">{{ author.count }}</span>
                                     </td>
                                 </tr>
                                 {% endfor %}

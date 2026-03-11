@@ -197,24 +197,27 @@ class SiteGenerator:
             # Use authors from DB
             authors_data = paper.get('db_authors', [])
             
-            # Fallback to extraction if DB is missing (should not happen after migration)
-            if not authors_data:
-                names = self._extract_authors(paper)
-                authors_data = [{'id': self._slugify(n), 'name': n} for n in names]
+            if authors_data:
+                for auth in authors_data:
+                    aid = auth['id']
+                    name = auth['name']
+                    
+                    # If the name is just the ID (fallback in DB), try to get it from Markdown
+                    if name == aid:
+                        extracted_names = self._extract_authors(paper)
+                        if extracted_names:
+                            # This is a bit of a guess but better than showing the ID
+                            name = extracted_names[0]
 
-            for auth in authors_data:
-                aid = auth['id']
-                name = auth['name']
-                
-                if aid not in author_map:
-                    author_map[aid] = {'name': name, 'papers': []}
+                    if aid not in author_map:
+                        author_map[aid] = {'name': name, 'papers': []}
 
-                author_map[aid]['papers'].append({
-                    'title': paper['title'],
-                    'year': paper['date_obj'].year,
-                    'rel_path': paper['rel_path'],
-                    'other_authors_count': len(authors_data) - 1
-                })
+                    author_map[aid]['papers'].append({
+                        'title': paper['title'],
+                        'year': paper['date_obj'].year,
+                        'rel_path': paper['rel_path'],
+                        'other_authors_count': len(authors_data) - 1
+                    })
 
         template = self.env.get_template("author.html")
         out_dir = PUBLIC_DIR / "authors"
@@ -223,8 +226,15 @@ class SiteGenerator:
         for aid, data in author_map.items():
             author_papers = data['papers']
             author_papers.sort(key=lambda x: x['year'], reverse=True)
+            
+            # Final safety check: never show raw ID as name to user
+            display_name = data['name']
+            if display_name.startswith('A') and display_name[1:].isdigit():
+                # If we still have an ID, skip generating this page or use fallback
+                continue
+
             output = template.render(
-                author_name=data['name'],
+                author_name=display_name,
                 papers=author_papers
             )
             self.urls.append(f"/authors/{aid}.html")
@@ -239,21 +249,28 @@ class SiteGenerator:
         for paper in papers:
             authors_data = paper.get('db_authors', [])
             
-            # Fallback to extraction if DB is missing
-            if not authors_data:
-                names = self._extract_authors(paper)
-                authors_data = [{'id': self._slugify(n), 'name': n} for n in names]
+            if authors_data:
+                for auth in authors_data:
+                    aid = auth['id']
+                    name = auth['name']
+                    
+                    # If the name is just the ID (fallback in DB), try to get it from Markdown
+                    if name == aid:
+                        extracted_names = self._extract_authors(paper)
+                        if extracted_names:
+                            name = extracted_names[0]
 
-            for auth in authors_data:
-                aid = auth['id']
-                name = auth['name']
-                if aid not in author_data_map:
-                    author_data_map[aid] = {'name': name, 'count': 0}
-                author_data_map[aid]['count'] += 1
+                    if aid not in author_data_map:
+                        author_data_map[aid] = {'name': name, 'count': 0}
+                    author_data_map[aid]['count'] += 1
 
         # Prepare list for sorting
         authors_list = []
         for aid, data in author_data_map.items():
+            # Safety check: skip if name is still an ID
+            if data['name'].startswith('A') and data['name'][1:].isdigit():
+                continue
+
             authors_list.append({
                 'name': data['name'],
                 'count': data['count'],
@@ -525,17 +542,23 @@ class SiteGenerator:
             # Use the robust extraction method from DB if available
             authors_data = paper.get('db_authors', [])
             
-            # Fallback to extraction if DB is missing
-            if not authors_data:
-                names = self._extract_authors(paper)
-                authors_data = [{'id': self._slugify(n), 'name': n} for n in names]
-
             if authors_data:
                 linked_authors_list = []
                 for auth in authors_data:
                     aid = auth['id']
                     name = auth['name']
-                    linked_authors_list.append(f'<a href="/authors/{aid}.html">{name}</a>')
+                    
+                    # If the name is just the ID (fallback in DB), try to get it from Markdown
+                    if name == aid:
+                        extracted_names = self._extract_authors(paper)
+                        if extracted_names:
+                            name = extracted_names[0]
+                    
+                    # Last resort: if it's an ID, just use the name as extracted without ID link
+                    if name.startswith('A') and name[1:].isdigit():
+                        linked_authors_list.append(name)
+                    else:
+                        linked_authors_list.append(f'<a href="/authors/{aid}.html">{name}</a>')
 
                 linked_authors_html = ", ".join(linked_authors_list)
 
@@ -686,40 +709,38 @@ class SiteGenerator:
             })
         
         # 2. Top 10 Authors
-        all_authors = []
+        author_stats = {} # id -> {name, count}
         for paper in papers:
-            import re
-            match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", paper['raw_content'])
-            if match:
-                authors_str = match.group(1).strip()
-                # 1. Handle "Last, First" by temporarily replacing that comma with something else
-                # A common pattern is "Last, First, Last2, First2" or "Last, First and Last2, First2"
-                # If there are many commas, it's likely "Last, First"
-                if authors_str.count(',') > authors_str.count(';'):
-                    # Heuristic: if it's "Last, First, Last, First", we group pairs
-                    parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
-                    # If we have an even number of parts and many commas, they might be pairs
-                    if len(parts) > 1 and len(parts) % 2 == 0:
-                        # Join pairs: "Bradford, John" -> "John Bradford"
-                        for i in range(0, len(parts), 2):
-                            all_authors.append(f"{parts[i+1]} {parts[i]}")
-                    else:
-                        all_authors.extend(parts)
-                else:
-                    # Normal "First Last, First Last"
-                    authors_list = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
-                    all_authors.extend(authors_list)
-            else:
-                all_authors.append(paper['author'])
-        
-        # Clean up: Remove very short names (likely artifacts) and normalize
-        cleaned_authors = []
-        for a in all_authors:
-            # Remove "U S Geological Survey" and similar non-human authors if needed
-            if len(a) > 3 and "Geological Survey" not in a:
-                cleaned_authors.append(a)
+            authors_data = paper.get('db_authors', [])
+            
+            if authors_data:
+                for auth in authors_data:
+                    aid = auth['id']
+                    name = auth['name']
+                    
+                    # If the name is just the ID (fallback in DB), try to get it from Markdown
+                    if name == aid:
+                        extracted_names = self._extract_authors(paper)
+                        if extracted_names:
+                            name = extracted_names[0]
 
-        top_authors = Counter(cleaned_authors).most_common(10)
+                    if aid not in author_stats:
+                        author_stats[aid] = {'name': name, 'count': 0}
+                    author_stats[aid]['count'] += 1
+
+        # Prepare list for sorting and filter out raw IDs
+        authors_list = []
+        for aid, data in author_stats.items():
+            if data['name'].startswith('A') and data['name'][1:].isdigit():
+                continue
+            authors_list.append({
+                'id': aid,
+                'name': data['name'],
+                'count': data['count']
+            })
+        
+        # Sort by count and take top 10
+        top_authors = sorted(authors_list, key=lambda x: x['count'], reverse=True)[:10]
         
         # 3. Articles per Year
         years = [paper['date_obj'].year for paper in papers]
