@@ -307,6 +307,16 @@ class Database:
         except Exception as e:
             logger.error(f"Error adding monitored journal: {e}")
 
+    def add_monitored_author(self, author_id: str):
+        """Add an author to the monitored list (auto-promotion)."""
+        try:
+            with sqlite3.connect(self.db_path, timeout=30) as conn:
+                cursor = conn.cursor()
+                cursor.execute('INSERT OR IGNORE INTO monitored_authors (author_id) VALUES (?)', (author_id,))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"Error adding monitored author: {e}")
+
     def get_monitored_journals(self) -> list[str]:
         """Returns list of source_ids that have been promoted."""
         conn = sqlite3.connect(self.db_path, timeout=30)
@@ -325,16 +335,34 @@ class Database:
         conn.close()
         return results
 
+    def get_promotable_authors(self, threshold: int = 5) -> list:
+        """Find authors with many relevant papers that aren't monitored yet."""
+        conn = sqlite3.connect(self.db_path, timeout=30)
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT pa.author_id, COUNT(*) as count
+            FROM paper_authors pa
+            JOIN seen_papers p ON pa.paper_id = p.id
+            WHERE p.is_relevant = 1
+            AND pa.author_id NOT IN (SELECT author_id FROM monitored_authors)
+            GROUP BY pa.author_id
+            HAVING count >= ?
+            ORDER BY count DESC
+        ''', (threshold,))
+        results = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        return results
+
     def get_all_authors(self) -> list:
         """Returns a list of all authors with their paper counts, sorted by name."""
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT a.id, a.name, COUNT(pa.paper_id) as count
-            FROM authors a
-            JOIN paper_authors pa ON a.id = pa.author_id
-            GROUP BY a.id, a.name
-            ORDER BY a.name ASC
+            SELECT pa.author_id, COALESCE(a.name, pa.author_id) as name, COUNT(pa.paper_id) as count
+            FROM paper_authors pa
+            LEFT JOIN authors a ON pa.author_id = a.id
+            GROUP BY pa.author_id
+            ORDER BY name ASC
         ''')
         rows = cursor.fetchall()
         conn.close()
@@ -360,10 +388,10 @@ class Database:
         conn = sqlite3.connect(self.db_path, timeout=30)
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT p.link, a.id, a.name
-            FROM authors a
-            JOIN paper_authors pa ON a.id = pa.author_id
-            JOIN seen_papers p ON p.id = pa.paper_id
+            SELECT p.link, pa.author_id, a.name
+            FROM paper_authors pa
+            JOIN seen_papers p ON pa.paper_id = p.id
+            LEFT JOIN authors a ON pa.author_id = a.id
         ''')
         rows = cursor.fetchall()
         conn.close()
@@ -372,7 +400,7 @@ class Database:
         for link, aid, name in rows:
             if link not in results:
                 results[link] = []
-            results[link].append({"id": aid, "name": name})
+            results[link].append({"id": aid, "name": name or aid}) # Use ID as name if unknown
         return results
 
 db = Database()
