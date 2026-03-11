@@ -56,16 +56,16 @@ def run_backfill():
     cursor_str = db.get_metadata("backfill_cursor")
     
     if not cursor_str:
-        # First time running: start from 7 days ago
-        cursor = datetime.now() - timedelta(days=7)
-        logger.info(f"No backfill cursor found. Starting from 7 days ago: {cursor.strftime('%Y-%m-%d')}")
+        # First time running: start from 30 days ago
+        cursor = datetime.now() - timedelta(days=30)
+        logger.info(f"No backfill cursor found. Starting from 30 days ago: {cursor.strftime('%Y-%m-%d')}")
     else:
         cursor = datetime.strptime(cursor_str, "%Y-%m-%d")
         logger.info(f"Backfill cursor found: {cursor.strftime('%Y-%m-%d')}")
 
-    # 2. Define the window (one week)
+    # 2. Define the window (one month)
     end_date = cursor
-    start_date = cursor - timedelta(days=7)
+    start_date = cursor - timedelta(days=30)
     
     # 3. Check if we reached the limit (Jan 1, 2000)
     limit = datetime(2000, 1, 1)
