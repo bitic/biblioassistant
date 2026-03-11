@@ -7,7 +7,7 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 from typing import List, Dict
-from src.config import TEMPLATES_DIR, PUBLIC_DIR, SUMMARIES_DIR, PAPERS_DIR, SITE_URL, SITE_TITLE
+from src.config import TEMPLATES_DIR, PUBLIC_DIR, SUMMARIES_DIR, PAPERS_DIR, SITE_URL, SITE_TITLE, AUTHOR_NORMALIZATION
 from src.db import db
 from src.logger import logger
 
@@ -102,6 +102,9 @@ class SiteGenerator:
         # Generate Author Pages
         self._render_author_pages(papers)
 
+        # Generate Authors List Page
+        self._render_authors_list_page(papers)
+
         # Generate Sitemap
         self._generate_sitemap()
         
@@ -153,32 +156,46 @@ class SiteGenerator:
         robots_txt = f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL.rstrip('/')}/sitemap.xml\n"
         self._write_if_changed(PUBLIC_DIR / "robots.txt", robots_txt)
 
+    def _extract_authors(self, paper):
+        """Extracts a list of clean author names from a paper's raw content."""
+        import re
+        match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", paper['raw_content'])
+        authors_to_index = []
+        if match:
+            authors_str = match.group(1).strip()
+            # 1. Prefer semicolon as primary separator if present
+            if ';' in authors_str:
+                authors_to_index = [a.strip() for a in re.split(r";| and ", authors_str) if a.strip()]
+            # 2. Otherwise use comma but avoid the even-parts-swap trap
+            else:
+                # Common pattern: Name Surname, Name Surname
+                authors_to_index = [a.strip() for a in re.split(r",| and ", authors_str) if a.strip()]
+        else:
+            # Fallback to the main author field if no authors block found
+            authors_to_index = [paper['author']]
+
+        # Final cleanup: remove short strings or institutional names
+        clean_authors = [name for name in authors_to_index if len(name) >= 4 and "Geological Survey" not in name]
+        
+        # Apply normalization
+        normalized_authors = []
+        for name in clean_authors:
+            # Check for direct mapping or surname mapping
+            canonical_name = AUTHOR_NORMALIZATION.get(name, name)
+            normalized_authors.append(canonical_name)
+            
+        return list(dict.fromkeys(normalized_authors)) # Deduplicate preserved order
+
     def _render_author_pages(self, papers):
         """Generates a separate page for each author with their list of papers."""
         author_map = {}
         for paper in papers:
-            import re
-            match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", paper['raw_content'])
-            authors_to_index = []
-            if match:
-                authors_str = match.group(1).strip()
-                if authors_str.count(',') > authors_str.count(';'):
-                    parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
-                    if len(parts) > 1 and len(parts) % 2 == 0:
-                        for i in range(0, len(parts), 2):
-                            authors_to_index.append(f"{parts[i+1]} {parts[i]}")
-                    else:
-                        authors_to_index.extend(parts)
-                else:
-                    authors_to_index.extend([a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()])
-            else:
-                authors_to_index.append(paper['author'])
+            authors_to_index = self._extract_authors(paper)
 
             for name in authors_to_index:
-                if len(name) < 4 or "Geological Survey" in name: continue
                 if name not in author_map:
                     author_map[name] = []
-                
+
                 author_map[name].append({
                     'title': paper['title'],
                     'year': paper['date_obj'].year,
@@ -200,6 +217,44 @@ class SiteGenerator:
             slug = self._slugify(name)
             self.urls.append(f"/authors/{slug}.html")
             self._write_if_changed(out_dir / f"{slug}.html", output)
+
+    def _render_authors_list_page(self, papers):
+        """Generates a master list of all authors, sorted alphabetically (Surname, Name)."""
+        logger.info("Generating Authors list page...")
+
+        author_counts = {}
+        for paper in papers:
+            authors_to_index = self._extract_authors(paper)
+            for name in authors_to_index:
+                author_counts[name] = author_counts.get(name, 0) + 1
+
+        # Prepare list for sorting
+        authors_list = []
+        for name, count in author_counts.items():
+            authors_list.append({
+                'name': name,
+                'count': count,
+                'slug': self._slugify(name)
+            })
+
+        # Sort by Surname, Name
+        authors_list.sort(key=lambda x: self._author_sort_key(x['name']))
+
+        template = self.env.get_template("authors.html")
+        output = template.render(
+            authors=authors_list
+        )
+        self.urls.append("/authors.html")
+        self._write_if_changed(PUBLIC_DIR / "authors.html", output)
+    def _author_sort_key(self, name):
+        """Returns a sort key for (Surname, Name) sorting."""
+        parts = name.strip().split()
+        if not parts:
+            return ""
+        if len(parts) == 1:
+            return parts[0].lower()
+        # Last word as surname, rest as name
+        return f"{parts[-1]}, {' '.join(parts[:-1])}".lower()
 
     def _slugify(self, text):
         import re
@@ -425,40 +480,27 @@ class SiteGenerator:
     def _render_paper(self, paper):
         template = self.env.get_template("paper.html")
         summary_link = f"{SITE_URL}/{paper['rel_path']}"
-        
+
         # Post-process content to make authors clickable
-        # We look for the "Authors:** Name1, Name2" line in the HTML
         content_html = paper['content']
         import re
         authors_match = re.search(r"<li><strong>Authors:</strong>\s*(.*?)</li>", content_html)
         if authors_match:
             original_authors_html = authors_match.group(1)
-            # Split by comma or 'and' while preserving commas for the final string
-            # This is tricky in HTML, but we can try to find names.
-            # A simpler way is to use the raw_content authors if we can map them back.
-            
-            # Let's extract authors from raw_content (more reliable)
-            raw_match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", paper['raw_content'])
-            if raw_match:
-                raw_authors_str = raw_match.group(1).strip()
-                # Use logic similar to author indexing
-                if raw_authors_str.count(',') > raw_authors_str.count(';'):
-                    parts = [p.strip() for p in re.split(r",| and ", raw_authors_str) if p.strip()]
-                    if len(parts) > 1 and len(parts) % 2 == 0:
-                        processed_parts = []
-                        for i in range(0, len(parts), 2):
-                            name = f"{parts[i+1]} {parts[i]}"
-                            slug = self._slugify(name)
-                            processed_parts.append(f'<a href="/authors/{slug}.html">{name}</a>')
-                        linked_authors = ", ".join(processed_parts)
-                    else:
-                        linked_authors = ", ".join([f'<a href="/authors/{self._slugify(a)}.html">{a}</a>' for a in parts])
-                else:
-                    parts = [a.strip() for a in re.split(r",| and |;", raw_authors_str) if a.strip()]
-                    linked_authors = ", ".join([f'<a href="/authors/{self._slugify(a)}.html">{a}</a>' for a in parts])
-                
+
+            # Use the robust extraction method
+            authors_list = self._extract_authors(paper)
+
+            if authors_list:
+                linked_authors_list = []
+                for name in authors_list:
+                    slug = self._slugify(name)
+                    linked_authors_list.append(f'<a href="/authors/{slug}.html">{name}</a>')
+
+                linked_authors_html = ", ".join(linked_authors_list)
+
                 # Replace in HTML
-                content_html = content_html.replace(original_authors_html, linked_authors)
+                content_html = content_html.replace(original_authors_html, linked_authors_html)
 
         # Post-process journal name to be clickable
         journal_match = re.search(r"<li><strong>Journal:</strong>\s*(.*?)</li>", content_html)

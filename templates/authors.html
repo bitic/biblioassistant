@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Authors</h1>
+<p>Total authors tracked: <strong>{{ authors|length }}</strong></p>
+
+<div class="authors-grid">
+    {% for author in authors %}
+    <div class="author-item">
+        <a href="/authors/{{ author.slug }}.html">{{ author.name }}</a>
+        <span class="paper-count">({{ author.count }} papers)</span>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .authors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .author-item {
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+    }
+    .paper-count {
+        font-size: 0.85em;
+        color: #666;
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}

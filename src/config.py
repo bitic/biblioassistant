@@ -97,3 +97,24 @@ DISCOVERY_TASKS = [
     # 8. New Journal Watch: Earth Observation (EO)
     {"name": "Earth Observation (EO)", "type": "issn", "issn": "3054-1786"}
 ]
+
+# Author Normalization Mapping (Deduplication)
+# Maps variations or surnames to canonical Full Names
+AUTHOR_NORMALIZATION = {
+    "Quintana-Seguí": "Pere Quintana Seguí",
+    "Quintana Seguí": "Pere Quintana Seguí",
+    "Quintana Segui": "Pere Quintana Seguí",
+    "Quintana": "Pere Quintana Seguí",
+    "P. Quintana-Seguí": "Pere Quintana Seguí",
+    "Pere Quintana-Segui": "Pere Quintana Seguí",
+    "Pere Quintana-Seguí": "Pere Quintana Seguí",
+    "Vicente-Serrano": "Sergio Vicente-Serrano",
+    "S. Vicente-Serrano": "Sergio Vicente-Serrano",
+    "Beguería": "Santiago Beguería",
+    "S. Beguería": "Santiago Beguería",
+    "Tramblay": "Yves Tramblay",
+    "Y. Tramblay": "Yves Tramblay",
+    "Vidal": "Jean-Philippe Vidal",
+    "J. Vidal": "Jean-Philippe Vidal",
+    "J.-P. Vidal": "Jean-Philippe Vidal",
+}

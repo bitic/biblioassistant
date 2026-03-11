@@ -134,7 +134,8 @@ class RelevanceFilter:
         self.ollama_url = f"{OLLAMA_HOST}/api/generate"
 
     def check_relevance(self, paper: Paper) -> bool:
-        logger.info(f"Checking relevance for: {paper.title[:50]}... using {self.engine}")
+        title_for_log = (paper.title or "No Title")[:50]
+        logger.info(f"Checking relevance for: {title_for_log}... using {self.engine}")
         
         # 1. BARRERA 1: Journal Blacklist (Immediate REJECT)
         if paper.source and JOURNAL_BLACKLIST:

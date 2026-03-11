@@ -246,7 +246,7 @@ class Discovery:
             papers = []
             for work in data.get("results", []):
                 # Extract metadata from OpenAlex format
-                title = work.get("title", "No Title")
+                title = work.get("title") or "No Title"
                 
                 # DOI and Link handling
                 raw_doi = work.get("doi")
