@@ -6,7 +6,7 @@
 <div class="authors-grid">
     {% for author in authors %}
     <div class="author-item">
-        <a href="/authors/{{ author.slug }}.html">{{ author.name }}</a>
+        <a href="/authors/{{ author.id }}.html">{{ author.name }}</a>
         <span class="paper-count">({{ author.count }} papers)</span>
     </div>
     {% endfor %}

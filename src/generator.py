@@ -56,11 +56,13 @@ class SiteGenerator:
         # Fetch added dates and journal URLs from DB
         try:
             added_dates_map = db.get_all_processed_dates()
-            self.paper_journal_links = db.get_journal_urls() # link -> (id, url)
+            self.paper_journal_links = db.get_journal_urls()
+            self.paper_authors_map = db.get_all_paper_authors() # Link -> list of {id, name}
         except Exception as e:
             logger.warning(f"Could not fetch metadata from DB: {e}")
             added_dates_map = {}
             self.paper_journal_links = {}
+            self.paper_authors_map = {}
 
         # Collect all summaries
         papers = self._collect_papers(added_dates_map)
@@ -187,57 +189,78 @@ class SiteGenerator:
         return list(dict.fromkeys(normalized_authors)) # Deduplicate preserved order
 
     def _render_author_pages(self, papers):
-        """Generates a separate page for each author with their list of papers."""
+        """Generates a separate page for each author with their list of papers, using ID for mapping."""
+        # author_id -> {name: str, papers: list}
         author_map = {}
+        
         for paper in papers:
-            authors_to_index = self._extract_authors(paper)
+            # Use authors from DB
+            authors_data = paper.get('db_authors', [])
+            
+            # Fallback to extraction if DB is missing (should not happen after migration)
+            if not authors_data:
+                names = self._extract_authors(paper)
+                authors_data = [{'id': self._slugify(n), 'name': n} for n in names]
 
-            for name in authors_to_index:
-                if name not in author_map:
-                    author_map[name] = []
+            for auth in authors_data:
+                aid = auth['id']
+                name = auth['name']
+                
+                if aid not in author_map:
+                    author_map[aid] = {'name': name, 'papers': []}
 
-                author_map[name].append({
+                author_map[aid]['papers'].append({
                     'title': paper['title'],
                     'year': paper['date_obj'].year,
                     'rel_path': paper['rel_path'],
-                    'other_authors_count': len(authors_to_index) - 1
+                    'other_authors_count': len(authors_data) - 1
                 })
 
         template = self.env.get_template("author.html")
         out_dir = PUBLIC_DIR / "authors"
         out_dir.mkdir(exist_ok=True)
 
-        for name, author_papers in author_map.items():
+        for aid, data in author_map.items():
+            author_papers = data['papers']
             author_papers.sort(key=lambda x: x['year'], reverse=True)
-            slug = self._slugify(name)
             output = template.render(
-                author_name=name,
+                author_name=data['name'],
                 papers=author_papers
             )
-            slug = self._slugify(name)
-            self.urls.append(f"/authors/{slug}.html")
-            self._write_if_changed(out_dir / f"{slug}.html", output)
+            self.urls.append(f"/authors/{aid}.html")
+            self._write_if_changed(out_dir / f"{aid}.html", output)
 
     def _render_authors_list_page(self, papers):
         """Generates a master list of all authors, sorted alphabetically (Surname, Name)."""
         logger.info("Generating Authors list page...")
-
-        author_counts = {}
+        
+        # author_id -> {name: str, count: int}
+        author_data_map = {}
         for paper in papers:
-            authors_to_index = self._extract_authors(paper)
-            for name in authors_to_index:
-                author_counts[name] = author_counts.get(name, 0) + 1
+            authors_data = paper.get('db_authors', [])
+            
+            # Fallback to extraction if DB is missing
+            if not authors_data:
+                names = self._extract_authors(paper)
+                authors_data = [{'id': self._slugify(n), 'name': n} for n in names]
+
+            for auth in authors_data:
+                aid = auth['id']
+                name = auth['name']
+                if aid not in author_data_map:
+                    author_data_map[aid] = {'name': name, 'count': 0}
+                author_data_map[aid]['count'] += 1
 
         # Prepare list for sorting
         authors_list = []
-        for name, count in author_counts.items():
+        for aid, data in author_data_map.items():
             authors_list.append({
-                'name': name,
-                'count': count,
-                'slug': self._slugify(name)
+                'name': data['name'],
+                'count': data['count'],
+                'id': aid
             })
 
-        # Sort by Surname, Name
+        # Sort by Surname, Name using the canonical name
         authors_list.sort(key=lambda x: self._author_sort_key(x['name']))
 
         template = self.env.get_template("authors.html")
@@ -399,19 +422,29 @@ class SiteGenerator:
                     except ValueError:
                         pass
 
-                # 4. Authors
-                match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", raw_content)
-                if match:
-                    authors_str = match.group(1).strip()
-                    if authors_str.count(',') > authors_str.count(';'):
-                        parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
-                        if len(parts) > 1 and len(parts) % 2 == 0:
-                            author = f"{parts[1]} {parts[0]}"
-                        else:
+                # 4. Authors (Now from DB if available)
+                db_authors = self.paper_authors_map.get(original_link, [])
+                
+                # Fallback to DOI lookup if link fails
+                if not db_authors and "https://doi.org/" in original_link:
+                    doi = original_link.replace("https://doi.org/", "")
+                    # We need a reverse map or a new query. For now, let's stick to link.
+                    # Actually, OpenAlex IDs ARE consistent.
+                
+                if db_authors:
+                    author = db_authors[0]['name']
+                else:
+                    # Legacy fallback to Regex
+                    match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", raw_content)
+                    author = "Unknown"
+                    if match:
+                        authors_str = match.group(1).strip()
+                        if authors_str.count(',') > authors_str.count(';'):
+                            parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
                             author = parts[0]
-                    else:
-                        parts = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
-                        author = parts[0]
+                        else:
+                            parts = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
+                            author = parts[0]
 
                 # Determine Added Date (for Sorting/RSS)
                 added_date_obj = added_dates_map.get(original_link)
@@ -467,6 +500,7 @@ class SiteGenerator:
                     'date_obj': paper_date_obj,
                     'added_date_obj': added_date_obj,
                     'preview': preview,
+                    'db_authors': db_authors,
                     'content': html_content,
                     'raw_content': raw_content,
                     'rel_path': rel_path,
@@ -488,14 +522,20 @@ class SiteGenerator:
         if authors_match:
             original_authors_html = authors_match.group(1)
 
-            # Use the robust extraction method
-            authors_list = self._extract_authors(paper)
+            # Use the robust extraction method from DB if available
+            authors_data = paper.get('db_authors', [])
+            
+            # Fallback to extraction if DB is missing
+            if not authors_data:
+                names = self._extract_authors(paper)
+                authors_data = [{'id': self._slugify(n), 'name': n} for n in names]
 
-            if authors_list:
+            if authors_data:
                 linked_authors_list = []
-                for name in authors_list:
-                    slug = self._slugify(name)
-                    linked_authors_list.append(f'<a href="/authors/{slug}.html">{name}</a>')
+                for auth in authors_data:
+                    aid = auth['id']
+                    name = auth['name']
+                    linked_authors_list.append(f'<a href="/authors/{aid}.html">{name}</a>')
 
                 linked_authors_html = ", ".join(linked_authors_list)
 
@@ -617,7 +657,7 @@ class SiteGenerator:
                 'title_doi': title_doi,
                 'pass': "YES" if p['is_relevant'] else "NO",
                 'comment': p['relevance_reason'] or "No reason provided.",
-                'date': p['processed_date']
+                'date': p['date']
             })
 
         template = self.env.get_template("filter.html")

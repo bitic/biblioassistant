@@ -13,6 +13,7 @@ class Paper:
     abstract: str = ""
     authors: List[str] = field(default_factory=list)
     author_ids: List[str] = field(default_factory=list) # OpenAlex Author IDs
+    authors_data: dict = field(default_factory=dict) # OpenAlex ID -> Official Name
     doi: Optional[str] = None
     pdf_link: Optional[str] = None
     type: Optional[str] = None # e.g., 'article', 'preprint', 'book'

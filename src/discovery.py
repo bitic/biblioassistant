@@ -294,6 +294,7 @@ class Discovery:
                 # Authors and Author IDs
                 authors = []
                 author_ids = []
+                authors_data = {}
                 for authorship in work.get("authorships", []):
                     author_data = authorship.get("author", {})
                     name = author_data.get("display_name", "")
@@ -301,7 +302,10 @@ class Discovery:
                     if name:
                         authors.append(name)
                     if full_id:
-                        author_ids.append(full_id.split("/")[-1])
+                        aid = full_id.split("/")[-1]
+                        author_ids.append(aid)
+                        if name:
+                            authors_data[aid] = name
 
                 # Extract Topics and Concepts
                 topics = []
@@ -327,6 +331,7 @@ class Discovery:
                     abstract=abstract,
                     authors=authors,
                     author_ids=author_ids,
+                    authors_data=authors_data,
                     doi=doi,
                     type=work_type,
                     topics=topics
