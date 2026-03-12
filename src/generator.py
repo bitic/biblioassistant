@@ -15,7 +15,6 @@ class SiteGenerator:
     def __init__(self):
         self.env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
         self.env.filters['slugify'] = self._slugify
-        self.env.globals['generated_at'] = datetime.now().strftime("%Y-%m-%d %H:%M")
         self.journal_url_map = {} # Name -> URL
         self.urls = [] # List of relative paths for the sitemap
 
@@ -69,8 +68,8 @@ class SiteGenerator:
         # Collect all summaries
         papers = self._collect_papers(added_dates_map)
         
-        # Sort by added date (descending)
-        papers.sort(key=lambda x: x['added_date_obj'], reverse=True)
+        # Sort by publication date (descending), then by added date as fallback
+        papers.sort(key=lambda x: (x['date_obj'], x['added_date_obj']), reverse=True)
         
         # Generate individual pages
         for paper in papers:
@@ -522,23 +521,22 @@ class SiteGenerator:
                 # Fallback to DOI lookup if link fails
                 if not db_authors and "https://doi.org/" in original_link:
                     doi = original_link.replace("https://doi.org/", "")
-                    # We need a reverse map or a new query. For now, let's stick to link.
-                    # Actually, OpenAlex IDs ARE consistent.
                 
-                if db_authors:
+                author = "Unknown"
+                # Check if we have a valid name in DB (not just an ID)
+                if db_authors and not (db_authors[0]['name'].startswith('A') and db_authors[0]['name'][1:].isdigit()):
                     author = db_authors[0]['name']
                 else:
-                    # Legacy fallback to Regex
+                    # Legacy fallback to Regex (used if DB is empty or only has the ID)
                     match = re.search(r"-\s+\*\*Authors:\*\*\s+(.*)", raw_content)
-                    author = "Unknown"
                     if match:
                         authors_str = match.group(1).strip()
-                        if authors_str.count(',') > authors_str.count(';'):
-                            parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
-                            author = parts[0]
+                        # Use same splitting logic as _extract_authors
+                        if ';' in authors_str:
+                            parts = [a.strip() for a in re.split(r";| and ", authors_str) if a.strip()]
                         else:
-                            parts = [a.strip() for a in re.split(r",| and |;", authors_str) if a.strip()]
-                            author = parts[0]
+                            parts = [p.strip() for p in re.split(r",| and ", authors_str) if p.strip()]
+                        author = parts[0] if parts else "Unknown"
 
                 # Determine Added Date (for Sorting/RSS)
                 added_date_obj = added_dates_map.get(original_link)
@@ -596,6 +594,7 @@ class SiteGenerator:
                     'preview': preview,
                     'db_authors': db_authors,
                     'db_journal': db_journal,
+                    'first_author_id': db_authors[0]['id'] if db_authors else self._slugify(author),
                     'content': html_content,
                     'raw_content': raw_content,
                     'rel_path': rel_path,
@@ -622,17 +621,18 @@ class SiteGenerator:
             
             if authors_data:
                 linked_authors_list = []
-                for auth in authors_data:
+                extracted_names = self._extract_authors(paper)
+                
+                for idx, auth in enumerate(authors_data):
                     aid = auth['id']
                     name = auth['name']
                     
-                    # If the name is just the ID (fallback in DB), try to get it from Markdown
+                    # If the name is just the ID (fallback in DB), try to get it from Markdown by position
                     if name == aid:
-                        extracted_names = self._extract_authors(paper)
-                        if extracted_names:
-                            name = extracted_names[0]
+                        if extracted_names and idx < len(extracted_names):
+                            name = extracted_names[idx]
                     
-                    # Last resort: if it's an ID, just use the name as extracted without ID link
+                    # Last resort: if it's still an ID, just use the ID as name without ID link
                     if name.startswith('A') and name[1:].isdigit():
                         linked_authors_list.append(name)
                     else:
@@ -640,8 +640,9 @@ class SiteGenerator:
 
                 linked_authors_html = ", ".join(linked_authors_list)
 
-                # Replace in HTML
-                content_html = content_html.replace(original_authors_html, linked_authors_html)
+                # Replace in HTML (only the metadata line to avoid linking names in title/text)
+                new_authors_line = authors_match.group(0).replace(original_authors_html, linked_authors_html)
+                content_html = content_html.replace(authors_match.group(0), new_authors_line)
 
         # Post-process journal name to be clickable
         journal_match = re.search(r"<li><strong>Journal:</strong>\s*(.*?)</li>", content_html)
@@ -649,15 +650,24 @@ class SiteGenerator:
             original_journal_html = journal_match.group(1).strip()
             db_journal = paper.get('db_journal')
             
+            # Decide on the display name for the journal
+            journal_display_name = original_journal_html
+            if db_journal and db_journal['name'] and not (db_journal['name'].startswith('S') and db_journal['name'][1:].isdigit()):
+                journal_display_name = db_journal['name']
+
             if db_journal:
                 jid = db_journal['id']
-                name = db_journal['name']
-                linked_journal_html = f'<a href="/journals/{jid}.html">{name}</a>'
-                content_html = content_html.replace(original_journal_html, linked_journal_html)
+                linked_journal_html = f'<a href="/journals/{jid}.html">{journal_display_name}</a>'
+                # Replace only the metadata line
+                new_journal_line = journal_match.group(0).replace(original_journal_html, linked_journal_html)
+                content_html = content_html.replace(journal_match.group(0), new_journal_line)
             elif not original_journal_html.startswith("<a"):
                 url = self.journal_url_map.get(original_journal_html)
                 if url:
-                    content_html = content_html.replace(original_journal_html, f'<a href="{url}" target="_blank" rel="noopener noreferrer">{original_journal_html}</a>')
+                    linked_journal_html = f'<a href="{url}" target="_blank" rel="noopener noreferrer">{original_journal_html}</a>'
+                    # Replace only the metadata line
+                    new_journal_line = journal_match.group(0).replace(original_journal_html, linked_journal_html)
+                    content_html = content_html.replace(journal_match.group(0), new_journal_line)
 
         output = template.render(
             title=paper['title'],

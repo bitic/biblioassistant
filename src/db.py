@@ -105,8 +105,49 @@ class Database:
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS metadata (
+                key TEXT PRIMARY KEY,
+                value TEXT,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
         
         conn.commit()
+
+    def get_metadata(self, key: str, default: str = None) -> Optional[str]:
+        """Fetch a value from the metadata table."""
+        conn = sqlite3.connect(self.db_path, timeout=30)
+        cursor = conn.cursor()
+        cursor.execute('SELECT value FROM metadata WHERE key = ?', (key,))
+        result = cursor.fetchone()
+        conn.close()
+        return result[0] if result else default
+
+    def set_metadata(self, key: str, value: str):
+        """Store a value in the metadata table."""
+        try:
+            with sqlite3.connect(self.db_path, timeout=30) as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    'INSERT INTO metadata (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=CURRENT_TIMESTAMP',
+                    (key, str(value))
+                )
+                conn.commit()
+        except Exception as e:
+            logger.error(f"Error setting metadata {key}: {e}")
+
+    def get_last_run_date(self) -> Optional[str]:
+        """Returns the date of the last successful pipeline run."""
+        return self.get_metadata("last_run_date")
+
+    def update_last_run_date(self, date_str: str = None):
+        """Updates the last run date to today or a specific date."""
+        if not date_str:
+            from datetime import datetime
+            date_str = datetime.now().strftime("%Y-%m-%d")
+        self.set_metadata("last_run_date", date_str)
 
     def is_seen(self, link: str, doi: str = None) -> bool:
         """Check if a paper has already been processed."""
@@ -239,11 +280,16 @@ class Database:
         conn.close()
         return [dict(row) for row in rows]
 
-    def record_usage(self, model: str, prompt_tokens: int, completion_tokens: int, total_tokens: int, cost: float):
+    def add_usage(self, model: str, prompt_tokens: int, completion_tokens: int, cost: float):
+        """Record LLM API usage and cost."""
+        total_tokens = (prompt_tokens or 0) + (completion_tokens or 0)
         try:
             with sqlite3.connect(self.db_path, timeout=30) as conn:
                 cursor = conn.cursor()
-                cursor.execute('INSERT INTO usage (model, prompt_tokens, completion_tokens, total_tokens, cost) VALUES (?, ?, ?, ?, ?)', (model, prompt_tokens, completion_tokens, total_tokens, cost))
+                cursor.execute(
+                    'INSERT INTO usage (model, prompt_tokens, completion_tokens, total_tokens, cost) VALUES (?, ?, ?, ?, ?)',
+                    (model, prompt_tokens, completion_tokens, total_tokens, cost)
+                )
                 conn.commit()
         except Exception as e:
             logger.error(f"Error recording usage: {e}")
