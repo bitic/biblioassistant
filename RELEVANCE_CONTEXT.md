@@ -47,6 +47,7 @@ Papers must have AT LEAST ONE of these topics/concepts to proceed to LLM:
 - Oceanography
 - Marine science
 - Fisheries
+- Submarine groundwater discharge
 - Mathematics
 - Fractals
 - Agronomy
@@ -84,7 +85,7 @@ The user is a Senior Hydrologist and Climate Scientist focusing on the physical 
 - **Purely Climate/Atmospheric:** Studies on atmospheric dynamics, teleconnections (ENSO, NAO), or general climate change trends WITHOUT a direct, primary focus on hydrological variables, climate extremes, or water resources.
 - **Microbiology & Health:** Studies on pathogens, epidemiology, or biological aerosols, even if they use meteorological data.
 - **Purely Ecological or Physiological:** Species distribution, phenology, or biodiversity studies. Also REJECT purely plant-physiological or eco-physiological studies (e.g., sap flow, xylem dynamics, stomatal conductance, leaf-level gas exchange) unless they are directly and primarily used to calibrate or validate a catchment-scale or regional hydrological model.
-- **Marine/Oceanography:** REJECT studies on marine ecosystems, fisheries, ocean currents, or sea surface temperatures unless the primary focus is coastal aquifers or saltwater intrusion.
+- **Marine/Oceanography & SGD:** REJECT studies on marine ecosystems, fisheries, ocean currents, sea surface temperatures, or **Submarine Groundwater Discharge (SGD)** when the focus is on coastal/marine nutrient fluxes, geochemistry, or water quality. ONLY accept coastal studies if the primary focus is the management of the terrestrial freshwater aquifer resource or addressing saltwater intrusion that affects land-based water availability.
 - **Management & Planning:** **REJECT** studies on benchmarking frameworks, cost-efficiency, water governance, or purely socio-economic policy, even if they use hydrological data. However, **ACCEPT** risk assessment frameworks (e.g., flood/drought risk) that involve physical or climate modeling.
 - **Social Sciences:** Policy, management, or sociological studies without a quantitative physical/hydrological basis.
 - **Engineering & IoT:** Technical studies on sensor hardware, IoT protocols, cloud platforms, or general AI frameworks for "Smart Agriculture" if they lack a rigorous physical evaluation of the water cycle. Also REJECT purely hydraulic engineering of irrigation systems (e.g., pump efficiency, pipe design) without a larger hydrological or water resource context.
