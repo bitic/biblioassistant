@@ -40,6 +40,17 @@ class Database:
                 logger.info(f"Migrating database: adding {col} column to seen_papers.")
                 cursor.execute(f'ALTER TABLE seen_papers ADD COLUMN {col} {col_type}')
 
+        # Migration for journals table
+        cursor.execute("PRAGMA table_info(journals)")
+        j_columns = [row[1] for row in cursor.fetchall()]
+        for col, col_type in [
+            ('h_index', 'INTEGER'),
+            ('impact_factor', 'REAL')
+        ]:
+            if col not in j_columns:
+                logger.info(f"Migrating database: adding {col} column to journals.")
+                cursor.execute(f'ALTER TABLE journals ADD COLUMN {col} {col_type}')
+
         # 3. Create Supporting Tables
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS monitored_journals (
@@ -55,6 +66,8 @@ class Database:
                 name TEXT,
                 url TEXT,
                 issn TEXT,
+                h_index INTEGER,
+                impact_factor REAL,
                 added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -189,7 +202,7 @@ class Database:
         conn.close()
         return {row[0]: (row[1], row[2]) for row in rows}
 
-    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None, type: str = None, source_url: str = None, is_relevant: bool = False, relevance_reason: str = None, authors_data: dict = None):
+    def add_seen(self, link: str, title: str, doi: str = None, source_id: str = None, author_ids: list[str] = None, processed_date: str = None, type: str = None, source_url: str = None, is_relevant: bool = False, relevance_reason: str = None, authors_data: dict = None, h_index: int = None, impact_factor: float = None):
         """Mark a paper as seen and record its authors, journal and relevance status."""
         import time
         retries = 3
@@ -215,8 +228,14 @@ class Database:
                         clean_sid = source_id.split("/")[-1]
                         # We don't have the official name here easily, but we'll update it during migration/discovery
                         cursor.execute(
-                            'INSERT OR IGNORE INTO journals (id, url) VALUES (?, ?)',
-                            (clean_sid, source_url)
+                            '''
+                            INSERT INTO journals (id, url, h_index, impact_factor) VALUES (?, ?, ?, ?)
+                            ON CONFLICT(id) DO UPDATE SET 
+                                url=COALESCE(excluded.url, journals.url),
+                                h_index=COALESCE(excluded.h_index, journals.h_index),
+                                impact_factor=COALESCE(excluded.impact_factor, journals.impact_factor)
+                            ''',
+                            (clean_sid, source_url, h_index, impact_factor)
                         )
 
                     # Record authors

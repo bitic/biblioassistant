@@ -19,6 +19,10 @@ class Paper:
     type: Optional[str] = None # e.g., 'article', 'preprint', 'book'
     topics: List[str] = field(default_factory=list) # OpenAlex Topics/Concepts
     
+    # Journal Quality Stats
+    journal_h_index: Optional[int] = None
+    journal_impact: Optional[float] = None
+    
     # Filtering status
     is_relevant: bool = False
     relevance_reason: str = ""

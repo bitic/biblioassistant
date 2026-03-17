@@ -44,6 +44,9 @@ MAX_MONTHLY_COST = float(os.getenv("MAX_MONTHLY_COST", "10.0"))
 
 # OpenAlex Discovery
 OPENALEX_EMAIL = os.getenv("OPENALEX_EMAIL", "your-email@example.com")
+# Journal Quality Defaults (OpenAlex metrics)
+MIN_JOURNAL_H_INDEX = int(os.getenv("MIN_JOURNAL_H_INDEX", "50"))
+MIN_JOURNAL_IMPACT_FACTOR = float(os.getenv("MIN_JOURNAL_IMPACT_FACTOR", "2.0"))
 
 # CORE API (Optional)
 CORE_API_KEY = os.getenv("CORE_API_KEY")
@@ -83,16 +86,40 @@ DISCOVERY_TASKS = [
     },
 
     # 4. Regional Focus: Pyrenees and Ebro Basin (Keep specific)
-    {"name": "Local: Pyrenees & Ebro", "type": "search", "query": "(Pyrenees OR \"Ebro Basin\"  OR Catalonia OR Spain OR \"Iberian Peninsula\") AND (drought OR snow OR hydrology OR \"water resources\")"},
+    {
+        "name": "Local: Pyrenees & Ebro", 
+        "type": "search", 
+        "query": "(Pyrenees OR \"Ebro Basin\"  OR Catalonia OR Spain OR \"Iberian Peninsula\") AND (drought OR snow OR hydrology OR \"water resources\")",
+        "min_impact": 1.0,
+        "min_h_index": 30
+    },
 
     # 5. Global Methodological: Irrigation & Water Management
-    {"name": "Global: Irrigation & LSM", "type": "search", "query": "irrigation AND (\"remote sensing\" OR \"soil moisture\" OR \"evapotranspiration\" OR \"streamflow\" OR \"groundwater\")"},
+    {
+        "name": "Global: Irrigation & LSM", 
+        "type": "search", 
+        "query": "irrigation AND (\"remote sensing\" OR \"soil moisture\" OR \"evapotranspiration\" OR \"streamflow\" OR \"groundwater\")",
+        "min_impact": 3.0,
+        "min_h_index": 100
+    },
 
     # 6. Global Model Watch: LSM & Hydrological Models
-    {"name": "Global: Model Development", "type": "search", "query": "\"SURFEX\" OR \"SAFRAN\" OR \"mHM model\" OR \"ORCHIDEE model\" OR \"JULES model\" OR \"VIC model\" OR \"LPRM\" OR \"global hydrolocial model\""},
+    {
+        "name": "Global: Model Development", 
+        "type": "search", 
+        "query": "\"SURFEX\" OR \"SAFRAN\" OR \"mHM model\" OR \"ORCHIDEE model\" OR \"JULES model\" OR \"VIC model\" OR \"LPRM\" OR \"global hydrolocial model\"",
+        "min_impact": 2.0,
+        "min_h_index": 70
+    },
 
     # 7. Global Process: Drought & Flood Extremes
-    {"name": "Global: Hydrological Extremes", "type": "search", "query": "(\"drought\" OR \"flash flood\") AND (\"groundwater\" OR \"soil moisture\" OR \"data assimilation\")"},
+    {
+        "name": "Global: Hydrological Extremes", 
+        "type": "search", 
+        "query": "(\"drought\" OR \"flash flood\") AND (\"groundwater\" OR \"soil moisture\" OR \"data assimilation\")",
+        "min_impact": 2.0,
+        "min_h_index": 70
+    },
 
     # 8. New Journal Watch: Earth Observation (EO)
     {"name": "Earth Observation (EO)", "type": "issn", "issn": "3054-1786"}

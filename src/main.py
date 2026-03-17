@@ -121,7 +121,7 @@ def main():
                     logger.info(f"Skipping {paper.title}: already exists on disk at {year_dir / filename}")
                     # Sync DB with reality
                     p_date = paper.published.strftime("%Y-%m-%d %H:%M:%S") if args.backfill_mode else None
-                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type, source_url=paper.source_url, is_relevant=True, relevance_reason="Recovered from existing summary on disk.", authors_data=paper.authors_data)
+                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type, source_url=paper.source_url, is_relevant=True, relevance_reason="Recovered from existing summary on disk.", authors_data=paper.authors_data, h_index=paper.journal_h_index, impact_factor=paper.journal_impact)
                     exists_locally = True
                     break
             if exists_locally:
@@ -151,7 +151,7 @@ def main():
                     processed_count += 1
                     # Mark as seen in DB only after successful processing
                     p_date = paper.published.strftime("%Y-%m-%d %H:%M:%S") if args.backfill_mode else None
-                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type, source_url=paper.source_url, is_relevant=True, relevance_reason=paper.relevance_reason, authors_data=paper.authors_data)
+                    db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type, source_url=paper.source_url, is_relevant=True, relevance_reason=paper.relevance_reason, authors_data=paper.authors_data, h_index=paper.journal_h_index, impact_factor=paper.journal_impact)
                 
                 synthesizer.engine = original_engine
             else:
@@ -161,7 +161,7 @@ def main():
         else:
             # Mark irrelevant papers as seen too, so we don't re-check them
             p_date = paper.published.strftime("%Y-%m-%d %H:%M:%S") if args.backfill_mode else None
-            db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type, source_url=paper.source_url, is_relevant=paper.is_relevant, relevance_reason=paper.relevance_reason, authors_data=paper.authors_data)
+            db.add_seen(paper.link, paper.title, paper.doi, paper.source_id, paper.author_ids, processed_date=p_date, type=paper.type, source_url=paper.source_url, is_relevant=paper.is_relevant, relevance_reason=paper.relevance_reason, authors_data=paper.authors_data, h_index=paper.journal_h_index, impact_factor=paper.journal_impact)
     end_cost = db.get_monthly_cost()
     run_cost = end_cost - start_cost
     

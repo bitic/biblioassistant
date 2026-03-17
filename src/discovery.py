@@ -2,7 +2,7 @@ import requests
 import time
 from datetime import datetime
 from typing import List
-from src.config import OPENALEX_EMAIL, DISCOVERY_TASKS
+from src.config import OPENALEX_EMAIL, DISCOVERY_TASKS, MIN_JOURNAL_H_INDEX, MIN_JOURNAL_IMPACT_FACTOR
 from src.models import Paper
 from src.logger import logger
 from src.db import db
@@ -62,7 +62,11 @@ class Discovery:
             papers = []
             
             if task['type'] == "search":
-                papers = self.search_by_keywords(task['query'])
+                papers = self.search_by_keywords(
+                    task['query'], 
+                    min_impact=task.get('min_impact'), 
+                    min_h_index=task.get('min_h_index')
+                )
             elif task['type'] == "author":
                 papers = self.search_by_author(task['id'])
             elif task['type'] == "citation":
@@ -137,12 +141,25 @@ class Discovery:
             logger.error(f"Error in author citation discovery: {e}")
             return []
 
-    def search_by_keywords(self, query: str) -> List[Paper]:
+    def search_by_keywords(self, query: str, min_impact: float = None, min_h_index: int = None) -> List[Paper]:
         params = self.params.copy()
+        
+        # Use defaults from config if not provided
+        impact = min_impact if min_impact is not None else MIN_JOURNAL_IMPACT_FACTOR
+        h_index = min_h_index if min_h_index is not None else MIN_JOURNAL_H_INDEX
+        
+        filter_str = f"title_and_abstract.search:{query},from_publication_date:{self.from_date},to_publication_date:{self.to_date}"
+        
+        # Add quality filters
+        if impact > 0:
+            filter_str += f",primary_location.source.summary_stats.2yr_mean_citedness:>{impact}"
+        if h_index > 0:
+            filter_str += f",primary_location.source.summary_stats.h_index:>{h_index}"
+
         params.update({
-            "filter": f"title_and_abstract.search:{query},from_publication_date:{self.from_date},to_publication_date:{self.to_date}",
+            "filter": filter_str,
             "sort": "publication_date:desc",
-            "per_page": 20
+            "per_page": 50
         })
         return self._fetch_openalex(params)
 
@@ -288,13 +305,21 @@ class Discovery:
                     source = "Unknown Source"
                     source_id = None
                     source_url = None
+                    journal_h_index = None
+                    journal_impact = None
                     location = work.get("primary_location")
                     if location and location.get("source"):
-                        source = location["source"].get("display_name", source)
-                        source_url = location["source"].get("homepage_url")
-                        full_source_id = location["source"].get("id")
+                        src_obj = location["source"]
+                        source = src_obj.get("display_name", source)
+                        source_url = src_obj.get("homepage_url")
+                        full_source_id = src_obj.get("id")
                         if full_source_id:
                             source_id = full_source_id.split("/")[-1]
+                        
+                        # Extract quality stats
+                        stats = src_obj.get("summary_stats", {})
+                        journal_h_index = stats.get("h_index")
+                        journal_impact = stats.get("2yr_mean_citedness")
 
                     # EXCLUSIONS: Zenodo, Figshare, Unknown Source, Preprints
                     excluded_sources = ["Zenodo", "Figshare", "Unknown Source"]
@@ -363,7 +388,9 @@ class Discovery:
                         authors_data=authors_data,
                         doi=doi,
                         type=work_type,
-                        topics=topics
+                        topics=topics,
+                        journal_h_index=journal_h_index,
+                        journal_impact=journal_impact
                     )
                     all_papers.append(paper)
                 
