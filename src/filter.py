@@ -19,9 +19,17 @@ def load_system_prompt() -> str:
             
         content = context_file.read_text()
         # Find the text between ```text and ```
-        match = re.search(r"```text\n(.*?)\n```", content, re.DOTALL)
+        match = re.search(r"## Local Filter Prompt \(Ollama & Gemini\)\s+```text\s+(.*?)\s+```", content, re.DOTALL)
+        if not match:
+             # Fallback to older header name if needed
+             match = re.search(r"## Local Filter Prompt \(Ollama\)\s+```text\s+(.*?)\s+```", content, re.DOTALL)
+        
         if match:
-            return match.group(1).strip()
+            prompt = match.group(1).strip()
+            # Add critical formatting instructions that might not be in the MD file
+            if "CRITICAL" not in prompt:
+                prompt += "\n\n**CRITICAL:** Do NOT include any internal monologue, thoughts, or `<think>` blocks. Do NOT provide any introductory or concluding text. Return ONLY a valid JSON object."
+            return prompt
         
         logger.warning("Could not find prompt block in RELEVANCE_CONTEXT.md. Using fallback.")
         return HARDCODED_FALLBACK

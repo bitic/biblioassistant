@@ -92,6 +92,15 @@ The user is a Senior Hydrologist and Climate Scientist focusing on the physical 
 - **Local Irrigation Engineering & Agronomy:** **REJECT** irrigation studies that focus on a single local area, a specific crop (e.g., rice, ginger), or irrigation system reliability. REJECT purely agronomic studies on yield optimization, pests, or fertilizer management.
 - **Purely Mathematical/Statistical:** REJECT papers whose primary contribution is a new mathematical method (e.g., Fractals, Fractional calculus, general AI/ML architectures) without a substantial and specific application to a physical hydrological process or climate extremes.
 - **Deep Hydrogeology & Geochemistry:** REJECT studies on petrophysical modeling, stratigraphic reconstructions, or salinity mapping of deep fossil aquifers without a physical modeling of the active water cycle or surface-subsurface coupling.
+- **Geographic exclusions:** REJECT studies on Arctic, Tropics (unless affecting Mediterranean), or very local studies in irrelevant regions.
+- **Specific Exclusions:** 
+    - Coastal water levels, sea level rise, or salt water intrusion.
+    - Urban hydrology or purely urban studies.
+    - Wetlands.
+    - Purely civil engineering or hydraulic infrastructure.
+    - Groundwater-only studies (if they lack surface coupling or LSM context).
+    - Tropical cyclones/typhoons (unless specifically Medicanes).
+    - Highly specialized microphysics (e.g., snow microphysics) or remote sensing *methods* without clear application to regional hydrology/climatology.
 
 **INSTRUCTIONS:**
 Analyze the provided Title and Abstract.
