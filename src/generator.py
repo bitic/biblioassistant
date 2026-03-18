@@ -430,12 +430,8 @@ class SiteGenerator:
         # Fetch added dates and journal URLs from DB
         try:
             added_dates_map = db.get_all_processed_dates()
-            # New helper to get journal URLs
-            conn = sqlite3.connect(db.db_path)
-            cursor = conn.cursor()
-            cursor.execute("SELECT DISTINCT source_id, source_url FROM seen_papers WHERE source_url IS NOT NULL")
-            journal_db_urls = {row[0]: row[1] for row in cursor.fetchall() if row[0]}
-            conn.close()
+            # Use improved db helper
+            journal_db_urls = db.get_distinct_journal_urls()
         except Exception as e:
             logger.warning(f"Could not fetch metadata from DB: {e}")
             added_dates_map = {}

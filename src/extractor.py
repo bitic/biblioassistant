@@ -305,14 +305,15 @@ class Extractor:
 
     def _extract_text(self, pdf_path: Path) -> str:
         try:
-            doc = fitz.open(pdf_path)
-            text = ""
-            for page in doc:
-                text += page.get_text()
-            
-            # Basic cleanup (remove too much whitespace)
-            return " ".join(text.split())
-            
+            with fitz.open(pdf_path) as doc:
+                text = ""
+                for page in doc:
+                    text += page.get_text()
+
+                # Basic cleanup (remove too much whitespace)
+                return " ".join(text.split())
+
         except Exception as e:
             logger.error(f"Error extracting text from {pdf_path}: {e}")
             return ""
+
