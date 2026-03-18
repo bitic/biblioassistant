@@ -150,16 +150,12 @@ class Discovery:
         
         filter_str = f"title_and_abstract.search:{query},from_publication_date:{self.from_date},to_publication_date:{self.to_date}"
         
-        # Add quality filters
-        if impact > 0:
-            filter_str += f",primary_location.source.summary_stats.2yr_mean_citedness:>{impact}"
-        if h_index > 0:
-            filter_str += f",primary_location.source.summary_stats.h_index:>{h_index}"
-
         params.update({
             "filter": filter_str,
             "sort": "publication_date:desc",
-            "per_page": 50
+            "per_page": 50,
+            "_min_h_index": h_index,
+            "_min_impact": impact
         })
         return self._fetch_openalex(params)
 
@@ -271,6 +267,10 @@ class Discovery:
         current_params = params.copy()
         current_params["cursor"] = "*"
         
+        # Quality filters (pop so they are not sent to API)
+        min_h_index = current_params.pop("_min_h_index", 0)
+        min_impact = current_params.pop("_min_impact", 0)
+        
         # Ensure per_page is set efficiently
         if "per_page" not in current_params:
             current_params["per_page"] = 100
@@ -291,7 +291,7 @@ class Discovery:
                     break
                 
                 for work in results:
-                    # Extract metadata from OpenAlex format
+                    # ... (rest of metadata extraction) ...
                     title = work.get("title") or "No Title"
                     
                     # DOI and Link handling
@@ -321,7 +321,16 @@ class Discovery:
                         journal_h_index = stats.get("h_index")
                         journal_impact = stats.get("2yr_mean_citedness")
 
+                    # Apply Post-Fetch Quality Filtering
+                    if min_h_index and journal_h_index is not None and journal_h_index < min_h_index:
+                         logger.debug(f"Skipping {title[:30]}... due to low H-Index ({journal_h_index} < {min_h_index})")
+                         continue
+                    if min_impact and journal_impact is not None and journal_impact < min_impact:
+                         logger.debug(f"Skipping {title[:30]}... due to low Impact ({journal_impact:.2f} < {min_impact:.2f})")
+                         continue
+
                     # EXCLUSIONS: Zenodo, Figshare, Unknown Source, Preprints
+                    # ... (continue as before) ...
                     excluded_sources = ["Zenodo", "Figshare", "Unknown Source"]
                     if any(excl in source for excl in excluded_sources):
                         logger.debug(f"Skipping {title[:30]}... due to excluded source: {source}")
