@@ -75,8 +75,8 @@ class SiteGenerator:
         for paper in papers:
             self._render_paper(paper)
             
-        # Generate Index (Recent 10)
-        self._render_index(papers[:10])
+        # Generate Index (Recent 20)
+        self._render_index(papers[:20])
         
         # Generate Archive
         self._render_archive(papers)

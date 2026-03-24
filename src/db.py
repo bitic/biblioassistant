@@ -14,8 +14,9 @@ class Database:
     @contextmanager
     def _get_conn(self):
         """Context manager for database connections to ensure they are always closed."""
-        conn = sqlite3.connect(self.db_path, timeout=30)
+        conn = sqlite3.connect(self.db_path, timeout=60)
         try:
+            conn.execute('PRAGMA busy_timeout=60000;')
             yield conn
         finally:
             conn.close()
@@ -26,6 +27,7 @@ class Database:
             cursor = conn.cursor()
             # TRUNCATE is safer than WAL on NFS but faster than DELETE
             cursor.execute('PRAGMA journal_mode=TRUNCATE;')
+            cursor.execute('PRAGMA busy_timeout=60000;')
             
             # 1. Ensure seen_papers exists
             cursor.execute('''

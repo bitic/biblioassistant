@@ -4,6 +4,7 @@ from pathlib import Path
 from src.config import PAPERS_DIR, OPENALEX_EMAIL, CORE_API_KEY, ELSEVIER_API_KEY, ELSEVIER_INST_TOKEN
 from src.models import Paper
 from src.logger import logger
+from src.utils import retry
 import random
 
 import re
@@ -77,6 +78,7 @@ class Extractor:
              
         return text, is_full_text
 
+    @retry(requests.exceptions.RequestException, tries=2, delay=5)
     def _extract_from_html(self, paper: Paper, url: str = None) -> str:
         """
         Fetches the article's HTML and strips tags to get raw text.
@@ -254,6 +256,7 @@ class Extractor:
             logger.warning(f"CORE API check failed: {e}")
             return ""
 
+    @retry(requests.exceptions.RequestException, tries=2, delay=5)
     def _try_download_url(self, target_url: str, save_path: Path, paper: Paper) -> bool:
         """Helper to attempt a download from a specific URL."""
         # Heuristics for specific publishers

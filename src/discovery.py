@@ -6,6 +6,7 @@ from src.config import OPENALEX_EMAIL, DISCOVERY_TASKS, MIN_JOURNAL_H_INDEX, MIN
 from src.models import Paper
 from src.logger import logger
 from src.db import db
+from src.utils import retry
 
 class Discovery:
     def __init__(self, email: str = OPENALEX_EMAIL, from_date: str = None, to_date: str = None):
@@ -262,6 +263,7 @@ class Discovery:
         })
         return self._fetch_openalex(params, ignore_seen=ignore_seen)
 
+    @retry(requests.exceptions.RequestException, tries=3, delay=2)
     def _fetch_openalex(self, params: dict, ignore_seen: bool = False) -> List[Paper]:
         all_papers = []
         current_params = params.copy()

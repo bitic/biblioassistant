@@ -6,6 +6,7 @@ from src.config import SUMMARIES_DIR, SYNTHESIS_ENGINE, OLLAMA_HOST, OLLAMA_MODE
 from src.models import Paper
 from src.db import db
 from src.logger import logger
+from src.utils import retry
 
 SYNTHESIS_PROMPT = """
 You are an expert scientific synthesizer. Your task is to generate an "Extended Card" for the provided scientific paper.
@@ -223,6 +224,7 @@ class Synthesizer:
         
         return section
 
+    @retry(Exception, tries=3, delay=10)
     def _synthesize_gemini_api(self, full_text: str) -> str:
         """Uses the new Google GenAI SDK."""
         if not GEMINI_API_KEY:
@@ -258,6 +260,7 @@ class Synthesizer:
             logger.error(f"Gemini API synthesis error: {e}")
             return ""
 
+    @retry(requests.exceptions.RequestException, tries=3, delay=10)
     def _synthesize_ollama(self, full_text: str) -> str:
         url = f"{OLLAMA_HOST}/api/generate"
         prompt = f"{SYNTHESIS_PROMPT}\n\nPAPER TEXT:\n{full_text}"

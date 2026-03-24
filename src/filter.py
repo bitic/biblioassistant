@@ -5,6 +5,7 @@ from src.config import OLLAMA_HOST, OLLAMA_FILTER_MODEL, RELEVANCE_ENGINE, RELEV
 from src.models import Paper
 from src.logger import logger
 from src.db import db
+from src.utils import retry
 
 def load_system_prompt() -> str:
     """Reads the system prompt from RELEVANCE_CONTEXT.md."""
@@ -191,6 +192,7 @@ class RelevanceFilter:
         else:
             return self._check_relevance_ollama(paper)
 
+    @retry(Exception, tries=3, delay=5)
     def _check_relevance_gemini(self, paper: Paper) -> bool:
         if not GEMINI_API_KEY:
             logger.error("GEMINI_API_KEY not found. Falling back to Ollama.")
@@ -248,6 +250,7 @@ class RelevanceFilter:
             db.add_event("ERROR", msg)
             return False
 
+    @retry(requests.exceptions.RequestException, tries=3, delay=5)
     def _check_relevance_ollama(self, paper: Paper) -> bool:
         # Use config model if engine is ollama and model not specified or default to config
         model = self.model if self.engine == "ollama" else OLLAMA_FILTER_MODEL
