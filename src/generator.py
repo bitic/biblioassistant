@@ -66,7 +66,35 @@ class SiteGenerator:
             self.paper_journals_map = {}
 
         # Collect all summaries
-        papers = self._collect_papers(added_dates_map)
+        all_papers = self._collect_papers(added_dates_map)
+        
+        # Deduplicate papers by normalized title
+        seen_titles = {} # normalized_title -> paper
+        import re
+        
+        for p in all_papers:
+            # Normalize title for comparison: lowercase, alphanumeric only
+            norm_title = re.sub(r'[^a-z0-9]', '', p['title'].lower())
+            
+            if norm_title in seen_titles:
+                existing = seen_titles[norm_title]
+                
+                # Preference logic:
+                # 1. Prefer ones with a real DOI (not an OpenAlex URL placeholder)
+                p_has_real_doi = p.get('doi') and not str(p['doi']).startswith('https://openalex.org/')
+                ex_has_real_doi = existing.get('doi') and not str(existing['doi']).startswith('https://openalex.org/')
+                
+                if p_has_real_doi and not ex_has_real_doi:
+                    seen_titles[norm_title] = p
+                elif not (ex_has_real_doi and not p_has_real_doi):
+                    # If DOI status is equal, keep the most recently processed one
+                    if p['added_date_obj'] > existing['added_date_obj']:
+                        seen_titles[norm_title] = p
+                continue
+            
+            seen_titles[norm_title] = p
+            
+        papers = list(seen_titles.values())
         
         # Sort by publication date (descending), then by added date as fallback
         papers.sort(key=lambda x: (x['date_obj'], x['added_date_obj']), reverse=True)

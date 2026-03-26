@@ -21,8 +21,10 @@ class Discovery:
         else:
             last_run = db.get_last_run_date()
             if last_run:
-                self.from_date = last_run
-                logger.info(f"Discovery starting from last run date: {self.from_date}")
+                # Subtract 7 days to account for OpenAlex indexing delays
+                last_run_dt = datetime.strptime(last_run, "%Y-%m-%d")
+                self.from_date = (last_run_dt - timedelta(days=7)).strftime("%Y-%m-%d")
+                logger.info(f"Discovery starting from last run date minus 7 days: {self.from_date}")
             else:
                 self.from_date = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
                 logger.info(f"First run detected. Discovery starting from fallback date: {self.from_date}")

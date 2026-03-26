@@ -24,6 +24,7 @@ def deploy():
 
     cmd = [
         "rsync", "-avz", "--delete",
+        "--chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r", # Force 755 for dirs, 644 for files
         "-e", "ssh", # Explicitly use ssh
         local_path,
         remote_dest
