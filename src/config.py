@@ -18,8 +18,8 @@ DB_PATH = DATA_DIR / "db.sqlite3"
 
 # Local LLM (Ollama)
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-OLLAMA_FILTER_MODEL = os.getenv("OLLAMA_FILTER_MODEL", "llama3.1:8b")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "deepseek-r1:14b")
+OLLAMA_FILTER_MODEL = os.getenv("OLLAMA_FILTER_MODEL", "gemma4:e4b")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma4:31b")
 
 # Relevance Engine ('gemini' or 'ollama')
 RELEVANCE_ENGINE = os.getenv("RELEVANCE_ENGINE", "gemini")
