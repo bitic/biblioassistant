@@ -13,6 +13,7 @@ class Discovery:
         self.base_url = "https://api.openalex.org/works"
         self.email = email
         self.api_key = api_key
+        self.has_errors = False
         self.params = {}
         if email:
             self.params["mailto"] = email
@@ -158,6 +159,7 @@ class Discovery:
             
         except Exception as e:
             logger.error(f"Error in author citation discovery: {e}")
+            self.has_errors = True
             return []
 
     def search_by_keywords(self, query: str, min_impact: float = None, min_h_index: int = None) -> List[Paper]:
@@ -258,6 +260,7 @@ class Discovery:
             msg = f"Error resolving DOI {doi}: {e}"
             logger.error(msg)
             db.add_event("ERROR", msg)
+            self.has_errors = True
             return []
 
     def search_by_citing_id(self, work_id: str) -> List[Paper]:
@@ -433,6 +436,7 @@ class Discovery:
             msg = f"OpenAlex fetch error: {e}"
             logger.error(msg)
             db.add_event("ERROR", msg)
+            self.has_errors = True
             return all_papers
 
     def _reconstruct_abstract(self, inverted_index: dict) -> str:

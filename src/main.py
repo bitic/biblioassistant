@@ -1,3 +1,4 @@
+import sys
 import argparse
 import subprocess
 from src.config import REMOTE_HOST, REMOTE_USER, REMOTE_PATH, PUBLIC_DIR, SUMMARIES_DIR
@@ -206,8 +207,11 @@ def main():
 
     # 7. Update Last Run Date (only for normal runs)
     if not args.backfill and not args.add_doi and not args.to_date:
-        db.update_last_run_date()
-        logger.info("Updated last run date in database.")
+        if discovery.has_errors:
+            logger.warning("Discovery encountered errors. Skipping update of last run date to avoid missing papers.")
+        else:
+            db.update_last_run_date()
+            logger.info("Updated last run date in database.")
 
     # 8. Generate Site
     generator = SiteGenerator()
@@ -216,6 +220,11 @@ def main():
     # 9. Deploy (Optional)
     if args.deploy:
         deploy()
+
+    # If running backfill and discovery failed, exit with non-zero code to preserve backfill cursor
+    if args.backfill and discovery.has_errors:
+        logger.error("Discovery encountered errors during backfill. Exiting with error to preserve backfill cursor.")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
