@@ -137,9 +137,14 @@ TOPIC_WHITELIST, TOPIC_BLACKLIST = load_topic_lists()
 JOURNAL_BLACKLIST = load_journal_blacklist()
 
 class RelevanceFilter:
-    def __init__(self, engine: str = RELEVANCE_ENGINE, model: str = RELEVANCE_MODEL):
-        self.engine = engine
-        self.model = model
+    def __init__(self, engine: str = None, model: str = None):
+        self.engine = engine or RELEVANCE_ENGINE
+        if model:
+            self.model = model
+        elif self.engine == "ollama":
+            self.model = OLLAMA_FILTER_MODEL
+        else:
+            self.model = RELEVANCE_MODEL
         self.ollama_url = f"{OLLAMA_HOST}/api/generate"
 
     def check_relevance(self, paper: Paper) -> bool:
@@ -248,7 +253,8 @@ class RelevanceFilter:
             msg = f"Error calling Gemini: {e}"
             logger.error(msg)
             db.add_event("ERROR", msg)
-            return False
+            logger.info("Falling back to Ollama for relevance filtering...")
+            return self._check_relevance_ollama(paper)
 
     @retry(requests.exceptions.RequestException, tries=3, delay=5)
     def _check_relevance_ollama(self, paper: Paper) -> bool:

@@ -11,13 +11,15 @@ The system implements a four-stage "Waterfall Filter" architecture:
 1.  **Ingestion (Fetcher):**
     *   Monitors RSS feeds and APIs (AGU, EGU, AMS, Springer, etc.).
 2.  **Relevance Filtering (Local):**
-    *   **Engine:** Ollama (Llama 3 8B or similar).
+    *   **Engine:** Ollama (`llama3.1:8b`).
     *   **Input:** Title and Abstract.
     *   **Logic:** Binary classification (Interesting: YES/NO).
+    *   **Characteristics:** High-throughput local processing (~6s/abstract, ~20 min/day for ~200 candidates), zero API cost, no external quota limits.
 3.  **Processing & Synthesis (Remote):**
-    *   **Engine:** Gemini 1.5 Pro or Claude 3.5 Sonnet (via API).
-    *   **Input:** Full PDF text.
-    *   **Output:** structured "Extended Card" (Fitxa Estesa).
+    *   **Engine:** Gemini API (`gemini-2.5-flash` via Google GenAI SDK).
+    *   **Input:** Full PDF text or HTML extraction.
+    *   **Output:** Structured "Extended Card" (Fitxa Estesa).
+    *   **Characteristics:** Near-instant (5–10s/paper), 1M token context window (prevents CPU timeouts on large texts), 0€ cost within Google AI Studio's free tier (20 requests/day covers the 2–6 daily relevant papers). Automatic fallback to local Ollama if remote API is unavailable.
 4.  **Presentation (Static Site):**
     *   **Output:** Static HTML website.
     *   **Structure:**

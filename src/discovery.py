@@ -183,7 +183,7 @@ class Discovery:
             all_papers.extend(papers)
             
             if len(ids) > batch_size:
-                time.sleep(0.5) # Politeness delay for large batches
+                time.sleep(1.0) # Politeness delay for large batches
                 
         return all_papers
 
@@ -208,7 +208,7 @@ class Discovery:
             all_papers.extend(papers)
             
             if len(ids) > batch_size:
-                time.sleep(0.5)
+                time.sleep(1.0)
                 
         return all_papers
 
@@ -265,7 +265,7 @@ class Discovery:
         })
         return self._fetch_openalex(params, ignore_seen=ignore_seen)
 
-    @retry(requests.exceptions.RequestException, tries=3, delay=2)
+    @retry(requests.exceptions.RequestException, tries=4, delay=3, backoff=2)
     def _fetch_openalex(self, params: dict, ignore_seen: bool = False) -> List[Paper]:
         all_papers = []
         current_params = params.copy()

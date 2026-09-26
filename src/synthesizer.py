@@ -68,8 +68,13 @@ class Synthesizer:
                 content = self._synthesize_ollama(full_text)
                 model_display = f"{OLLAMA_MODEL} (Ollama)"
             elif self.engine == "gemini-api":
-                content = self._synthesize_gemini_api(full_text)
-                model_display = f"{GEMINI_MODEL} (Google API)"
+                try:
+                    content = self._synthesize_gemini_api(full_text)
+                    model_display = f"{GEMINI_MODEL} (Google API)"
+                except Exception as e:
+                    logger.warning(f"Gemini API synthesis failed ({e}). Falling back to Ollama...")
+                    content = self._synthesize_ollama(full_text)
+                    model_display = f"{OLLAMA_MODEL} (Ollama fallback)"
             else:
                 content = self._synthesize_gemini(full_text)
                 model_display = "Gemini CLI"
@@ -224,44 +229,44 @@ class Synthesizer:
         
         return section
 
-    @retry(Exception, tries=3, delay=10)
+    @retry(Exception, tries=3, delay=5)
     def _synthesize_gemini_api(self, full_text: str) -> str:
         """Uses the new Google GenAI SDK."""
         if not GEMINI_API_KEY:
             logger.error("GEMINI_API_KEY not found in environment.")
-            return ""
+            raise ValueError("GEMINI_API_KEY not found in environment.")
             
-        try:
-            from google import genai
-            client = genai.Client(api_key=GEMINI_API_KEY)
-            
-            response = client.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=f"{SYNTHESIS_PROMPT}\n\nPAPER TEXT:\n{full_text}",
-                config={
-                    "temperature": 0.2,
-                }
-            )
-            
-            if response and response.text:
-                # Record usage
-                try:
-                    usage = response.usage_metadata
-                    # Costs for Gemini 1.5 Flash (approximate)
-                    # Input: $0.10 / 1M tokens, Output: $0.40 / 1M tokens
-                    cost = (usage.prompt_token_count * 0.10 / 1_000_000) + (usage.candidates_token_count * 0.40 / 1_000_000)
-                    db.add_usage(GEMINI_MODEL, usage.prompt_token_count, usage.candidates_token_count, cost)
-                except Exception as e:
-                    logger.warning(f"Could not record usage: {e}")
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=f"{SYNTHESIS_PROMPT}\n\nPAPER TEXT:\n{full_text}",
+            config={
+                "temperature": 0.2,
+            }
+        )
+        
+        if response and response.text:
+            # Record usage
+            try:
+                usage = response.usage_metadata
+                # Costs for Gemini 1.5/2.5 Flash (approximate)
+                cost = (usage.prompt_token_count * 0.10 / 1_000_000) + (usage.candidates_token_count * 0.40 / 1_000_000)
+                db.add_usage(GEMINI_MODEL, usage.prompt_token_count, usage.candidates_token_count, cost)
+            except Exception as e:
+                logger.warning(f"Could not record usage: {e}")
 
-                return self._clean_output(response.text)
-            return ""
-        except Exception as e:
-            logger.error(f"Gemini API synthesis error: {e}")
-            return ""
+            return self._clean_output(response.text)
+        return ""
 
     @retry(requests.exceptions.RequestException, tries=3, delay=10)
     def _synthesize_ollama(self, full_text: str) -> str:
+        # Cap text length to avoid CPU timeouts on local inference
+        if len(full_text) > 35000:
+            logger.info(f"Trimming full text from {len(full_text)} to 35000 chars for local Ollama synthesis.")
+            full_text = full_text[:35000] + "\n\n[... Text truncated for local processing ...]"
+
         url = f"{OLLAMA_HOST}/api/generate"
         prompt = f"{SYNTHESIS_PROMPT}\n\nPAPER TEXT:\n{full_text}"
         

@@ -5,9 +5,9 @@
 ## Features
 
 - **Waterfall Filter Architecture:**
-  - **Ingestion:** Monitors RSS feeds from major journals (AGU, EGU, AMS, Springer, etc.).
-  - **Relevance Filtering:** Local processing using **Ollama** (e.g., Llama 3 or DeepSeek-R1) to maintain privacy and reduce costs.
-  - **Synthesis:** Deep synthesis of relevant content using advanced LLMs (Ollama/DeepSeek or Gemini API).
+  - **Ingestion:** Monitors RSS feeds and OpenAlex for author publications, citations, and journal updates.
+  - **Relevance Filtering:** High-throughput local processing using **Ollama** (recommended: `llama3.1:8b`) to maintain privacy, eliminate API costs, and evaluate hundreds of abstracts daily without quota limits.
+  - **Synthesis:** Deep synthesis of identified relevant papers into structured "Extended Cards" using **Google Gemini API** (`gemini-2.5-flash`). Because only 2–6 papers are typically synthesized per day, this fits comfortably within Gemini's free tier (up to 20 requests/day at 0€ cost) while providing 1M token context window and near-instant processing (5–10s per paper) without local CPU timeouts.
 - **Full-Text Extraction:** Automated PDF download and text extraction (with HTML fallback).
 - **Static Site Generation:** Beautiful, bookish-style website for browsing summaries.
 - **MathJax Support:** High-quality rendering of LaTeX equations.
@@ -19,7 +19,7 @@
 - **Python 3.12+**
 - **[uv](https://github.com/astral-sh/uv)** (Python package and project manager)
 - **[Ollama](https://ollama.com/)** (for local LLM processing)
-- **Optional:** [Gemini CLI](https://github.com/google/gemini-cli) (if using Gemini for synthesis)
+- **Optional / Recommended:** Google Gemini API Key from [Google AI Studio](https://aistudio.google.com/) for synthesis
 
 ## Setup
 
@@ -36,23 +36,31 @@
    ```
 
 3. **Configure Ollama:**
-   Pull the required models (e.g., DeepSeek-R1 14B):
+   Pull the recommended local model for relevance filtering:
    ```bash
-   ollama pull deepseek-r1:14b
+   ollama pull llama3.1:8b
    ```
 
 4. **Environment Variables:**
-   Create a `.env` file (or set variables in your shell) for sensitive or environment-specific configuration:
+   Copy `.env.example` to `.env` and adjust your configuration:
    ```bash
-   # LLM Configuration
-   SYNTHESIS_ENGINE=gemini-api           # 'ollama' or 'gemini-api'
-   GEMINI_API_KEY=your_api_key_here
-   GEMINI_MODEL=gemini-flash-latest      # Defaults to gemini-flash-latest
-   
-   # Local Ollama Settings (Optional)
+   cp .env.example .env
+   ```
+
+   Key configuration settings:
+   ```bash
+   # Relevance Filtering Engine (Local Ollama is recommended)
+   RELEVANCE_ENGINE=ollama
+   OLLAMA_FILTER_MODEL=llama3.1:8b
    OLLAMA_HOST=http://localhost:11434
-   OLLAMA_MODEL=deepseek-r1:14b          # Model used for synthesis
-   OLLAMA_FILTER_MODEL=llama3.1:8b       # Model used for relevance filtering
+   
+   # Synthesis Engine (Gemini API is recommended)
+   SYNTHESIS_ENGINE=gemini-api
+   GEMINI_API_KEY=your_gemini_api_key_here
+   GEMINI_MODEL=gemini-2.5-flash
+   
+   # Ollama Fallback / Local Synthesis Model
+   OLLAMA_MODEL=gemma4:31b
    
    # Budget Control
    MAX_MONTHLY_COST=10.0                 # Maximum monthly spend in Euro
