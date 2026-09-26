@@ -2,16 +2,22 @@ import requests
 import time
 from datetime import datetime
 from typing import List
-from src.config import OPENALEX_EMAIL, DISCOVERY_TASKS, MIN_JOURNAL_H_INDEX, MIN_JOURNAL_IMPACT_FACTOR
+from src.config import OPENALEX_EMAIL, OPENALEX_API_KEY, DISCOVERY_TASKS, MIN_JOURNAL_H_INDEX, MIN_JOURNAL_IMPACT_FACTOR
 from src.models import Paper
 from src.logger import logger
 from src.db import db
 from src.utils import retry
 
 class Discovery:
-    def __init__(self, email: str = OPENALEX_EMAIL, from_date: str = None, to_date: str = None):
+    def __init__(self, email: str = OPENALEX_EMAIL, api_key: str = OPENALEX_API_KEY, from_date: str = None, to_date: str = None):
         self.base_url = "https://api.openalex.org/works"
-        self.params = {"mailto": email} if email else {}
+        self.email = email
+        self.api_key = api_key
+        self.params = {}
+        if email:
+            self.params["mailto"] = email
+        if api_key:
+            self.params["api_key"] = api_key
         
         # Determine Start Date: Priority override -> Last run from DB -> fallback to 90 days
         from datetime import timedelta
@@ -35,6 +41,18 @@ class Discovery:
             logger.info(f"Discovery ending at override date: {self.to_date}")
         else:
             self.to_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
+
+    @retry(requests.exceptions.RequestException, tries=4, delay=3, backoff=2)
+    def _get_json(self, params: dict, timeout: int = 30) -> dict:
+        """Helper to execute an HTTP GET against OpenAlex with retries and authentication."""
+        headers = {}
+        if self.email:
+            headers["User-Agent"] = f"mailto:{self.email}"
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+        response = requests.get(self.base_url, params=params, headers=headers, timeout=timeout)
+        response.raise_for_status()
+        return response.json()
 
     def run_all_tasks(self, ignore_seen: bool = False) -> List[Paper]:
         """Executes all discovery tasks defined in config and DB."""
@@ -106,9 +124,7 @@ class Discovery:
         ids = []
         try:
             while True:
-                response = requests.get(self.base_url, params=params, timeout=30)
-                response.raise_for_status()
-                data = response.json()
+                data = self._get_json(params, timeout=30)
                 
                 results = data.get("results", [])
                 if not results:
@@ -230,9 +246,8 @@ class Discovery:
             "select": "id"
         })
         try:
-            response = requests.get(self.base_url, params=params, timeout=20)
-            response.raise_for_status()
-            results = response.json().get("results", [])
+            data = self._get_json(params, timeout=20)
+            results = data.get("results", [])
             if results:
                 work_id = results[0].get("id").split("/")[-1]
                 return self.search_by_citing_id(work_id)
@@ -265,7 +280,6 @@ class Discovery:
         })
         return self._fetch_openalex(params, ignore_seen=ignore_seen)
 
-    @retry(requests.exceptions.RequestException, tries=4, delay=3, backoff=2)
     def _fetch_openalex(self, params: dict, ignore_seen: bool = False) -> List[Paper]:
         all_papers = []
         current_params = params.copy()
@@ -286,9 +300,7 @@ class Discovery:
                 page_count += 1
                 logger.debug(f"Fetching OpenAlex page {page_count}...")
                 
-                response = requests.get(self.base_url, params=current_params, timeout=30)
-                response.raise_for_status()
-                data = response.json()
+                data = self._get_json(current_params, timeout=30)
                 
                 results = data.get("results", [])
                 if not results:

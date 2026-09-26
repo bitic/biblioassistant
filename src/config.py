@@ -44,6 +44,7 @@ MAX_MONTHLY_COST = float(os.getenv("MAX_MONTHLY_COST", "10.0"))
 
 # OpenAlex Discovery
 OPENALEX_EMAIL = os.getenv("OPENALEX_EMAIL", "your-email@example.com")
+OPENALEX_API_KEY = os.getenv("OPENALEX_API_KEY")
 # Journal Quality Defaults (OpenAlex metrics)
 MIN_JOURNAL_H_INDEX = int(os.getenv("MIN_JOURNAL_H_INDEX", "50"))
 MIN_JOURNAL_IMPACT_FACTOR = float(os.getenv("MIN_JOURNAL_IMPACT_FACTOR", "2.0"))
