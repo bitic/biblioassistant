@@ -221,15 +221,36 @@ class Database:
                     cursor = conn.cursor()
                     if processed_date:
                         cursor.execute(
-                            'INSERT INTO seen_papers (link, doi, title, source_id, processed_date, type, source_url, is_relevant, relevance_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                            '''
+                            INSERT INTO seen_papers (link, doi, title, source_id, processed_date, type, source_url, is_relevant, relevance_reason)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ON CONFLICT(link) DO UPDATE SET
+                                doi=COALESCE(excluded.doi, seen_papers.doi),
+                                title=COALESCE(excluded.title, seen_papers.title),
+                                source_id=COALESCE(excluded.source_id, seen_papers.source_id),
+                                is_relevant=excluded.is_relevant,
+                                relevance_reason=COALESCE(excluded.relevance_reason, seen_papers.relevance_reason)
+                            RETURNING id
+                            ''', 
                             (link, doi, title, source_id, processed_date, type, source_url, rel_int, relevance_reason)
                         )
                     else:
                         cursor.execute(
-                            'INSERT INTO seen_papers (link, doi, title, source_id, type, source_url, is_relevant, relevance_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+                            '''
+                            INSERT INTO seen_papers (link, doi, title, source_id, type, source_url, is_relevant, relevance_reason)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            ON CONFLICT(link) DO UPDATE SET
+                                doi=COALESCE(excluded.doi, seen_papers.doi),
+                                title=COALESCE(excluded.title, seen_papers.title),
+                                source_id=COALESCE(excluded.source_id, seen_papers.source_id),
+                                is_relevant=excluded.is_relevant,
+                                relevance_reason=COALESCE(excluded.relevance_reason, seen_papers.relevance_reason)
+                            RETURNING id
+                            ''', 
                             (link, doi, title, source_id, type, source_url, rel_int, relevance_reason)
                         )
-                    paper_id = cursor.lastrowid
+                    row = cursor.fetchone()
+                    paper_id = row[0] if row else cursor.lastrowid
                     
                     # Record journal metadata if available
                     if source_id:
@@ -272,6 +293,9 @@ class Database:
                 else:
                     logger.error(f"Database error in add_seen: {e}")
                     break
+            except Exception as e:
+                logger.error(f"Unexpected error in add_seen: {e}")
+                break
 
     def get_recent_papers_by_days(self, days: int = 7) -> list:
         """Returns list of papers processed in the last X days for filter audit."""

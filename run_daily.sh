@@ -10,6 +10,14 @@ LOG_FILE="$PROJECT_DIR/data/cron.log"
 # Ensure the data directory exists for logging
 mkdir -p "$PROJECT_DIR/data"
 
+# Ensure only one instance of the pipeline runs at any given time
+LOCK_FILE="/tmp/biblioassistant_daily.lock"
+exec 200>"$LOCK_FILE"
+if ! flock -n 200; then
+    echo "[$(date)] WARNING: Another instance of BiblioAssistant is already running. Skipping run." >> "$LOG_FILE"
+    exit 0
+fi
+
 echo "--- Pipeline Run Started: $(date) ---" >> "$LOG_FILE"
 
 # 1. Navigate to project directory
